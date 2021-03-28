@@ -1,0 +1,178 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- https://github.com/hostettler/microservices/blob/master/pom.xml -->
+    <groupId>ch.unige</groupId>
+    <artifactId>moviet-microservices</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <name>Moviet Microservices</name>
+
+    <packaging>pom</packaging> <!-- because it is the super pom -->
+
+    <modules> <!-- define modules -->
+        <module>group-service</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <java-ee-api.version>8.0.1</java-ee-api.version>
+        <version.thorntail>2.7.0.Final</version.thorntail> <!-- careful about the version -->
+
+        <failOnMissingWebXml>false</failOnMissingWebXml>
+        <!-- Added for building docker images -->
+        <skip-docker-build>true</skip-docker-build>
+        <!-- has to set it to true in the super-pom because do not want to build a Docker image for it but false in modules pom-->
+        <dockerHost>tcp://localhost:2375</dockerHost> <!-- need to search why these values in particular -->
+    </properties>
+
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.thorntail</groupId>
+                <artifactId>bom-all</artifactId>
+                <version>${version.thorntail}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- BUILD -->
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+
+                    <configuration>
+                        <configuration>
+                            <source>${maven.compiler.source}</source>
+                            <target>${maven.compiler.target}</target>
+                        </configuration>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>io.thorntail</groupId>
+                    <artifactId>thorntail-maven-plugin</artifactId>
+                    <version>${version.thorntail}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>fabric8-maven-plugin</artifactId>
+                    <version>4.4.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <!-- -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>io.thorntail</groupId>
+                <artifactId>thorntail-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+    </build>
+
+    <!-- profiles copied from https://github.com/PInfo-2020/Exercises/blob/master/maven/super-project/pom.xml-->
+    <profiles>
+        <profile>
+            <id>activate_windows</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <properties>
+                <dockerHost>tcp://localhost:2375</dockerHost>
+            </properties>
+        </profile>
+        <profile>
+            <id>activation_unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <properties>
+                <dockerHost>unix:///var/run/docker.sock</dockerHost>
+            </properties>
+        </profile>
+        <profile>
+            <id>package-docker-image</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>fabric8-maven-plugin</artifactId>
+                        <configuration>
+                            <skip>${skip-docker-build}</skip>
+                            <useColor>true</useColor>
+                            <dockerHost>${dockerHost}</dockerHost>
+                            <images>
+                                <image>
+                                    <name>%g/%a:%l</name>
+                                    <run>
+                                        <ports>
+                                            <port>8080:8080</port>
+                                        </ports>
+                                    </run>
+                                    <build>
+                                        <from>java:openjdk-8-jdk</from>
+                                        <ports>
+                                            <port>8080</port>
+                                        </ports>
+                                        <assembly>
+                                            <basedir>/</basedir>
+                                            <inline>
+                                                <files>
+                                                    <file>
+                                                        <source>${project.build.directory}/${project.build.finalName}-thorntail.jar</source>
+                                                        <outputDirectory>/opt</outputDirectory>
+                                                    </file>
+                                                </files>
+                                            </inline>
+                                        </assembly>
+                                        <entryPoint>
+                                            <shell>java -Djava.net.preferIPv4Stack=true -jar \
+                                                /opt/${project.build.finalName}-thorntail.jar</shell>
+                                        </entryPoint>
+                                    </build>
+                                </image>
+                            </images>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>
