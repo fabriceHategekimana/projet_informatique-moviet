@@ -1,5 +1,5 @@
-# projet_informatique-moviet
-The project for projets informatics
+# Moviet project
+The project for projets informatics (pinfo)
 
 Member:
 - Mohsen
@@ -9,7 +9,9 @@ Member:
 - Raphaël
 - Fabrice
 
-# Build
+---
+# Run locally
+## Build
 
 In the current directory:
 ```bash
@@ -33,7 +35,7 @@ Output should look like:
 ```
 
 
-# Docker images
+## Docker images
 
 We have to make sure first that the docker daemon is running (with `ps -a` and check if `dockerd` is running, other do `sudo dockerd`)
 ```bash
@@ -69,7 +71,7 @@ Output should look like:
 unige/group-service                             latest          e66e2588a92f   3 minutes ago   706MB
 ```
 
-## Start a single docker container
+### Start a single docker container
 For the `group-service`, we can do this:
 ```bash
 $ docker run -p 10080:8080 --name=group-service unige/group-service & 
