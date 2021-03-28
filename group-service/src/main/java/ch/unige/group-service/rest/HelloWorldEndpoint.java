@@ -12,6 +12,6 @@ public class HelloWorldEndpoint {
     @GET
     @Produces("text/plain")
     public Response doGet() {
-        return Response.ok("Hello from Subproject 1!").build();
+        return Response.ok("Hello from group-service!").build();
     }
 }
