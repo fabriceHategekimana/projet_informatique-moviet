@@ -1,0 +1,147 @@
+version: "3.5"
+
+services:
+
+  #Zookeeper service provides distributed configuration management to Kafka
+  zookeeper:
+    image: zookeeper:3.4.9
+    container_name: zookeeper 
+    hostname: zookeeper
+    networks:
+      - backend-network
+    ports:
+      - "2181:2181"
+    environment:
+        ZOO_MY_ID: 1
+        ZOO_PORT: 2181
+        ZOO_SERVERS: server.1=zookeeper:2888:3888
+    volumes:
+      - ./target/zk-single-kafka-single/zoo1/data:/data
+      - ./target/zk-single-kafka-single/zoo1/datalog:/datalog
+
+#   kafka is the messaging backbone of the micro-service architecture. The objective is avoid point 2 point connections.
+  kafka:
+    image: confluentinc/cp-kafka:5.1.0
+    container_name: kafka 
+    hostname: kafka
+    networks:
+      - backend-network    
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka:19092,LISTENER_DOCKER_EXTERNAL://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_BROKER_ID: 1
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    volumes:
+      - ./target/zk-single-kafka-single/kafka1/data:/var/lib/kafka/data
+    depends_on:
+      - zookeeper
+
+  counterparty-database:
+    image: postgres:10
+    container_name: counterparty-database
+    hostname: counterparty-database
+    networks:
+     - backend-network
+    environment:
+      POSTGRES_USER: cpty
+      POSTGRES_PASSWORD: cpty
+      POSTGRES_DB: counterparty
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "cpty", "-d", "counterparty"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    volumes:
+      - pgdata-cpty:/var/lib/postgresql/data
+      - ./test-data/counterparties/:/docker-entrypoint-initdb.d/
+    restart: on-failure
+    stdin_open: true
+    tty: true
+
+  #The counterparty service provides counterparty data, it is also the single version of truth for these data
+  counterparty-service:
+    container_name: counterparty-service    
+    image: unige/counterparty-service:latest
+    hostname: counterparty-service
+    environment:
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COUNTERPARTYDS_CONNECTION_DASH_URL: "jdbc:postgresql://counterparty-database:5432/counterparty"
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COUNTERPARTYDS_DRIVER_DASH_NAME: 'postgresql'   
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COUNTERPARTYDS_USER_DASH_NAME: 'cpty'
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COUNTERPARTYDS_PASSWORD: 'cpty'
+    networks:
+      - backend-network    
+    ports:
+      - "10080:28080"
+    depends_on:
+       - counterparty-database
+
+  instrument-database:
+    image: postgres:10
+    container_name: instrument-database
+    hostname: instrument-database
+    networks:
+     - backend-network
+    environment:
+      POSTGRES_USER: inst
+      POSTGRES_PASSWORD: inst
+      POSTGRES_DB: instrument
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "inst", "-d", "instrument"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    volumes:
+      - pgdata-inst:/var/lib/postgresql/data
+      - ./test-data/instruments/:/docker-entrypoint-initdb.d/
+    restart: on-failure
+    stdin_open: true
+    tty: true
+    
+  instrument-service:
+    container_name: instrument-service    
+    image: unige/instrument-service:latest
+    hostname: instrument-service
+    networks:
+      - backend-network
+    ports:
+      - "11080:28080"
+    environment:
+      THORNTAIL_KAFKA_DASH_CONFIGURATION_HOST: "kafka"
+      THORNTAIL_KAFKA_DASH_CONFIGURATION_PORT: "9092"
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_INSTRUMENTDS_CONNECTION_DASH_URL: "jdbc:postgresql://instrument-database:5432/instrument"
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_INSTRUMENTDS_DRIVER_DASH_NAME: 'postgresql'   
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_INSTRUMENTDS_USER_DASH_NAME: 'inst'
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_INSTRUMENTDS_PASSWORD: 'inst'      
+    depends_on:
+       - kafka
+       - instrument-database
+
+  valuation-service:
+    container_name: valuation-service    
+    image: unige/valuation-service:latest
+    hostname: valuation-service
+    networks:
+      - backend-network
+    ports:
+      - "12080:28080"
+    environment:
+      THORNTAIL_KAFKA_DASH_CONFIGURATION_HOST: "kafka"
+      THORNTAIL_KAFKA_DASH_CONFIGURATION_PORT: "9092"      
+    depends_on:
+       - kafka
+       - instrument-service   
+
+volumes:
+   pgdata-cpty:
+   pgdata-inst:
+  
+
+networks:
+  backend-network:
+    driver: bridge
