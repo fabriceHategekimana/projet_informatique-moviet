@@ -10,7 +10,28 @@ Member:
 - Fabrice
 
 ---
-# Run locally
+# Run locally using scripts
+
+## Build project and Docker images and run Docker containers
+
+Make the file executable then run the script:
+```bash
+$ chmod u+x scripts/run_locally.sh
+
+$ ./scripts/run_locally.sh
+```
+
+## Kill and remove Docker containers
+Make the file executable then run the script:
+```bash
+$ chmod u+x scripts/kill_remove_containers.sh
+
+$ ./scripts/kill_remove_containers.sh
+```
+
+```
+
+# Run locally manually
 
 All commands should be in super-user.
 
