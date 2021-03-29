@@ -14,12 +14,13 @@ Member:
 
 ## Build project and Docker images and run Docker containers
 
-Make the file executable then run the script:
+Make the file executable then run the script (but make sure no Docker containers with same name are currently running otherwise use the `kill_remove_containers.sh` script before running `run_locally.sh`):
 ```bash
 $ chmod u+x scripts/run_locally.sh
 
 $ ./scripts/run_locally.sh
 ```
+
 
 ## Kill and remove Docker containers
 Make the file executable then run the script:
