@@ -11,6 +11,9 @@ Member:
 
 ---
 # Run locally
+
+All commands should be in super-user.
+
 ## Build
 
 In the current directory:
@@ -37,13 +40,14 @@ Output should look like:
 
 ## Docker images
 
-We have to make sure first that the docker daemon is running (with `ps -a` and check if `dockerd` is running, other do `sudo dockerd`)
+We have to make sure first that the docker daemon is running (with `ps -a` and check if `dockerd` is running, otherwise do `sudo dockerd`)
 ```bash
 $ mvn install -Ppackage-docker-image
 ```
 
 Output should look like:
 ```
+...
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary for Moviet Microservices 0.1.0-SNAPSHOT:
 [INFO]
