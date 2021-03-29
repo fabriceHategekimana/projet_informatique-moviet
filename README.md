@@ -29,8 +29,6 @@ $ chmod u+x scripts/kill_remove_containers.sh
 $ ./scripts/kill_remove_containers.sh
 ```
 
-```
-
 # Run locally manually
 
 All commands should be in super-user.
