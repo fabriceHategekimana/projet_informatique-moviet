@@ -49,6 +49,16 @@
                 <type>pom</type>
             </dependency>
 
+            <!-- Lombok : annotations -->
+            <!-- https://projectlombok.org/setup/maven , https://projectlombok.org/features/all-->
+            <!-- http://anthonywhitford.com/lombok.maven/lombok-maven-plugin/usage.html -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.20</version>
+                <scope>provided</scope>
+            </dependency>
+
             <!-- Unit Testing -->
             <!-- http://maven.apache.org/surefire/maven-surefire-plugin/examples/junit-platform.html -->
             <dependency>
@@ -85,6 +95,50 @@
 
         </dependencies>
     </dependencyManagement>
+
+    <!-- https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html -->
+    <dependencies>
+        <!-- Lombok : annotations -->
+        <!-- https://projectlombok.org/setup/maven , https://projectlombok.org/features/all-->
+        <!-- http://anthonywhitford.com/lombok.maven/lombok-maven-plugin/usage.html -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.20</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Unit Testing -->
+        <!-- http://maven.apache.org/surefire/maven-surefire-plugin/examples/junit-platform.html -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${version.junit}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+        <!-- Maybe add later junit-jupiter-api and junit-platform-launcher version 1.6.0, not sure if useful-->
+
+        <!-- Mockito : Mocks, used for test -->
+        <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
+        <!-- https://mvnrepository.com/artifact/org.mockito -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
 
     <!-- BUILD -->
     <build>
