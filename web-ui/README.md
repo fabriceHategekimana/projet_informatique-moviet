@@ -1,15 +1,23 @@
 # WebUi
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.2.6.
+## install nodjs (v14)
+
+`curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -`\
+`sudo apt-get install -y nodejs`\
+`sudo n latest`\
+`npm cache clean -f`\
+`npm install -g n`\
+`sudo n stable`
 
 ## Development server
 
-Run `ng serve` (or `serve --poll=2000` if live-refresh does not work) for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+`cd web-ui`\
+`npm install`\
+
+Run `ng serve` (or `ng serve --poll=2000` if live-refresh does not work) for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 If it doesn't work:
 
-`cd web-ui`\
-`npm install`\
 `npm audit fix`
 
 If it still doesn't work:
