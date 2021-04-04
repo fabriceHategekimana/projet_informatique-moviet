@@ -4,7 +4,20 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run `ng serve` (or `serve --poll=2000` if live-refresh does not work) for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+
+If it doesn't work:
+
+`cd web-ui`
+`npm install`
+`npm audit fix`
+
+If it still doesn't work:
+
+`npm uninstall -g @angular/cli`
+`npm cache verify`
+`npm install -g @angular/cli@next`
+ `npm update`
 
 ## Code scaffolding
 
