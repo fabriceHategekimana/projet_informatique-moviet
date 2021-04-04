@@ -8,15 +8,15 @@ Run `ng serve` (or `serve --poll=2000` if live-refresh does not work) for a dev 
 
 If it doesn't work:
 
-`cd web-ui`
-`npm install`
+`cd web-ui`\
+`npm install`\
 `npm audit fix`
 
 If it still doesn't work:
 
-`npm uninstall -g @angular/cli`
-`npm cache verify`
-`npm install -g @angular/cli@next`
+`npm uninstall -g @angular/cli`\
+`npm cache verify`\
+`npm install -g @angular/cli@next`\
  `npm update`
 
 ## Code scaffolding
