@@ -13,6 +13,7 @@
 
     <modules> <!-- define modules -->
         <module>group-service</module>
+        <!-- Add here if need to add a module ! In the module, you have to define the parent -->
     </modules>
 
     <properties>
@@ -31,14 +32,16 @@
         <java-ee-api.version>8.0.1</java-ee-api.version>
         <version.thorntail>2.7.0.Final</version.thorntail> <!-- careful about the version -->
 
+        <!-- used to bypass some warning, say to maven that we do not need web xml -->
         <failOnMissingWebXml>false</failOnMissingWebXml>
-        <!-- Added for building docker images -->
+
+        <!-- Added for building docker images, only building for modules, /!\ need to set to false for modules -->
         <skip-docker-build>true</skip-docker-build>
         <!-- has to set it to true in the super-pom because do not want to build a Docker image for it but false in modules pom-->
         <dockerHost>tcp://localhost:2375</dockerHost> <!-- need to search why these values in particular -->
     </properties>
 
-
+    <!-- More information : https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html -->
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -192,6 +195,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
+            <!-- Packaging -->
             <plugin>
                 <groupId>io.thorntail</groupId>
                 <artifactId>thorntail-maven-plugin</artifactId>
@@ -231,6 +235,7 @@
                 <dockerHost>unix:///var/run/docker.sock</dockerHost>
             </properties>
         </profile>
+        <!-- To obtain docker images -->
         <profile>
             <id>package-docker-image</id>
             <build>
