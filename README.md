@@ -103,4 +103,4 @@ $ docker run -p 10080:8080 --name=group-service unige/group-service &
 ```
 The `&` specifies that we want the process to be in background. We should see `Thorntail is Ready`.
 
-We can check that it works by going to `localhost:10080/hello1` to see the message `Hello from group-service!`
+We can check that it works by going to `localhost:10080/groups` to see all the groups and `http://localhost:10080/groups/{id}` with `{id}` being the id of an existant group in the list of groups, for instance `42`: `http://localhost:10080/groups/42` (Currently, the "no group corresponding to the id" is not handled).
