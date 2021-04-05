@@ -27,6 +27,8 @@ import domain.service.GroupServiceImpl;
 // maybe add ApplicationScoped later
 @Path("/groups")
 public class GroupRestService {
+    // Endpoint
+
     /*
     @Inject
     private GroupService groupService;
@@ -60,8 +62,28 @@ public class GroupRestService {
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Group getGroup(@PathParam("id") String id) {
+    public Response getGroup(@PathParam("id") String id) {
         // need String instead of Integer otherwise we would have a conversion in the parameters !
-        return groupService.getGroup(id);
+
+        // check parameters
+        if (id == null || !id.chars().allMatch(Character::isLetterOrDigit)) {
+            //https://www.techiedelight.com/check-string-contains-alphanumeric-characters-java/#:~:text=The%20idea%20is%20to%20use,matches%20the%20given%20regular%20expression.
+
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        Group group=groupService.getGroup(id);
+        if (group == null) { // group not found
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        // group exists
+        return Response.ok(group).build();
+
     }
+    /*
+    https://stackoverflow.com/questions/4687271/jax-rs-how-to-return-json-and-http-status-code-together
+    https://docs.oracle.com/javaee/7/api/javax/ws/rs/core/Response.Status.html
+    https://docs.oracle.com/javaee/7/api/javax/ws/rs/core/Response.html
+
+    Just to try something : Response.ok(groupService.getGroup(id)).header("hello",42).build();
+    */
 }
