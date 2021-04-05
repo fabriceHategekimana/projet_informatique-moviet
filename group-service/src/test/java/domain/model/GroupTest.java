@@ -7,28 +7,20 @@ import org.junit.jupiter.api.Test;
 
 // just a test for unit testing
 public class GroupTest {
-    private final Group group=new Group(1);
+    private final Group group=new Group("1");
 
     @Test // if forget to put this : test not launched
     void testGetId(){
-        assertEquals(1, group.getId() );
+        assertEquals("1", group.getId() );
         //assertEquals(true, true);
     }
 
     @Test
     void testSetId(){
-        group.setId(10);
-        assertEquals(10, group.getId() );
+        group.setId("10");
+        assertEquals("10", group.getId() );
         //assertEquals(true, true);
     }
 
-    // fail the test to see -> Build failure
-    /*
-    @Test
-    void testFailSetId(){
-        group.setId(6);
-        assertEquals(11, group.getId() );
-        //assertEquals(true, true);
-    }
-    */
+    // fail a test -> Build failure
 }
