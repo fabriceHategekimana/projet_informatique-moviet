@@ -8,5 +8,7 @@ import lombok.AllArgsConstructor;
 @Data
 @AllArgsConstructor // without this : empty constructor generated
 public class Group {
-    private Integer id;
+    private String id;
+    // need to be a String for http://localhost:10080/groups/{id} to work, otherwise we would have a conversion
+    // from string to integer and getGroup wouldn't work as intuitively expected
 }
