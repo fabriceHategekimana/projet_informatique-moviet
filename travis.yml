@@ -1,0 +1,12 @@
+language: java
+java:
+ - 11.0.10
+install:
+
+script:
+deploy:
+ provider: pages
+ skip-cleanup: true
+ github-token: $GITHUB_TOKEN
+ on:
+	branch: main
