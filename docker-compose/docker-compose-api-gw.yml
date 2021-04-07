@@ -25,7 +25,7 @@ services:
     tty: true
             
    api-gateway:
-    image: test/api-gateway
+    image: moviet/api-gateway
     container_name:  api-gateway
     hostname:  api-gateway
     networks:
