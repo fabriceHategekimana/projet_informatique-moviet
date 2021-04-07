@@ -13,6 +13,7 @@
 
     <modules> <!-- define modules -->
         <module>group-service</module>
+        <module>tmdb-requests</module>
         <!-- Add here if need to add a module ! In the module, you have to define the parent -->
     </modules>
 
