@@ -22,7 +22,7 @@ public class WatchProvidersExample {
         String country = "FR";  // ISO 3166-1
 
         // !!! Should be gotten through configuration. DO NOT DO THIS. see DataExample.java
-        String base_url = "https://image.tmdb.org/t/p"
+        String base_url = "https://image.tmdb.org/t/p";
 
         MoviesService moviesService = tmdb.moviesService();
         try {
