@@ -1,0 +1,13 @@
+.form-container {
+    padding-top: 5em;
+}
+
+.form-box {
+    padding: 2em;
+    margin: auto;
+    width: 25em;
+    border: 1px solid grey;
+    border-radius: 2em;
+    background-color: whitesmoke;
+    vertical-align: middle;
+}

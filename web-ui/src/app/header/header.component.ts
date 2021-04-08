@@ -8,6 +8,8 @@ import { Location } from '@angular/common';
 })
 export class HeaderComponent implements OnInit {
 
+  isTogglerShown = false; // true if the toggler is displayed
+
   constructor(private location: Location) { }
 
   ngOnInit(): void {
