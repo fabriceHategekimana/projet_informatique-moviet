@@ -7,7 +7,9 @@ html, body {
     margin: 0;
 }
 
+/* used to blur a div */
 .blur-box {
+    justify-content: center;
     position: absolute;
     top: 0;
     width: 100%;
@@ -16,4 +18,25 @@ html, body {
     padding: 0;
     /* blur */
     backdrop-filter: blur(6px);
+}
+
+.background-box{
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    z-index: -9999;
+}
+
+.page-container {
+    padding-top: 3em;
+    height: 100%;
+    margin: 0;
+    position: relative;
 }

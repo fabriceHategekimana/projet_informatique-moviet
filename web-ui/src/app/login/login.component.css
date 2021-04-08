@@ -1,16 +1,9 @@
-.form-container {
-    padding-top: 3em;
-    height: 100%;
-    margin: 0;
-    position: relative;
-}
-
 .form-box {
-    position: fixed;
+    position: relative;
     top: 50%;
     left: 50%;
     /* center the div */
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -110%);
     padding: 2em;
     margin: 0;
     width: 25em;
@@ -23,9 +16,6 @@
 }
 
 /* background */
-.form-container {
+.background-box {
     background-image: url("../../assets/background/background-login.jpg");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
 }
