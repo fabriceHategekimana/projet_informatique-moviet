@@ -1,0 +1,14 @@
+/* background */
+.background-box {
+    background-image: url("../../assets/background/background-home.jpg");
+}
+
+.page-container {
+    color: white;
+}
+
+#home-title-container {
+    position: relative;
+    top: 50%;
+    transform: translateY(-65%);
+}

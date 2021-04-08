@@ -12,7 +12,7 @@
 ## Development server
 
 `cd web-ui`\
-`npm install`\
+`npm install`
 
 Run `ng serve` (or `ng serve --poll=2000` if live-refresh does not work) for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
