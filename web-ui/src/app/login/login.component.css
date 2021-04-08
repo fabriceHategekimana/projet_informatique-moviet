@@ -1,13 +1,31 @@
 .form-container {
-    padding-top: 5em;
+    padding-top: 3em;
+    height: 100%;
+    margin: 0;
+    position: relative;
 }
 
 .form-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    /* center the div */
+    transform: translate(-50%, -50%);
     padding: 2em;
-    margin: auto;
+    margin: 0;
     width: 25em;
-    border: 1px solid grey;
+    /* border: 1px solid grey; */
     border-radius: 2em;
     background-color: whitesmoke;
     vertical-align: middle;
+    /* shadow */
+    box-shadow: 1px 1px 40px 0px black;
+}
+
+/* background */
+.form-container {
+    background-image: url("../../assets/background/background-login.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
 }
