@@ -10,5 +10,6 @@
 #home-title-container {
     position: relative;
     top: 50%;
+    -webkit-transform: translateY(-65%);
     transform: translateY(-65%);
 }
