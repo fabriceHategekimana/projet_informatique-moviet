@@ -40,6 +40,8 @@
         <skip-docker-build>true</skip-docker-build>
         <!-- has to set it to true in the super-pom because do not want to build a Docker image for it but false in modules pom-->
         <dockerHost>tcp://localhost:2375</dockerHost> <!-- need to search why these values in particular -->
+
+        <microservice.port>10080</microservice.port>
     </properties>
 
     <!-- More information : https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html -->
@@ -296,9 +298,14 @@
             <id>package-docker-image</id>
             <build>
                 <plugins>
+                    <!--Changed artifactId..-->
+                    <!--Pre integration test , we need to start docker containers so we can verify..-->
+                    <!-- "It is recommended to use the maven-failsafe-plugin" -->
+                    <!-- "for integration testing in order to stop the docker container even when the tests fail." -->
                     <plugin>
                         <groupId>io.fabric8</groupId>
-                        <artifactId>fabric8-maven-plugin</artifactId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.35.0</version>
                         <configuration>
                             <skip>${skip-docker-build}</skip>
                             <useColor>true</useColor>
@@ -308,8 +315,9 @@
                                     <name>%g/%a:%l</name>
                                     <run>
                                         <ports>
-                                            <port>10080:8080</port>
+                                            <port>${microservice.port}:8080</port>
                                         </ports>
+
                                     </run>
                                     <build>
                                         <from>java:openjdk-8-jdk</from>
@@ -335,16 +343,29 @@
                                 </image>
                             </images>
                         </configuration>
+
                         <executions>
                             <execution>
-                                <phase>package</phase>
+                                <id>run_containers</id>
+                                <phase>package</phase> <!-- pre-integration-test -->
                                 <goals>
                                     <goal>build</goal>
+                                    <goal>start</goal> <!-- docker start -->
+                                </goals>
+                            </execution>
+
+                            <execution>
+                                <id>stop_containers</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal> <!-- docker stop -->
                                 </goals>
                             </execution>
                         </executions>
                     </plugin>
+
                 </plugins>
+
             </build>
         </profile>
     </profiles>
