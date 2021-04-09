@@ -86,6 +86,9 @@ public class GroupRestServiceIT {
             statusCode(409); // CONFLICT
     }
 
+    // IT up to this comment work if we first start the docker containers then run integration tests
+    // and also works if run my other profile mvn clean verify -Ppackage-docker-image-with-IT (with wait) and doing in parallel
+    // but slightly a bit later mvn clean verify -Ppackage-docker-image -> integration tests pass
     @Test
     void E_testCreateGroup_created(){ // POST
         String myJson="{\"id\": \"100\",\"name\":\"ethan\" }";
@@ -148,4 +151,5 @@ public class GroupRestServiceIT {
         then().
             statusCode(400); // BAD REQUEST
     }
+
 }
