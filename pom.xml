@@ -63,6 +63,15 @@
                 <scope>provided</scope>
             </dependency>
 
+            <!-- Also restassured used to test REST services (integration test) -->
+            <!-- https://github.com/crystalzenchi/microservices/blob/master/counterparty-service/src/test/java/api/CounterpartyRestServiceIT.java -->
+            <dependency>
+                <groupId>io.rest-assured</groupId>
+                <artifactId>rest-assured</artifactId>
+                <version>4.3.3</version>
+                <scope>test</scope>
+            </dependency>
+
             <!-- Unit Testing -->
             <!-- http://maven.apache.org/surefire/maven-surefire-plugin/examples/junit-platform.html -->
             <dependency>
@@ -93,10 +102,13 @@
                 <scope>test</scope>
             </dependency>
 
-
-            <!-- Also restassured used to test REST services (integration test) -->
-            <!-- https://github.com/crystalzenchi/microservices/blob/master/counterparty-service/src/test/java/api/CounterpartyRestServiceIT.java -->
-
+            <!-- Hamcrest : Used with restassured for matching etc. -->
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-all</artifactId>
+                <version>1.3</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -110,6 +122,15 @@
             <artifactId>lombok</artifactId>
             <version>1.18.20</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- Also restassured used to test REST services (integration test) -->
+        <!-- https://github.com/crystalzenchi/microservices/blob/master/counterparty-service/src/test/java/api/CounterpartyRestServiceIT.java -->
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>4.3.3</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- Unit Testing -->
@@ -141,6 +162,15 @@
             <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Hamcrest : Used with restassured for matching etc. -->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
+        </dependency>
+
 
     </dependencies>
 
@@ -196,6 +226,31 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
+            <!-- Unit tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skipTests>false</skipTests>
+                </configuration>
+            </plugin>
+            <!-- Integration tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <runOrder>filesystem</runOrder> <!-- alphabetic order.. -->
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Packaging -->
             <plugin>
                 <groupId>io.thorntail</groupId>

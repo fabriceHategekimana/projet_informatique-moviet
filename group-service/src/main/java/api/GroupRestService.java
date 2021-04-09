@@ -45,8 +45,8 @@ public class GroupRestService {
     // GET a list of all groups in JSON
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Group> getAllGroups() {
-        return groupService.getAllGroups();
+    public Response getAllGroups() {
+        return Response.ok(groupService.getAllGroups()).build();
     }
 
     // http://localhost:10080/groups/{id}
