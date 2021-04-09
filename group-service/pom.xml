@@ -50,6 +50,32 @@
           </execution>
         </executions>
       </plugin>
+      <!--Pre integration test , we need to start docker containers so we can verify..-->
+      <!-- "It is recommended to use the maven-failsafe-plugin" -->
+      <!-- "for integration testing in order to stop the docker container even when the tests fail." -->
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+
+        <executions>
+          <execution>
+            <id>run_containers</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>start</goal> <!-- docker start -->
+            </goals>
+          </execution>
+          
+          <execution>
+            <id>stop_containers</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>stop</goal> <!-- docker stop -->
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 

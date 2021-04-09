@@ -308,7 +308,7 @@
                                     <name>%g/%a:%l</name>
                                     <run>
                                         <ports>
-                                            <port>8080:8080</port>
+                                            <port>10080:8080</port>
                                         </ports>
                                     </run>
                                     <build>
