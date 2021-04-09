@@ -22,6 +22,7 @@ import domain.service.GroupServiceImpl;
 
 
 // https://www.restapitutorial.com/lessons/httpmethods.html
+
 @ApplicationScoped
 @Path("/groups")
 public class GroupRestService {
@@ -32,7 +33,8 @@ public class GroupRestService {
     private GroupService groupService;
     */
 
-    private GroupService groupService;
+    private final String current_link="http://localhost:10080/groups/"; // for link informations
+    private final GroupService groupService;
 
     public GroupRestService() {
         this.groupService=new GroupServiceImpl();
@@ -101,8 +103,8 @@ public class GroupRestService {
             // group exists already
             return Response.status(Response.Status.CONFLICT).build(); // 409
         }
-        // TODO: remove hardcoded link
-        return Response.status(Response.Status.CREATED).header("Location", "localhost/groups/{id}").build(); // 201
+
+        return Response.status(Response.Status.CREATED).header("Location", current_link.concat(group.getId())).build(); // 201
     }
 
     // Update existing group
@@ -120,8 +122,8 @@ public class GroupRestService {
             // group does not exist already
             return Response.status(Response.Status.NOT_FOUND).build(); // 404
         }
-        // TODO: remove hardcoded link
-        return  Response.ok(returnedGroup).header("Location", "localhost/groups/{id}").build(); // 200
+
+        return  Response.ok(returnedGroup).header("Location", current_link.concat(group.getId())).build(); // 200
     }
 
     // Delete existing group
