@@ -8,6 +8,9 @@ import java.util.Iterator;
 
 import domain.model.Group;
 
+import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singleton
+
+@ApplicationScoped
 public class GroupServiceImpl implements GroupService{
     private List<Group> groups=new ArrayList<>(); // temporary, no DB for the moment..
 
@@ -37,15 +40,11 @@ public class GroupServiceImpl implements GroupService{
             }
         }
 
-        /*
-        Iterator<Group> iterator = groups.iterator();
-        while(iterator.hasNext()) {
-            if (iterator.next().getId() == id){
-                return iterator.next();
-            }
-        }
-        */
         // should do something when not in the list..
         return null;
+    }
+
+    public void addGroup(String id){
+        groups.add(new Group(id));
     }
 }

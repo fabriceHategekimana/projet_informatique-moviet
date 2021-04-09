@@ -2,15 +2,12 @@ package api;
 
 // Injection
 // import javax.inject.Inject; // Need to understand what injection is
-import javax.ws.rs.PathParam; // Need to understand more about what it is
+import javax.ws.rs.*;
 
-import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
-
 // MediaType
 import javax.ws.rs.core.MediaType;
+import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singleton
 
 // List
 import java.util.List;
@@ -25,6 +22,7 @@ import domain.service.GroupService;
 import domain.service.GroupServiceImpl;
 
 // maybe add ApplicationScoped later
+@ApplicationScoped
 @Path("/groups")
 public class GroupRestService {
     // Endpoint
@@ -86,4 +84,27 @@ public class GroupRestService {
 
     Just to try something : Response.ok(groupService.getGroup(id)).header("hello",42).build();
     */
+    //@Path("{id}")
+
+    // TODO: a voir si convention d'ecrire add..
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addGroup(String id){
+        // curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d "4"
+        // check parameters
+        if (id == null || !id.chars().allMatch(Character::isLetterOrDigit)) {
+            //https://www.techiedelight.com/check-string-contains-alphanumeric-characters-java/#:~:text=The%20idea%20is%20to%20use,matches%20the%20given%20regular%20expression.
+
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        Group group=groupService.getGroup(id);
+        if (group != null) { // if group exists already
+            return Response.status(Response.Status.CONFLICT).build();
+        }
+        // group did not exist, so we create
+        groupService.addGroup(id);
+
+        // TODO: remove hardcoded link
+        return  Response.status(Response.Status.CREATED).header("Location", "localhost/groups/{id}").build();
+    }
 }
