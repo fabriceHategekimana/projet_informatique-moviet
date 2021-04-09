@@ -4,6 +4,7 @@
     width: 20em;
     height: 50em;
     margin: 0 auto;
+    -webkit-transform: translateY(-25%);
     transform: translateY(-25%);
 }
 

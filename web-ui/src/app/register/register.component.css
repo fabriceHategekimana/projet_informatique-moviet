@@ -10,6 +10,7 @@
     top: 50%;
     left: 50%;
     /* center the div */
+    -webkit-transform: translate(-50%, -90%);
     transform: translate(-50%, -90%);
     padding: 2em;
     margin: 0;
