@@ -14,9 +14,14 @@ sudo dockerd &
 sudo scripts/kill_remove_containers.sh
 
 
-# mvn clean install
+# Build, obtain docker images for microservices and api-gateway
 sudo mvn clean install -Ppackage-docker-image
+
 # integration tests won't work if we do not run docker containers before..
 
 # currently only has group-service
 sudo docker run -p 10080:8080 --name=group-service unige/group-service &
+
+# api-gateway and postgres:10
+sudo docker-compose -f docker-compose/docker-compose-api-gw.yml up &
+
