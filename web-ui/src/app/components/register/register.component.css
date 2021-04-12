@@ -7,13 +7,13 @@
 
 .form-box {
     position: relative;
-    top: 50%;
-    left: 50%;
     /* center the div */
-    -webkit-transform: translate(-50%, -90%);
-    transform: translate(-50%, -90%);
+    /* -webkit-transform: translate(-50%, -90%);
+    transform: translate(-50%, -90%); */
     padding: 2em;
-    margin: 0;
+    margin: 0 auto;
+    -webkit-transform: translateY(-3em);
+    transform: translateY(-3em);
     width: 25em;
     /* border: 1px solid grey; */
     border-radius: 2em;
