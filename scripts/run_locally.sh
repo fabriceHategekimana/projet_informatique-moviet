@@ -7,15 +7,11 @@
 echo "Building locally the project and images and running the Docker containers"
 
 # Build project locally, build Docker images and run Docker containers
-
+# Launch docker daemon
 sudo dockerd &
 
-# Kill and remove docker container first
-sudo scripts/kill_remove_containers.sh
-
-
-# Build, obtain docker images for microservices and api-gateway
-sudo mvn clean install -Ppackage-docker-image
+# Kill and remove docker container first then build using mvn clean install -Ppackage-docker-image
+sudo scripts/build_locally.sh
 
 # integration tests won't work if we do not run docker containers before..
 
