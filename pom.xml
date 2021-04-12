@@ -409,7 +409,7 @@
 
                         <executions>
                             <execution>
-                                <id>run_containers</id>
+                                <id>build_run_containers</id>
                                 <phase>package</phase> <!-- pre-integration-test -->
                                 <goals>
                                     <goal>build</goal>
