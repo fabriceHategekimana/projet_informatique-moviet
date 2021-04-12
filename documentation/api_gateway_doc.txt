@@ -3,7 +3,7 @@ The api gateway is made using Kong (it does not have any authentification for no
 To build and run Kong, use theses commands
 
 #In the dirrectory api-gateway/src/main/docker
-sudo sudo docker build -t moviet/api-gateway .
+sudo docker build -t moviet/api-gateway .
 
 #in the docker-compose dirrectory
 sudo docker-compose -f docker-compose-api-gw.yml up

@@ -67,7 +67,7 @@ services:
           condition: service_healthy
 
    api-gateway-init:
-    image: unige/api-gateway
+    image: moviet/api-gateway
     container_name:  api-gateway-init
     hostname:  api-gateway-init
     networks:
