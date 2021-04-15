@@ -1,0 +1,5 @@
+<div *ngIf="movie">
+    <ul>
+        <li *ngFor="let entry of movie | keyvalue">{{entry.key}}: {{entry.value}}</li>
+    </ul>
+</div>
