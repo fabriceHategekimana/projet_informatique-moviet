@@ -46,3 +46,18 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+### Front-end structure:
+The source files are in `/src`.
+- `main.ts` contains is the main typescrit file for the application.
+- `style.css` contain the main style
+- `index.html`contain the "structure" of the app
+
+In `/src/app/components`:
+- all the components, for example the pages
+
+In `/src/app/shared`:
+- shared components (appear multiple times in different components), for example the header and the footer
+
+In `/src/app/services`:
+- contains all the services (a service allows for example to provide data to a component)
