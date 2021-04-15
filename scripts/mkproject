@@ -1,0 +1,29 @@
+#!/bin/bash
+mypath=$(pwd)
+cd scripts
+
+#create the project with the given name and the default groupId
+mvn archetype:generate -B -DgroupId=ch.unige -DartifactId=$1
+
+#Add the properties (without that, maven won't run properly)
+sed -i '10i\\n' $1/pom.xml
+sed -i '10i</properties>' $1/pom.xml
+sed -i '10i     <maven.compiler.target>1.8</maven.compiler.target>' $1/pom.xml
+sed -i '10i     <maven.compiler.source>1.8</maven.compiler.source>' $1/pom.xml
+sed -i '10i<properties>' $1/pom.xml
+sed -i '10i\\n' $1/pom.xml
+
+sed -i '4d' $1/pom.xml #delete the defautl groupId 
+
+#add the details about the super pom.xml
+sed -i '4i\\n' $1/pom.xml
+sed -i '4i  </parent>' $1/pom.xml
+sed -i '4i    <version>0.1.0-SNAPSHOT</version>' $1/pom.xml
+sed -i '4i    <artifactId>moviet-microservices</artifactId>' $1/pom.xml
+sed -i '4i    <groupId>ch.unige</groupId>' $1/pom.xml
+sed -i '4i  <parent> <!-- Added -->' $1/pom.xml
+sed -i '4i\\n' $1/pom.xml
+
+#sed -i '4i' $1/pom.xml
+
+mv $1 $mypath
