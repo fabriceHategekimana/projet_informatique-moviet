@@ -110,7 +110,7 @@ public class GroupRestServiceIT {
     // TODO: IT for updateGroup
     // --------------------------------------------------------
     IT for updateGroup
-    
+
     @Test
     void F_testUpdateGroup(){
         // nothing yet
