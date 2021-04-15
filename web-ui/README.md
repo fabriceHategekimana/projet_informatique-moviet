@@ -9,7 +9,7 @@
 `npm install -g n`\
 `sudo n stable`
 
-## Development server
+## Start development server
 
 `cd web-ui`\
 `npm install`
