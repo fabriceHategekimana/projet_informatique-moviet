@@ -35,7 +35,7 @@
 
 	<profiles>
 		<profile>
-			<id>package-docker-image-with-IT</id>
+			<id>package-docker-image</id>
 			<build>
 				<plugins>
 					<plugin>

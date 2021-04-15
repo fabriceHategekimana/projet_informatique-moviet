@@ -299,7 +299,7 @@
         <!-- To obtain docker images and run docker containers for IT -->
         <!-- Some additional informations : https://medium.com/@fndomoraes/running-docker-containers-on-maven-integration-tests-ee071bcd743f-->
         <profile>
-            <id>package-docker-image-with-IT</id>
+            <id>package-docker-image</id>
             <build>
                 <plugins>
 
