@@ -42,7 +42,7 @@
         <!-- has to set it to true in the super-pom because do not want to build a Docker image for it but false in modules pom-->
         <dockerHost>tcp://localhost:2375</dockerHost> <!-- need to search why these values in particular -->
 
-        <microservice.port>10080</microservice.port>
+        <microservice.port>8080</microservice.port> <!-- bind 8080 port of container to TCP port <microservice.port> on localhost of the host machine-->
     </properties>
 
     <!-- More information : https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html -->
@@ -243,9 +243,7 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <runOrder>filesystem</runOrder> <!-- alphabetic order.. -->
-                    <!-- To remove later once the integration tests work -->
-                    <!-- with restassured and the profile package-docker-image-with-IT-->
-                    <skipITs>true</skipITs>
+                    <!-- can use <skipITs>true</skipITs> -->
                 </configuration>
                 <executions>
                     <execution>
@@ -297,68 +295,9 @@
                 <dockerHost>unix:///var/run/docker.sock</dockerHost>
             </properties>
         </profile>
-        <!-- To obtain docker images -->
-        <profile>
-            <id>package-docker-image</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>io.fabric8</groupId>
-                        <artifactId>fabric8-maven-plugin</artifactId>
-                        <configuration>
-                            <skip>${skip-docker-build}</skip>
-                            <useColor>true</useColor>
-                            <dockerHost>${dockerHost}</dockerHost>
-                            <images>
-                                <image>
-                                    <name>%g/%a:%l</name>
-                                    <run>
-                                        <ports>
-                                            <port>8080:8080</port>
-                                        </ports>
-                                    </run>
-                                    <build>
-                                        <from>java:openjdk-8-jdk</from>
-                                        <ports>
-                                            <port>8080</port>
-                                        </ports>
-                                        <assembly>
-                                            <basedir>/</basedir>
-                                            <inline>
-                                                <files>
-                                                    <file>
-                                                        <source>${project.build.directory}/${project.build.finalName}-thorntail.jar</source>
-                                                        <outputDirectory>/opt</outputDirectory>
-                                                    </file>
-                                                </files>
-                                            </inline>
-                                        </assembly>
-                                        <entryPoint>
-                                            <shell>java -Djava.net.preferIPv4Stack=true -jar \
-                                                /opt/${project.build.finalName}-thorntail.jar</shell>
-                                        </entryPoint>
-                                    </build>
-                                </image>
-                            </images>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
 
-        <!--Changed artifactId..-->
-        <!--Pre integration test , we need to start docker containers so we can verify..-->
-        <!-- "It is recommended to use the maven-failsafe-plugin" -->
-        <!-- "for integration testing in order to stop the docker container even when the tests fail." -->
-        <!-- -->
+        <!-- To obtain docker images and run docker containers for IT -->
+        <!-- Some additional informations : https://medium.com/@fndomoraes/running-docker-containers-on-maven-integration-tests-ee071bcd743f-->
         <profile>
             <id>package-docker-image-with-IT</id>
             <build>
@@ -377,9 +316,23 @@
                                     <name>%g/%a:%l</name>
                                     <run>
                                         <ports>
+                                            <!-- bind 8080 port of container to TCP port <microservice.port> on localhost of the host machine-->
                                             <port>${microservice.port}:8080</port>
                                         </ports>
-                                        <!-- add wait if want to debug -->
+                                        <!-- important, maybe because the service needs some time at the beginning-->
+                                        <!-- section which is a readiness check when starting the service -->
+                                        <wait>
+                                            <!-- Waiting for a container to startup based on time, the reachability of an URL, or a pattern in the log output -->
+                                            <!-- can also use <time>20000</time> instead of log -->
+                                            <log>(?i)(Thorntail is Ready)|(GET \/ HTTP\/1.1" 200 5961)</log> <!-- case insentive matching, block until match-->
+                                            <!-- Thorntail is Ready : for microservices-->
+                                            <!-- GET / HTTP/1.1" 200 5961 : for api-gateway to not be stuck.. -->
+                                            <!-- "Regular expression which is applied against the log output of an -->
+                                            <!-- "container and blocks until the pattern is matched.-->
+                                            <!-- You can use (?s) in the pattern to switch on multi line matching."-->
+                                            <!-- https://dmp.fabric8.io/#java-regular-expression-patterns, https://regex101.com-->
+                                        </wait>
+                                        <!-- If have errors : make sure to verify your IT and if wait is long enough or order of tests -->
                                     </run>
                                     <build>
                                         <from>java:openjdk-8-jdk</from>
@@ -409,14 +362,19 @@
 
                         <executions>
                             <execution>
-                                <id>build_run_containers</id>
-                                <phase>package</phase> <!-- pre-integration-test -->
+                                <id>build_docker_images</id>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>build</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>run_containers</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
                                     <goal>start</goal> <!-- docker start -->
                                 </goals>
                             </execution>
-
                             <execution>
                                 <id>stop_containers</id>
                                 <phase>post-integration-test</phase>

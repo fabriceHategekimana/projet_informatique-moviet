@@ -18,6 +18,7 @@
 
   <properties> <!-- overrides super pom properties -->
     <skip-docker-build>false</skip-docker-build> <!-- false -->
+    <microservice.port>10080</microservice.port> <!-- bind 8080 port of container to TCP port 10080 on localhost of the host machine-->
   </properties>
 
   <dependencyManagement>

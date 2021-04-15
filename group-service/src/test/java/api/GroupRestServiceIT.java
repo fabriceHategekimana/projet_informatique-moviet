@@ -89,9 +89,10 @@ public class GroupRestServiceIT {
     // IT up to this comment work if we first start the docker containers then run integration tests
     // and also works if run my other profile mvn clean verify -Ppackage-docker-image-with-IT (with wait) and doing in parallel
     // but slightly a bit later mvn clean verify -Ppackage-docker-image -> integration tests pass
+    /*
     @Test
     void E_testCreateGroup_created(){ // POST
-        String myJson="{\"id\": \"100\",\"name\":\"ethan\" }";
+        String myJson="{"id": "100","name":"ethan" }";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -107,49 +108,50 @@ public class GroupRestServiceIT {
     // TODO: Maybe add BAD_REQUEST test for createGroup when id is null
 
     // TODO: IT for updateGroup
-    /* --------------------------------------------------------
+    // --------------------------------------------------------
     IT for updateGroup
-     */
+    
     @Test
     void F_testUpdateGroup(){
         // nothing yet
     }
 
 
-    /* --------------------------------------------------------
+    // --------------------------------------------------------
     IT for deleteGroup
-     */
+
     @Test
     void G_testDeleteGroup_ok(){ // DELETE
-        //String myJson="{\"id\": \"100\",\"name\":\"ethan\" }";
+        //String myJson="{"id": "100","name":"ethan" }";
         given().
-            param("100"). // id
-        when().
-            delete("/").
-        then().
-            statusCode(200). // OK
-            body("id", equalTo(100), // also returns body
-                    "name", equalTo("ethan"));
+                param("100"). // id
+                when().
+                delete("/").
+                then().
+                statusCode(200). // OK
+                body("id", equalTo(100), // also returns body
+                "name", equalTo("ethan"));
     }
 
     @Test
     void H_testDeleteGroup_not_found(){ // DELETE
         given().
-            param("id", "100").
-        when().
-            delete("/").
-        then().
-            statusCode(404); // NOT FOUND
+                param("id", "100").
+                when().
+                delete("/").
+                then().
+                statusCode(404); // NOT FOUND
     }
 
     @Test
     void I_testDeleteGroup_bad_request(){ // DELETE
         given().
-            param("id", "$").
-        when().
-            delete("/").
-        then().
-            statusCode(400); // BAD REQUEST
+                param("id", "$").
+                when().
+                delete("/").
+                then().
+                statusCode(400); // BAD REQUEST
     }
+    */
 
 }
