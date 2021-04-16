@@ -17,4 +17,4 @@ jobs:
   include:
   - stage: Prepare
     script:
-    - nvm install $NODE_VERSION
+    - sonar-scanner 
