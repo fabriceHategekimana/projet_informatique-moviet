@@ -8,6 +8,8 @@ addons:
     organization: moviet
     token:
       secure: BMrl+PPwxa9o7enTwlAQ+DoNidEMg28QOkqjna0yg4X6WrBjctGA9dPOWpYLxtaNZgAt2macCtsnEkAmdgL9QvqyKvx6xX8zBcF7r7n2MNFkQKEmUfjKsRin2uh7wtvLrsXphAPGrHjp/gb0Nwy0ogC8WN1bLLer7HX70y3sO1jSP0YzJONlXngwri/HBX0QBmksi8iQq6A0QxexteRD+TBKaDMYfcDO5D4JM+zIve8175MbI8aklfi1kFlpWmPoMjU7GSy+C8FXlgdFLwPz7py0C2DeG0RvhMkxYKMiMBBHfVKuiQXhIN5rUhyMZYYw4D1EPxsJGflW1Dczhpci0AmdWamfeIUjZlyZD5aLUMGuZbdyOw9G/3BoY9csRnRqryFS9A9HyTS2OJbHQr0BjHZzWHzwbEpDq6mD+AkPW2Jb6LYupzW03IYyOjuZurCopihhjL7d5o+8iw9wOR45qLdDWJ7JZmFzK2WI2krY0hf8kILDlril/dqKelbK8+Z4SJPWIbaHg4wCY5XU0RCo5viqGddU2ZaN4e3W46dn57Rkqr4YambobEzYJ+/2hlSwa2b9f7PlQyFa+bb0iBHxSWpL+hmmk1Ld+O56uQizxZYgh4DiIcjMkD52H8VFvk3Wc/DYF8wdXypLki9M+pVooovgrZzMN+7io/BQnG+43JY=
+   script:
+      - mvn sonar:sonar -Dsonar.projectKey=fabriceHategekimana_projet_informatique-moviet
 cache:
   directories:
   - .autoconf
@@ -17,4 +19,5 @@ jobs:
   include:
   - stage: Prepare
     script:
+      - mvn clean install
       - echo "Hello world!"
