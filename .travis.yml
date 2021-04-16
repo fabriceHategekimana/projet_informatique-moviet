@@ -20,6 +20,3 @@ jobs:
   - stage: Prepare
     script:
     - nvm install $NODE_VERSION
-  - stage: Build
-    after-script: 
-    - echo "Hello" >> tatata.txt
