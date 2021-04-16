@@ -21,7 +21,5 @@ jobs:
     script:
     - nvm install $NODE_VERSION
   - stage: Build
-    script:
-    - mvn install -Ppackage-docker-image
-  - stage: NextBuild
-    after-script: null
+    after-script: 
+    - echo "Hello" >> tatata.txt
