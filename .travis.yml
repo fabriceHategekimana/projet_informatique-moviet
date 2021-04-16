@@ -18,4 +18,3 @@ jobs:
   - stage: Prepare
     script:
     - nvm install $NODE_VERSION
-    - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=fabriceHategekimana_projet_informatique-moviet
