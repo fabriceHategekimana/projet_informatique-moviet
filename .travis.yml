@@ -17,4 +17,4 @@ jobs:
   include:
   - stage: Prepare
     script:
-    - sonar-scanner 
+      - echo "Hello world!"
