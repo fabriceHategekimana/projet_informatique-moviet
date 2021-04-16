@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/fabriceHategekimana/projet_informatique-moviet.svg?branch=develop)](https://travis-ci.com/fabriceHategekimana/projet_informatique-moviet)
+
 # Moviet project
 The project for projets informatics (pinfo)
 
