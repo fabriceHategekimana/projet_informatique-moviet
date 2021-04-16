@@ -244,6 +244,7 @@
                 <configuration>
                     <runOrder>filesystem</runOrder> <!-- alphabetic order.. -->
                     <!-- can use <skipITs>true</skipITs> -->
+                    <skipITs>true</skipITs>
                 </configuration>
                 <executions>
                     <execution>
@@ -296,10 +297,75 @@
             </properties>
         </profile>
 
+        <profile>
+            <id>package-docker-image</id>
+            <build>
+                <plugins>
+
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.35.0</version>
+                        <configuration>
+                            <skip>${skip-docker-build}</skip>
+                            <useColor>true</useColor>
+                            <dockerHost>${dockerHost}</dockerHost>
+                            <images>
+                                <image>
+                                    <name>%g/%a:%l</name>
+                                    <run>
+                                        <ports>
+                                            <!-- bind 8080 port of container to TCP port <microservice.port> on localhost of the host machine-->
+                                            <port>${microservice.port}:8080</port>
+                                        </ports>
+                                    </run>
+                                    <build>
+                                        <from>java:openjdk-8-jdk</from>
+                                        <ports>
+                                            <port>8080</port>
+                                        </ports>
+
+                                        <assembly>
+                                            <basedir>/</basedir>
+                                            <inline>
+                                                <files>
+                                                    <file>
+                                                        <source>${project.build.directory}/${project.build.finalName}-thorntail.jar</source>
+                                                        <outputDirectory>/opt</outputDirectory>
+                                                    </file>
+                                                </files>
+                                            </inline>
+                                        </assembly>
+                                        <entryPoint>
+                                            <shell>java -Djava.net.preferIPv4Stack=true -jar \
+                                                /opt/${project.build.finalName}-thorntail.jar</shell>
+                                        </entryPoint>
+                                    </build>
+                                </image>
+                            </images>
+                        </configuration>
+
+                        <executions>
+                            <execution>
+                                <id>build_docker_images</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+
+            </build>
+        </profile>
+
+
         <!-- To obtain docker images and run docker containers for IT -->
         <!-- Some additional informations : https://medium.com/@fndomoraes/running-docker-containers-on-maven-integration-tests-ee071bcd743f-->
         <profile>
-            <id>package-docker-image</id>
+            <id>package-docker-image-with-IT</id>
             <build>
                 <plugins>
 
