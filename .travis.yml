@@ -29,7 +29,6 @@ jobs:
       - nvm install $NODE_VERSION
     - stage : Build
       script:
-      - echo ${{ secrets.PROJECT_NAME }} >> tatatatata.txt
       - mvn install -Ppackage-docker-image  
     - stage : NextBuild
       after-script:
