@@ -23,7 +23,7 @@ import domain.service.GroupServiceImpl;
 
 // https://www.restapitutorial.com/lessons/httpmethods.html
 
-@ApplicationScoped
+@ApplicationScoped // singleton
 @Path("/groups")
 public class GroupRestService {
     // Endpoint
