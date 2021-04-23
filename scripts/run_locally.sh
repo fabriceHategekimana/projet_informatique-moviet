@@ -15,9 +15,9 @@ sudo scripts/build_locally.sh
 
 # integration tests won't work if we do not run docker containers before..
 
-# currently only has group-service
-sudo docker run -p 10080:8080 --name=group-service unige/group-service &
+# all microservices
+sudo docker-compose -f docker-compose/docker-compose-microservices.yml up -d
 
 # api-gateway and postgres:10
-sudo docker-compose -f docker-compose/docker-compose-api-gw.yml up &
+sudo docker-compose -f docker-compose/docker-compose-api-gw.yml up -d
 
