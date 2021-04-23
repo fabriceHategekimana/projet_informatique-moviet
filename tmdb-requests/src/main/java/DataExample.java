@@ -96,6 +96,7 @@ public class DataExample {
 
                 Double popularity = movie.popularity;
                 Integer rating = movie.rating;
+                Double vote_average = movie.vote_average;
                 ReviewResultsPage reviews = movie.reviews;
                 MovieResultsPage recommendations = movie.recommendations;
 
@@ -174,7 +175,8 @@ public class DataExample {
                 }
 
                 System.out.println("popularity: " + popularity);  // Some kind of score
-                System.out.println("rating: " + rating); // rating given by the user of the current session id
+                System.out.println("user rating: " + rating); // rating given by the user of the current session id
+                System.out.println("vote average: " + vote_average + " / 10");
 
                 System.out.println("reviews: " + reviews);  // (here no result for language = "fr")
                 assert reviews != null;
