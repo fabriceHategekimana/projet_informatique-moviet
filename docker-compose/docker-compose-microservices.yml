@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  group-service:
+    image: unige/group-service # use already built image that we've built from Maven
+    container_name: group-service # name of container we'll see in docker ps
+    ports:
+      - "10080:8080" # port mapping from host to container port
+    networks:
+      - backend
+networks:
+  backend:
+  frontend:
