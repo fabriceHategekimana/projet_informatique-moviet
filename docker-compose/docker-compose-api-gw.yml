@@ -90,4 +90,4 @@ networks:
      driver: bridge     
   backend-network:
     external:
-      name: microservices_backend-network
+      name: docker-compose_backend-network

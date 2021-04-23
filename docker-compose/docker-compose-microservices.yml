@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: group-service
       POSTGRES_DB: group-service
     healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "group-service", "-d", "counterparty" ]
+      test: [ "CMD", "pg_isready", "-U", "group-service", "-d", "group-service" ]
       interval: 30s
       timeout: 30s
       retries: 3
@@ -32,6 +32,7 @@ services:
       - group-service-database
 networks:
   backend-network:
+    driver: bridge
 
 volumes:
   postgresql-db-group-service:
