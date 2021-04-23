@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.com/fabriceHategekimana/projet_informatique-moviet.svg?branch=develop)](https://travis-ci.com/fabriceHategekimana/projet_informatique-moviet)
-
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=bogdancondurache_ba&metric=alert_status)](https://sonarcloud.io/dashboard?id=bogdancondurache_ba)
+[![Build Status](https://travis-ci.com/fabriceHategekimana/projet_informatique-moviet.svg?branch=develop)](https://travis-ci.com/fabriceHategekimana/projet_informatique-moviet)  [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=bogdancondurache_ba&metric=alert_status)](https://sonarcloud.io/dashboard?id=bogdancondurache_ba)
 
 # Moviet project
 The project for projets informatics (pinfo)
