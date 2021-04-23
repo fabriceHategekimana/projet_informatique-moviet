@@ -1,8 +1,8 @@
 version: "3.8"
 services:
   group-service-database:
-    image: postgres:13
-    container_name: group-service-database
+    image: postgres:13 # name of image to pull from docker hub
+    container_name: group-service-database # name of container we'll see in docker ps
     networks:
       - backend-network
     environment:
@@ -14,7 +14,7 @@ services:
       interval: 30s
       timeout: 30s
       retries: 3
-    volumes:
+    volumes: # need to see in more details
       - postgresql-db-group-service:/var/lib/postgresql/data # careful, do not add a space in between
       - ./data/groups/:/docker-entrypoint-initdb.d/
     restart: on-failure
@@ -28,9 +28,10 @@ services:
       - "10080:8080" # port mapping from host to container port
     networks:
       - backend-network
+    depends_on:
+      - group-service-database
 networks:
   backend-network:
-  frontend-network:
 
 volumes:
   postgresql-db-group-service:
