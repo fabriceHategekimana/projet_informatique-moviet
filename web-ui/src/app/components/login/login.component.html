@@ -1,0 +1,28 @@
+<app-header></app-header>
+<div class="background-box">
+    <div class="blur-box"></div>
+</div>
+<div class="page-container d-flex flex-column flex-grow-1 justify-content-center">
+    <div class="form-box d-flex flex-column justify-content-center">
+        <div class="logo mb-3">
+            <div class="col-md-12 text-center">
+                <img src="../../../assets/brand/logo.svg" alt="" width="60" class="mb-3 d-inline-block align-text-top">
+                <h1>Sign in</h1>
+            </div>
+        </div>
+        <form name="login-form">
+            <div class="form-group mb-5">
+                <label for="username">Username</label>
+                <input type="text" name="username" class="form-control" id="username" aria-describedby="username" placeholder="Username">
+            </div>
+            <div class="form-group mb-5">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" class="form-control" aria-describedby="password" placeholder="Password">
+            </div>
+            <div class="col-md-12 text-center mb-3 mt-3">
+                <button type="submit" class=" btn btn-block btn-primary tx-tfm">login</button>
+            </div>
+        </form>
+    </div>
+</div>
+<app-footer></app-footer>

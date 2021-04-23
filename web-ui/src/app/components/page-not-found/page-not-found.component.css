@@ -1,0 +1,13 @@
+/* background */
+.background-box {
+    background-image: url("../../../assets/background/background-404.jpg");
+}
+
+#error-code {
+    color: white;
+    font-size: 6em;
+}
+
+#error-message {
+    color: white;
+}

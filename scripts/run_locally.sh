@@ -7,14 +7,17 @@
 echo "Building locally the project and images and running the Docker containers"
 
 # Build project locally, build Docker images and run Docker containers
-
+# Launch docker daemon
 sudo dockerd &
 
-# mvn clean install
-sudo mvn clean install -Ppackage-docker-image
+# Kill and remove docker container first then build using mvn clean install -Ppackage-docker-image
+sudo scripts/build_locally.sh
 
-# Clean docker container first
-sudo docker rm group-service 2> /dev/null # stderror -> dev/null
+# integration tests won't work if we do not run docker containers before..
 
-# currently only has group-service
-sudo docker run -p 10080:8080 --name=group-service unige/group-service &
+# all microservices
+sudo docker-compose -f docker-compose/docker-compose-microservices.yml up -d
+
+# api-gateway and postgres:10
+sudo docker-compose -f docker-compose/docker-compose-api-gw.yml up -d
+

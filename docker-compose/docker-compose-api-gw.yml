@@ -25,7 +25,7 @@ services:
     tty: true
             
    api-gateway:
-    image: moviet/api-gateway
+    image: unige/api-gateway
     container_name:  api-gateway
     hostname:  api-gateway
     networks:
@@ -90,4 +90,4 @@ networks:
      driver: bridge     
   backend-network:
     external:
-      name: microservices_backend-network
+      name: docker-compose_backend-network
