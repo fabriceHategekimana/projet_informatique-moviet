@@ -7,9 +7,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singleton
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
 
+@ApplicationScoped // singleton
 @Path("/movies")
 public class MovieRestServiceMock {
     public MovieRestServiceMock() {
