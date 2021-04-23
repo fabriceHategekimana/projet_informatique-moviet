@@ -30,6 +30,16 @@ services:
       - backend-network
     depends_on:
       - group-service-database
+
+  tmdb-requests:
+    image: unige/tmdb-requests # use already built image that we've built from Maven
+    container_name: tmdb-requests # name of container we'll see in docker ps
+    ports:
+      - "10081:8080" # port mapping from host to container port
+    networks:
+      - backend-network
+    # no database yet
+
 networks:
   backend-network:
     driver: bridge
