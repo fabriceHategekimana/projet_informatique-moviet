@@ -1,12 +1,41 @@
 version: "3.8"
 services:
+  group-service-database:
+    image: postgres:13
+    container_name: group-service-database
+    networks:
+      - backend-network
+    environment:
+      POSTGRES_USER: group-service
+      POSTGRES_PASSWORD: group-service
+      POSTGRES_DB: group-service
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "group-service", "-d", "counterparty" ]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    volumes:
+      - postgresql-db-group-service:/var/lib/postgresql/data # careful, do not add a space in between
+      - ./data/groups/:/docker-entrypoint-initdb.d/
+    restart: on-failure
+    stdin_open: true
+    tty: true
+
   group-service:
     image: unige/group-service # use already built image that we've built from Maven
     container_name: group-service # name of container we'll see in docker ps
     ports:
       - "10080:8080" # port mapping from host to container port
     networks:
-      - backend
+      - backend-network
 networks:
-  backend:
-  frontend:
+  backend-network:
+  frontend-network:
+
+volumes:
+  postgresql-db-group-service:
+
+# to build/pull/use existing images and start containers, use:
+# docker-compose -f docker-compose-microservices.yml up -d to build/pull/use existing images and start containers
+# to stop and remove docker containers, use:
+# docker-compose -f docker-compose-microservices.yml down
