@@ -19,8 +19,6 @@ import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
-import javax.persistence.EntityManagerFactory;
-
 @ApplicationScoped
 public class GroupServiceImpl implements GroupService{
     // TODO: DB + be careful about concurrency
@@ -35,43 +33,7 @@ public class GroupServiceImpl implements GroupService{
 
     If no error, return the group or list of groups.
     */
-
-    // init list..
-    public GroupServiceImpl(){
-        EntityManagerFactory entityManagerFactory = null;
-        em = null;
-        try {
-            entityManagerFactory = Persistence.createEntityManagerFactory("GroupPU");
-            em = entityManagerFactory.createEntityManager();
-
-
-            /*
-            System.out.println( "- Modification d'un article --------------" );
-
-            newArticle.setPrice( 40000 );
-            entityManager.persist( newArticle );
-
-            results = entityManager.createQuery("from Article", Article.class).getResultList();
-            for( Article article : results) {
-                System.out.println( article );
-            }
-
-            System.out.println( "- Suppression d'un article ---------------" );
-
-            entityManager.remove( newArticle );
-
-            results = entityManager.createQuery("from Article", Article.class).getResultList();
-            for( Article article : results) {
-                System.out.println( article );
-            }
-            */
-
-        } finally {
-            if ( em != null ) em.close();
-            if ( entityManagerFactory != null ) entityManagerFactory.close();
-        }
-    }
-
+    
 
 
     public List<Group> getAllGroups(){
@@ -81,30 +43,7 @@ public class GroupServiceImpl implements GroupService{
         criteria.from(Group.class);
         return em.createQuery( criteria ).getResultList();
         */
-        System.out.println( "- Lecture de tous les articles -----------" );
-
-        List<Group> groups = em.createQuery( "from Group", Group.class )
-                .getResultList();
-        for (Group g : groups) {
-            System.out.println( g );
-        }
-
-        System.out.println( "- Insertion d'un nouvel article ----------" );
-
-        EntityTransaction trans = em.getTransaction();
-        trans.begin();
-
-        Group newGroup = new Group( "test");
-        em.persist( newGroup );
-
-        List<Group> res = em.createQuery( "from Group", Group.class )
-                .getResultList();
-        for (Group g : res) {
-            System.out.println( g );
-        }
-        //return em.createQuery( "from Group", Group.class).getResultList();
-        trans.commit();
-        return null;
+        return em.createQuery( "from Group", Group.class).getResultList();
     }
 
     // find by ID
@@ -113,7 +52,7 @@ public class GroupServiceImpl implements GroupService{
         if not in the list return null, the Rest Service will take care of returning some HTTP code (404 not found here)
         https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html#find-java.lang.Class-java.lang.Object-
         */
-        return em.find(Group.class, "1"); // null if not found, 404
+        return em.find(Group.class, id); // null if not found, 404
     }
 
     public Group createGroup(@NonNull Group group){
