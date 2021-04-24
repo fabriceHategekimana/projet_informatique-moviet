@@ -5,6 +5,8 @@ services:
     container_name: group-service-database # name of container we'll see in docker ps
     networks:
       - backend-network
+    ports:
+      - "5432:5432" # port mapping from host to container port
     environment:
       POSTGRES_USER: group-service
       POSTGRES_PASSWORD: group-service
@@ -29,7 +31,7 @@ services:
     networks:
       - backend-network
     environment: # for thorntail
-      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_CONNECTION_DASH_URL: "jdbc:postgresql://group-service-database:5432/group" # TODO : check if group is okay. 5432 is a port defined by pg
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_CONNECTION_DASH_URL: "jdbc:postgresql://group-service-database:5432/t_groups" # it should be the name of the table !
       THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_DRIVER_DASH_NAME: 'postgresql'
       THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_USER_DASH_NAME: 'group-service'
       THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_PASSWORD: 'group-service'

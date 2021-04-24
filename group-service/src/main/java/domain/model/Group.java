@@ -22,7 +22,7 @@ import javax.persistence.Table;
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor // need this otherwise can have some problems with PUT (create) requests
-@Entity @Table( name="T_Groups")// JPA, mapping class - table
+@Entity @Table( name="T_groups")// JPA, mapping class - table
 public class Group {
     @Id @GeneratedValue( strategy=GenerationType.IDENTITY ) // Generated Value, automatically generated following how the db was configured
     private String id; // need string otherwise implicit conversion with Integer, maybe use int later ? but need to modify in db too

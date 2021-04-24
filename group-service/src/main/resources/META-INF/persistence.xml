@@ -11,7 +11,7 @@
         <!-- https://youtu.be/FeZ5BC0PirQ, https://gist.github.com/SergioDiniz/886723272d9fd95dd17ecb79b35b66e1 -->
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://group-service-database:5432/group" />
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://group-service-database:5432/t_groups" />
             <property name="javax.persistence.jdbc.user" value="group-service" />
             <property name="javax.persistence.jdbc.password" value="group-service" />
 
