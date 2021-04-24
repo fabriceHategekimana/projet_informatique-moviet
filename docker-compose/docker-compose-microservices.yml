@@ -29,7 +29,7 @@ services:
     networks:
       - backend-network
     environment: # for thorntail
-      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COUNTERPARTYDS_CONNECTION_DASH_URL: "jdbc:postgresql://group-service-database:5432/groups" # TODO : check if groups is okay. 5432 is a port defined by pg
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COUNTERPARTYDS_CONNECTION_DASH_URL: "jdbc:postgresql://group-service-database:5432/GroupPU" # TODO : check if GroupPU is okay. 5432 is a port defined by pg
       THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COUNTERPARTYDS_DRIVER_DASH_NAME: 'postgresql'
       THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COUNTERPARTYDS_USER_DASH_NAME: 'group-service'
       THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_COUNTERPARTYDS_PASSWORD: 'group-service'

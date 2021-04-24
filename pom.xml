@@ -32,6 +32,10 @@
         <mockito.version>3.3.0</mockito.version>
 
         <java-ee-api.version>8.0.1</java-ee-api.version>
+        <!-- DB: Used in the pom of modules + and can be in resources, module.xml-->
+        <postgresql.jdbc.driver.version>42.2.5</postgresql.jdbc.driver.version>
+        <hibernate-entitymanager.version>5.0.10.Final</hibernate-entitymanager.version>
+
         <version.thorntail>2.7.0.Final</version.thorntail> <!-- careful about the version -->
 
         <!-- used to bypass some warning, say to maven that we do not need web xml -->
