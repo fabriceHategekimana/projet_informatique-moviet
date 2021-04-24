@@ -12,7 +12,7 @@ thorntail:
     data-sources:
       groupds:
         driver-name: postgresql
-        connection-url: jdbc:postgresql://localhost:5432/group
+        connection-url: jdbc:postgresql://group-service-database:5432/group
         # jdbc:h2:${java.io.tmpdir}/target/InstrumentDB;AUTO_SERVER=TRUE;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
         user-name: group-service
         password: group-service

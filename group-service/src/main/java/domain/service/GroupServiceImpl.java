@@ -35,24 +35,27 @@ public class GroupServiceImpl implements GroupService{
     */
 
     // init list..
-    /*
+
     public GroupServiceImpl() {
         // https://www.journaldev.com/33297/java-list-add-addall-methods
         // TODO: remove this
-        groups.add(new Group("1", "erwan"));
-        groups.add(new Group("2", "mohsen"));
-        groups.add(new Group("3", "ethan"));
+        groups.add(new Group("erwan"));
+        groups.add(new Group("mohsen"));
+        groups.add(new Group("ethan"));
 
 
 
     }
-    */
+
 
     public List<Group> getAllGroups(){
+        /*
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Group> criteria = builder.createQuery( Group.class );
         criteria.from(Group.class);
         return em.createQuery( criteria ).getResultList();
+        */
+        return em.createQuery( "from Group", Group.class).getResultList();
     }
 
     // find by ID
