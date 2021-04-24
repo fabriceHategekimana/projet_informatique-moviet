@@ -54,14 +54,16 @@ public class GroupRestService {
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getGroup(@PathParam("id") String id) {
+    public Response getGroup(@PathParam("id") int id) {
         // need String instead of Integer otherwise we would have a conversion in the parameters !
 
-        // check parameters
+        // TODO: check parameters
+        /*
         if (id == null || !id.chars().allMatch(Character::isLetterOrDigit)) {
             //https://www.techiedelight.com/check-string-contains-alphanumeric-characters-java/#:~:text=The%20idea%20is%20to%20use,matches%20the%20given%20regular%20expression.
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
+        */
         Group group=groupService.getGroup(id);
         if (group == null) { // group not found
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -91,11 +93,13 @@ public class GroupRestService {
          Then use GET
          */
         // TODO: Need to check the JSON further
+        /*
         if (group.getId() == null) {
             throw new IllegalArgumentException("Group id is null ! ");
             // curl --verbose -H "Content-Type: application/json" -X DELETE http://localhost:10080/groups -d '{"name":"11"}'
             // gives BAD REQUEST
         }
+        */
 
         Group returnedGroup=groupService.createGroup(group); // get all groups and check if group inside list of groups
         // will add the Group if does not exist, otherwise return null
@@ -104,7 +108,7 @@ public class GroupRestService {
             return Response.status(Response.Status.CONFLICT).build(); // 409
         }
 
-        return Response.status(Response.Status.CREATED).header("Location", current_link.concat(group.getId())).build(); // 201
+        return Response.status(Response.Status.CREATED).header("Location", current_link.concat(String.valueOf(returnedGroup.getId()))).build(); // 201
     }
 
     // Update existing group
@@ -123,13 +127,13 @@ public class GroupRestService {
             return Response.status(Response.Status.NOT_FOUND).build(); // 404
         }
 
-        return  Response.ok(returnedGroup).header("Location", current_link.concat(group.getId())).build(); // 200
+        return  Response.ok(returnedGroup).header("Location", current_link.concat(String.valueOf(group.getId()))).build(); // 200
     }
 
     // Delete existing group
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteGroup(String id){
+    public Response deleteGroup(int id){
         /*
         curl --verbose -H "Content-Type: application/json" -X DELETE http://localhost:10080/groups -d "youridhere"
         Example:
@@ -137,10 +141,12 @@ public class GroupRestService {
 
         This does not work : '{"id":youridhere}'
          */
-        // check parameters
+        // TODO: check parameters
+        /*
         if (id == null || !id.chars().allMatch(Character::isLetterOrDigit)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
+        */
 
         Group returnedGroup=groupService.deleteGroup(id); // get all groups and check if group inside list of groups
         // will delete the group if exists, otherwise return null

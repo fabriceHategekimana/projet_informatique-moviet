@@ -19,13 +19,16 @@ import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
+import javax.persistence.EntityManagerFactory;
+
 @ApplicationScoped
 public class GroupServiceImpl implements GroupService{
     // TODO: DB + be careful about concurrency
-    private List<Group> groups=new ArrayList<>(); // temporary, no DB for the moment..
+    // private List<Group> groups=new ArrayList<>(); // temporary, no DB for the moment..
 
-    @PersistenceContext(unitName = "GroupPU") // name is the same as in persistence.xml file
+    //@PersistenceContext(unitName = "GroupPU") // name is the same as in persistence.xml file
     private EntityManager em;
+    private final EntityManagerFactory emFactory;
 
     /*
     We use null as return when there's an error. The HTTP code associated to them are written in GroupRestService.
@@ -33,7 +36,11 @@ public class GroupServiceImpl implements GroupService{
 
     If no error, return the group or list of groups.
     */
-    
+    public GroupServiceImpl(){
+
+        emFactory = Persistence.createEntityManagerFactory("GroupPU");
+
+    }
 
 
     public List<Group> getAllGroups(){
@@ -43,24 +50,35 @@ public class GroupServiceImpl implements GroupService{
         criteria.from(Group.class);
         return em.createQuery( criteria ).getResultList();
         */
-        return em.createQuery( "from Group", Group.class).getResultList();
+        try {
+            em = emFactory.createEntityManager();
+            return em.createQuery("from Group", Group.class).getResultList();
+        }
+        finally {
+            if ( em != null ) em.close();
+            //if ( emFactory != null ) emFactory.close();
+            return null;
+        }
     }
 
     // find by ID
-    public Group getGroup(@NonNull String id){
+    public Group getGroup(@NonNull int id){
         /* Need to find the group then return it, Id's are unique
         if not in the list return null, the Rest Service will take care of returning some HTTP code (404 not found here)
         https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html#find-java.lang.Class-java.lang.Object-
         */
+        System.out.println(id);
         return em.find(Group.class, id); // null if not found, 404
     }
 
     public Group createGroup(@NonNull Group group){
         // TODO: verify how id was init ? in Group class. I think we can always create ? because auto increment
+        /*
         if (group.getId() != null) {
             // throw new IllegalArgumentException("Group already exists : " + group.getId());
             return null; // the Rest Service will take care of returning some HTTP code, here CONFLICT 409
         }
+        */
         em.persist(group);
         return group;
         /*
@@ -96,7 +114,7 @@ public class GroupServiceImpl implements GroupService{
 
     }
 
-    public Group deleteGroup(@NonNull String id){
+    public Group deleteGroup(@NonNull int id){
         Group group = em.find(Group.class, id);
         if (group == null) {
             // throw new IllegalArgumentException("Instrument does not exist : " + instrument.getId());
