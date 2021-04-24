@@ -59,10 +59,10 @@
     <dependency>
       <groupId>javax</groupId>
       <artifactId>javaee-api</artifactId>
-      <version>8.0</version>
+      <version>${java-ee-api.version}</version>
       <scope>provided</scope>
     </dependency>
-  
+
     <dependency>
       <groupId>io.thorntail</groupId>
       <artifactId>jpa</artifactId>
@@ -81,12 +81,6 @@
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <version>${postgresql.jdbc.driver.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>javax</groupId>
-      <artifactId>javaee-api</artifactId>
-      <version>${java-ee-api.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
