@@ -1,0 +1,68 @@
+.movie-container {
+    position: relative;
+    margin: 0 auto;
+    width: 25em;
+    padding: 2em;
+    justify-content: center;
+    align-items: center;
+    vertical-align: middle;
+}
+
+.box-shadow {
+    box-shadow: 1px 1px 40px 0px black;
+}
+
+.poster-container {
+    position: relative;
+    width: 21em;
+    height: 30em;
+    margin: 0 auto;
+    padding: 0;
+    /* border: 1px solid grey; */
+    border-radius: 2em;
+    background-color: whitesmoke;
+    vertical-align: middle;
+    /* shadow */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* we dont want the image th overflow the div */
+    overflow: hidden
+}
+
+.poster-img {
+    flex-shrink: 0; /* prevent the image to be resized */
+    min-width: 100%;
+    min-height: 100%
+}
+
+.movie-rating {
+    position: relative;
+    width: 21em;
+    z-index: 1;
+    justify-content: center;
+    margin: 0 auto; /* center */
+    padding-top: 1em;
+}
+
+.rating-text {
+    color: white;
+    font-size: 1.8em;
+    text-align: center;
+    vertical-align: middle;
+    margin: 0 auto;
+}
+
+.progress {
+    height: 2em;
+}
+
+.movie-title {
+    position: relative;
+    width: 21em;
+    z-index: 1;
+    justify-content: center;
+    text-align: center;
+    margin: 0 auto; /* center */
+    padding-top: 1em;
+}
