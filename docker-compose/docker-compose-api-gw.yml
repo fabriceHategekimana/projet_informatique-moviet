@@ -52,7 +52,7 @@ services:
       KONG_PG_PASSWORD: kong
       KONG_PG_USER: kong
       KONG_PG_DATABASE: kongdb
-      KONG_PLUGINS: "bundled,jwt"
+      KONG_PLUGINS: ""
     volumes:      
       - ../web-ui/dist:/www/data:ro
 #    Assuming we want to put our own certificates, we should put them in /usr/local/kong/ssl/certs
@@ -78,7 +78,56 @@ services:
     depends_on:
        api-gateway:
           condition: service_healthy
-      
+
+   iam-db:
+    image: postgres:10
+    container_name: iam-db
+    hostname: iam-db
+    networks:
+     - backend-network        
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: keycloakdb
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "admin", "-d", "keycloakdb"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    restart: on-failure
+    stdin_open: true
+    tty: true      
+    volumes:
+      - pgdata-iam:/var/lib/postgresql/data
+ 
+  
+   iam:
+     image: jboss/keycloak:4.8.3.Final
+     container_name: iam
+     hostname: iam
+     networks:
+      - gateway-network
+      - backend-network       
+     restart: on-failure
+     ports:
+       - 8080:8080
+     volumes:      
+       - ./iam-config/:/tmp/iam-config
+     environment:
+       - KEYCLOAK_USER=admin
+       - KEYCLOAK_PASSWORD=password
+       - DB_VENDOR=postgres
+       - DB_USER=admin
+       - DB_PASSWORD=password
+       - DB_ADDR=iam-db
+       - DB_PORT=5432
+       - DB_DATABASE=keycloakdb
+       - PROXY_ADDRESS_FORWARDING=true
+       - KEYCLOAK_IMPORT=/tmp/iam-config/realms.json
+     depends_on:
+        iam-db :
+          condition: service_healthy
+         
 volumes:
    pgdata-kong:
    pgdata-iam:
