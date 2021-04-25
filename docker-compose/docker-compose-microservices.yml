@@ -5,14 +5,16 @@ services:
     container_name: group-service-database # name of container we'll see in docker ps
     networks:
       - backend-network
+    ports:
+      - "5432:5432" # port mapping from host to container port
     environment:
       POSTGRES_USER: group-service
       POSTGRES_PASSWORD: group-service
       POSTGRES_DB: group-service
     healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "group-service", "-d", "group-service" ]
-      interval: 30s
-      timeout: 30s
+      test: [ "CMD", "pg_isready", "-U", "group-service", "-d", "group-service" ] # user, db
+      interval: 30s # wait 30 seconds, try connecting
+      timeout: 30s # if cannot connect, wait timeout before retrying
       retries: 3
     volumes: # need to see in more details
       - postgresql-db-group-service:/var/lib/postgresql/data # careful, do not add a space in between
@@ -28,6 +30,11 @@ services:
       - "10080:8080" # port mapping from host to container port
     networks:
       - backend-network
+    environment: # for thorntail
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_CONNECTION_DASH_URL: "jdbc:postgresql://group-service-database:5432/group-service" # it should be the name of the database !
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_DRIVER_DASH_NAME: 'postgresql'
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_USER_DASH_NAME: 'group-service'
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_PASSWORD: 'group-service'
     depends_on:
       - group-service-database
 
@@ -38,7 +45,7 @@ services:
       - "10081:8080" # port mapping from host to container port
     networks:
       - backend-network
-    # no database yet
+    # no database or not yet
 
 networks:
   backend-network:

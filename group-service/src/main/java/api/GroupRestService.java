@@ -9,8 +9,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.MediaType;
 import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singleton
 
-// List
-import java.util.List;
 //  import classes of domain
 import domain.model.Group;
 
@@ -42,7 +40,7 @@ public class GroupRestService {
 
 
     // http://localhost:10080/groups
-    // GET a list of all groups in JSON
+    // GET a list of all groups
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllGroups() {
@@ -50,18 +48,12 @@ public class GroupRestService {
     }
 
     // http://localhost:10080/groups/{id}
-    // GET a particular group in JSON
+    // GET a particular group
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getGroup(@PathParam("id") String id) {
-        // need String instead of Integer otherwise we would have a conversion in the parameters !
+    public Response getGroup(@PathParam("id") int id) { // TODO: check input
 
-        // check parameters
-        if (id == null || !id.chars().allMatch(Character::isLetterOrDigit)) {
-            //https://www.techiedelight.com/check-string-contains-alphanumeric-characters-java/#:~:text=The%20idea%20is%20to%20use,matches%20the%20given%20regular%20expression.
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
         Group group=groupService.getGroup(id);
         if (group == null) { // group not found
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -78,43 +70,41 @@ public class GroupRestService {
     Just to try something : Response.ok(groupService.getGroup(id)).header("hello",42).build();
     */
 
-    // TODO: convention createGroup ?
+    // TODO: restriction on name ? or not
     // Create, add a group to the existing groups
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createGroup(Group group){
+    public Response createGroup(Group group){ // TODO: check input, for instance if we also enter id, not only name or only id
         /*
-        Examples with curl:
-        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"id":"24","name":"fabrice"}'
-        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"id":"13"}'
+        Create a group and returns HTTP status code and the location of the newly created object
 
-         Then use GET
-         */
-        // TODO: Need to check the JSON further
-        if (group.getId() == null) {
-            throw new IllegalArgumentException("Group id is null ! ");
-            // curl --verbose -H "Content-Type: application/json" -X DELETE http://localhost:10080/groups -d '{"name":"11"}'
-            // gives BAD REQUEST
-        }
+        Example with curl:
+        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test"}'
 
-        Group returnedGroup=groupService.createGroup(group); // get all groups and check if group inside list of groups
+         Then you use GET to see the created object
+        */
+
+        Group returnedGroup=groupService.createGroup(group); // get all groups and check if group inside groups
         // will add the Group if does not exist, otherwise return null
         if (returnedGroup == null){
             // group exists already
             return Response.status(Response.Status.CONFLICT).build(); // 409
         }
 
-        return Response.status(Response.Status.CREATED).header("Location", current_link.concat(group.getId())).build(); // 201
+        return Response.status(Response.Status.CREATED).header("Location", current_link.concat(String.valueOf(returnedGroup.getId()))).build(); // 201
     }
 
     // Update existing group
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateGroup(Group group){
+    public Response updateGroup(Group group){ // TODO: Need to check the JSON, and add 204 (No Content), seems still have 404 if we use only the name without id.
         /*
-        curl --verbose -H "Content-Type: application/json" -X PUT http://localhost:10080/groups -d '{"id":"24","name":"fabrice"}'
+        Update existing group. Need to know the id to update. Return modified object.
+
+        Example:
+        - curl --verbose -H "Content-Type: application/json" -X PUT http://localhost:10080/groups -d '{"id":3,"name":"fabrice"}'
+
          */
-        // TODO: Need to check the JSON, and add 204 (No Content)
 
         Group returnedGroup=groupService.updateGroup(group); // get all groups and check if group inside list of groups
         // will update the Group if exists, otherwise return null
@@ -123,26 +113,23 @@ public class GroupRestService {
             return Response.status(Response.Status.NOT_FOUND).build(); // 404
         }
 
-        return  Response.ok(returnedGroup).header("Location", current_link.concat(group.getId())).build(); // 200
+        return  Response.ok(returnedGroup).header("Location", current_link.concat(String.valueOf(group.getId()))).build(); // 200
     }
 
     // Delete existing group
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteGroup(String id){
+    public Response deleteGroup(int id){ // TODO: check input
         /*
-        curl --verbose -H "Content-Type: application/json" -X DELETE http://localhost:10080/groups -d "youridhere"
+        Delete existing group and return the deleted group.
+
         Example:
-        - curl --verbose -H "Content-Type: application/json" -X DELETE http://localhost:10080/groups -d "24"
+        - curl --verbose -H "Content-Type: application/json" -X DELETE http://localhost:10080/groups -d 4
 
         This does not work : '{"id":youridhere}'
          */
-        // check parameters
-        if (id == null || !id.chars().allMatch(Character::isLetterOrDigit)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
 
-        Group returnedGroup=groupService.deleteGroup(id); // get all groups and check if group inside list of groups
+        Group returnedGroup=groupService.deleteGroup(id); // get all groups and check if group inside groups
         // will delete the group if exists, otherwise return null
         if (returnedGroup == null){
             // group does not exist already
