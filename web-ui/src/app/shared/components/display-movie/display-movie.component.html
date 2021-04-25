@@ -1,21 +1,19 @@
 <div class="movie-container">
     <ng-container *ngIf="movie">
+        <ul>
+            <li *ngFor="let entry of movie | keyvalue">{{entry.key}}: {{entry.value}}</li>
+        </ul>
         <div class="poster-container box-shadow">
-            <!-- <ul>
-                <li [ngStyle]="{background: 'url(' + movie.backdrop + ')'}" *ngFor="let entry of movie | keyvalue">{{entry.key}}: {{entry.value}}</li>
-            </ul> -->
-            <!-- <div id="movie-backdrop" [style.background-image]="'linear-gradient(to right, slateblue 0%, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0) 70%, slateblue 100%), url(' + movie.backdrop + ')'">
-            </div> -->
-            <img class="poster-img" [src]="movie.poster" alt="movie poster">
+            <img class="poster-img" [src]="movie.poster_url" alt="movie poster">
         </div>
         <div class="movie-rating">
             <!-- We are using the bootstrap progression bar for the rating -->
             <div class="progress">
-                <div class="progress-bar bg-success" role="progressbar" [style.width.%]="movie.rating" [attr.aria-valuenow]="movie.rating" aria-valuemin="0" aria-valuemax="100"><span class="rating-text h3">{{movie.rating/10}}</span></div>
+                <div class="progress-bar bg-success" role="progressbar" [style.width.%]="movie.score * 10" [attr.aria-valuenow]="movie.score" aria-valuemin="0" aria-valuemax="10"><span class="rating-text h3">{{movie.score}}</span></div>
             </div>
         </div>
         <div class="movie-title">
-            <h2>{{movie.name}} ({{movie.year}})</h2>
+            <h2>{{movie.title}} ({{movie.release_year}})</h2>
         </div>
     </ng-container>
 </div>

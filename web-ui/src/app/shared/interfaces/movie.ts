@@ -4,9 +4,10 @@
  * */
 export interface Movie {
     id: number;
-    name: string;
-    year: string;
-    poster: string;
-    backdrop: string;
-    rating: number;
+    title: string;
+    release_year: number;
+    score: number;
+    poster_url: string;
+    backdrop_url: string;
+    genres: string[];
   }
