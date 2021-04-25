@@ -29,6 +29,7 @@ public class GroupServiceImpl implements GroupService{
     //@PersistenceContext(unitName = "GroupPU") // name is the same as in persistence.xml file
     private EntityManager em;
     private final EntityManagerFactory emFactory;
+    // TODO: when do I close : if ( emFactory != null ) emFactory.close(); ?
 
     /*
     We use null as return when there's an error. The HTTP code associated to them are written in GroupRestService.
@@ -37,101 +38,103 @@ public class GroupServiceImpl implements GroupService{
     If no error, return the group or list of groups.
     */
     public GroupServiceImpl(){
-
-        emFactory = Persistence.createEntityManagerFactory("GroupPU");
-
+        emFactory = Persistence.createEntityManagerFactory("GroupPU"); // name is the same as in persistence.xml file
     }
 
 
     public List<Group> getAllGroups(){
-        /*
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Group> criteria = builder.createQuery( Group.class );
-        criteria.from(Group.class);
-        return em.createQuery( criteria ).getResultList();
-        */
         try {
             em = emFactory.createEntityManager();
-            return em.createQuery("from Group", Group.class).getResultList();
+            CriteriaBuilder builder = em.getCriteriaBuilder();
+            CriteriaQuery<Group> criteria = builder.createQuery( Group.class );
+            criteria.from(Group.class);
+            return em.createQuery( criteria ).getResultList();
         }
         finally {
             if ( em != null ) em.close();
             //if ( emFactory != null ) emFactory.close();
-            return null;
         }
     }
 
-    // find by ID
+    // find by ID, names are not unique
     public Group getGroup(@NonNull int id){
         /* Need to find the group then return it, Id's are unique
         if not in the list return null, the Rest Service will take care of returning some HTTP code (404 not found here)
         https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html#find-java.lang.Class-java.lang.Object-
         */
-        System.out.println(id);
-        return em.find(Group.class, id); // null if not found, 404
+        try {
+            em = emFactory.createEntityManager();
+            System.out.println(id);
+            return em.find(Group.class, id); // null if not found, 404
+        }
+        finally {
+            if ( em != null ) em.close();
+        }
     }
 
+    // create a group using only the name
     public Group createGroup(@NonNull Group group){
-        // TODO: verify how id was init ? in Group class. I think we can always create ? because auto increment
         /*
-        if (group.getId() != null) {
-            // throw new IllegalArgumentException("Group already exists : " + group.getId());
-            return null; // the Rest Service will take care of returning some HTTP code, here CONFLICT 409
+        Can always create.. no restriction
+        TODO: return correctly group json ? maybe change the auto increment ?
+        TODO: Can always create.. no restriction. The Rest Service will take care of returning some HTTP code, here CONFLICT 409 ?
+         */
+        try{
+            em = emFactory.createEntityManager();
+            EntityTransaction trans = em.getTransaction();
+            trans.begin();
+
+            em.persist(group);
+            trans.commit();
+            return group;
         }
-        */
-        em.persist(group);
-        return group;
-        /*
-        // check if group in list of groups
-        for (Group g : groups) {
-            if (g.getId().equals(group.getId())) { // comparison of strings
-                return null; // the Rest Service will take care of returning some HTTP code, here CONFLICT 409
-            }
+        finally{
+            if ( em != null ) em.close();
         }
-        groups.add(group);
-        return group;
-        */
     }
 
     public Group updateGroup(@NonNull Group group){
-        Group g = em.find(Group.class, group.getId());
-        if (g == null) {
-            // throw new IllegalArgumentException("Instrument does not exist : " + instrument.getId());
-            return null; // error 404 not found in the group
-        }
-        em.merge(group);
-        return group;
-        /*
-        // probably do not want to update the id, only update the name
+        // Group need to has a non null id.
+        try{
+            em = emFactory.createEntityManager();
 
-        // find the group first, then update
-        for (Group g : groups) {
-            if (g.getId().equals(group.getId())) { // comparison of strings
-                return group; // not modifying yet
+            Group g = em.find(Group.class, group.getId());
+            if (g == null) {
+                return null; // error 404 not found in the group
             }
-        }
-         */
 
+            EntityTransaction trans = em.getTransaction();
+            trans.begin();
+
+            em.merge(group);
+
+            trans.commit();
+            return group;
+        }
+        finally{
+            if ( em != null ) em.close();
+        }
     }
 
     public Group deleteGroup(@NonNull int id){
-        Group group = em.find(Group.class, id);
-        if (group == null) {
-            // throw new IllegalArgumentException("Instrument does not exist : " + instrument.getId());
-            return null; // group does not exist, return null -> will be HTTP status code 404 not found
-        }
-        em.remove(group);
-        return group;
-        /*
-        for (int index=0; index < groups.size(); index++) {
-            if (groups.get(index).getId().equals(id)) { // comparison of strings
-                Group returnedGroup=groups.get(index);
-                groups.remove(index);
-                return returnedGroup;
+        try{
+            em = emFactory.createEntityManager();
+
+            Group group = em.find(Group.class, id);
+            if (group == null) {
+                return null; // group does not exist, return null -> will be HTTP status code 404 not found
             }
+
+            EntityTransaction trans = em.getTransaction();
+            trans.begin();
+
+            em.remove(group);
+
+            trans.commit();
+            return group;
         }
-        // group does not exist, return null -> will be HTTP status code 404 not found
-        return null;
-        */
+        finally{
+            if ( em != null ) em.close();
+        }
     }
 }
