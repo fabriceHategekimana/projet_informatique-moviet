@@ -5,8 +5,6 @@ services:
     container_name: group-service-database # name of container we'll see in docker ps
     networks:
       - backend-network
-    ports:
-      - "5432:5432" # port mapping from host to container port
     environment:
       POSTGRES_USER: group-service
       POSTGRES_PASSWORD: group-service
