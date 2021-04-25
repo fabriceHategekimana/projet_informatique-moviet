@@ -1,36 +1,21 @@
 language: java
-
 env:
-  - NODE_VERSION="12.13.1"
-  
+- NODE_VERSION="12.13.1"
 services:
-  - docker
-
+- docker
 addons:
   sonarcloud:
     organization: "moviet"
-    token:
-      secure: "**************************" # encrypted value of your token
-
-script:
-  # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
-  - travis encrypt 6e287f159a884b15aec523d75dfabd92bff714c4
-  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
 
 cache:
-    directories: #directories where the cache will be located
-      - .autoconf
-      - $HOME/.m2
-      - node_modules
+  directories:
+  - .autoconf
+  - $HOME/.m2
+  - node_modules
 
 jobs:
   include:
-    - stage: Prepare
-      script:
-      - nvm install $NODE_VERSION
-    - stage : Build
-      script:
-      - mvn install -Ppackage-docker-image  
-    - stage : Build
-      script:
-      - cd web-ui
+  - stage: Prepare
+    script:
+      - mvn clean install sonar:sonar -Dsonar.projectKey=fabriceHategekimana_projet_informatique-moviet -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=484c1228ccb3520a2722f9f54475d7c43089add6
+      - echo "Hello world!"
