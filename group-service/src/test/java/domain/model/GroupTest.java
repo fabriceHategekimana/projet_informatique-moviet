@@ -7,18 +7,7 @@ import org.junit.jupiter.api.Test;
 
 // just a test for unit testing
 public class GroupTest {
-    private final Group group=new Group("1", "hello world");
-
-    @Test // if forget to put this : test not launched
-    void testGetId(){
-        assertEquals("1", group.getId() );
-    }
-
-    @Test
-    void testSetId(){
-        group.setId("10");
-        assertEquals("10", group.getId() );
-    }
+    private final Group group=new Group("hello world");
 
     @Test
     void testGetName(){

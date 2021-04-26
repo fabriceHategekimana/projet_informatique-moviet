@@ -32,6 +32,12 @@
         <mockito.version>3.3.0</mockito.version>
 
         <java-ee-api.version>8.0.1</java-ee-api.version>
+        <jboss-jaxrs-api.artifactId>jboss-jaxrs-api_2.1_spec</jboss-jaxrs-api.artifactId>
+        <!-- DB: Used in the pom of modules + and can be in resources, module.xml-->
+        <postgresql.jdbc.driver.version>42.2.14</postgresql.jdbc.driver.version>
+        <hibernate-entitymanager.version>5.4.27.Final</hibernate-entitymanager.version>
+        <!--  -->
+
         <version.thorntail>2.7.0.Final</version.thorntail> <!-- careful about the version -->
 
         <!-- used to bypass some warning, say to maven that we do not need web xml -->
@@ -63,6 +69,20 @@
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>1.18.20</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.enterprise</groupId>
+                <artifactId>cdi-api</artifactId>
+                <version>2.0.SP1</version>
+                <scope>provided</scope>
+            </dependency>
+            <!-- jboss -->
+            <dependency>
+                <groupId>org.jboss.spec.javax.ws.rs</groupId>
+                <artifactId>${jboss-jaxrs-api.artifactId}</artifactId>
+                <version>1.0.1.Final</version>
                 <scope>provided</scope>
             </dependency>
 
