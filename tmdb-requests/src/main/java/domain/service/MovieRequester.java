@@ -7,11 +7,14 @@ import retrofit2.Response;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class MovieRequester implements MovieRequesterInterface {
+    private static final Logger LOGGER = Logger.getLogger(TmdbConfiguration.class.getName());
+
     public final String language;
     private final TmdbConfiguration tmdbConfiguration;
     private final String poster_size;
@@ -37,7 +40,7 @@ public class MovieRequester implements MovieRequesterInterface {
             if (response.isSuccessful()) {
                 Movie movie = response.body();
 
-                if (movie != null && movie.release_date != null){
+                if (movie != null && movie.release_date != null) {
                     String title = movie.title;
                     LocalDate localDate = movie.release_date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                     int release_year = localDate.getYear();
@@ -46,7 +49,7 @@ public class MovieRequester implements MovieRequesterInterface {
                     String backdrop_url = tmdbConfiguration.getBaseUrl() + this.backdrop_size + movie.backdrop_path;
 
                     List<String> genres = null;
-                    if (movie.genres != null){
+                    if (movie.genres != null) {
                         genres = movie.genres.stream().map(genre -> genre.name).collect(Collectors.toList());
                     }
 
@@ -54,7 +57,7 @@ public class MovieRequester implements MovieRequesterInterface {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, String.format("Couldn't retrieve movie information. (id: %s)", id), e);
         }
 
         return displayInfo;

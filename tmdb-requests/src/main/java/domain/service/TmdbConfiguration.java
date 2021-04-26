@@ -5,7 +5,12 @@ import com.uwetrottmann.tmdb2.entities.Configuration;
 import com.uwetrottmann.tmdb2.services.ConfigurationService;
 import retrofit2.Response;
 
-public class TmdbConfiguration implements TmdbConfigurationInterface{
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class TmdbConfiguration implements TmdbConfigurationInterface {
+    private static final Logger LOGGER = Logger.getLogger(TmdbConfiguration.class.getName());
+
     private final static TmdbConfiguration instance = new TmdbConfiguration();
     private final String API_KEY;
     private final Tmdb tmdb;
@@ -58,7 +63,7 @@ public class TmdbConfiguration implements TmdbConfigurationInterface{
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Couldn't retrieve Tmdb base url", e);
         }
 
         return BaseUrl;
