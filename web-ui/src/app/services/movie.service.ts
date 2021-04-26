@@ -17,11 +17,11 @@ export class MovieService {
       'userid':'1'
     })};
 
-  private movieUrl : string = "http://localhost:10081/movies/0";
+  private movieUrl : string = "http://localhost:10081/movies/1";
 
   constructor(private http: HttpClient) { }
 
-  getMovie(): Observable<any> {
+  getMovie(): Observable<any> { // type any because get can return httpEvent or Observable<Movie>
     // console.log(this.http.get<Movie>(movieUrl, httpOptions));
     return this.http.get<Movie>(this.movieUrl, this.httpOptions)
                   .pipe(catchError(this.handleError<Movie>('getMovie', undefined)));
