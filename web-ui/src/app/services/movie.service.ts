@@ -11,11 +11,10 @@ export class MovieService {
 
   // http options for the request
   private httpOptions = {
-    headers: new HttpHeaders({ 
-      'Access-Control-Allow-Origin':'*',
-      'Authorization':'authkey',
-      'userid':'1'
+    headers: new HttpHeaders({
+
     })};
+
 
   private movieUrl : string = "http://localhost:10081/movies/0";
 
