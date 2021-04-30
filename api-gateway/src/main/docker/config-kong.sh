@@ -1,7 +1,7 @@
 #Creates the services.
 
 
-curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=group-service" --data-urlencode "url=http://localhost:8080/groups"
+curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=group-service" --data-urlencode "url=http://group-service:8080/groups"
 
 
 #Creates the routes
