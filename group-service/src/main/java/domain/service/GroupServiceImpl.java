@@ -28,7 +28,6 @@ public class GroupServiceImpl implements GroupService{
     //@PersistenceContext(unitName = "GroupPU") // name is the same as in persistence.xml file
     private EntityManager em;
     private final EntityManagerFactory emFactory;
-    // TODO: when do I close : if ( emFactory != null ) emFactory.close(); ?
 
     /*
     We use null as return when there's an error. The HTTP code associated to them are written in GroupRestService.
@@ -74,9 +73,7 @@ public class GroupServiceImpl implements GroupService{
     // create a group using only the name
     public Group createGroup(@NonNull Group group){
         /*
-        Can always create.. no restriction
-        TODO: return correctly group json ? maybe change the auto increment ?
-        TODO: Can always create.. no restriction. The Rest Service will take care of returning some HTTP code, here CONFLICT 409 ?
+        Can always create.. no restriction due to auto increment of unique identifier / primary key
          */
         try{
             em = emFactory.createEntityManager();
