@@ -16,7 +16,7 @@ export class MovieService {
     })};
 
 
-  private movieUrl : string = "http://localhost:10081/movies/0";
+  private movieUrl : string = "http://localhost:10081/Mock_movies/0"; //! MOCK
 
   constructor(private http: HttpClient) { }
 

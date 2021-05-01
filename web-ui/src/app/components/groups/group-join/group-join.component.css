@@ -1,0 +1,13 @@
+#group-choice {
+    position: relative;
+    width: 20em;
+    height: 50em;
+    margin: 0 auto;
+    -webkit-transform: translateY(-4em);
+    transform: translateY(-4em);
+}
+
+/* background */
+.background-box {
+    background-image: url("../../../../assets/background/background-groups.jpg");
+}
