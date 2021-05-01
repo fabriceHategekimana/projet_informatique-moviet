@@ -79,7 +79,7 @@ public class GroupRestService {
         */
         // only want non init id and non null name, otherwise bad request
         if ((group.getId() != 0) || (group.getName() == null)){
-            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : id should not be initialized: id = " + group.getId() + ". Moreover, all the other attributes need to be instantiated").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : only other attributes than id are (must be) initialized: " + group).build();
         }
         Group returnedGroup=groupService.createGroup(group); // can never have conflict if id are auto-incremented.
 
@@ -98,7 +98,7 @@ public class GroupRestService {
          */
         // only want initialized id and non null name, otherwise bad request
         if ((group.getId() == 0) || (group.getName() == null)){
-            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : all attributes need to be instantiated").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : all attributes need to be instantiated: " + group).build();
         }
         Group returnedGroup=groupService.updateGroup(group); // get all groups and check if group inside list of groups
         // will update the Group if exists, otherwise return null
@@ -113,7 +113,7 @@ public class GroupRestService {
     // Delete existing group
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteGroup(String str_id){ // TODO: check input
+    public Response deleteGroup(String str_id){
         /*
         Delete existing group and return the deleted group.
 
