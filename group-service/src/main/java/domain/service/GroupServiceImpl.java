@@ -23,7 +23,6 @@ import javax.persistence.EntityManagerFactory;
 
 @ApplicationScoped
 public class GroupServiceImpl implements GroupService{
-    // TODO: DB + be careful about concurrency
     // private List<Group> groups=new ArrayList<>(); // temporary, no DB for the moment..
 
     //@PersistenceContext(unitName = "GroupPU") // name is the same as in persistence.xml file
