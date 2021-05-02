@@ -1,1 +1,4 @@
-<p>group-info works!</p>
+<div *ngIf="currentGroup">
+    <h2>Group ID: {{currentGroup.id}}</h2>
+    <h2>Created by: {{currentGroup.name}}</h2>
+</div>
