@@ -15,6 +15,7 @@ export class GroupGenresComponent implements OnInit {
 
   ngOnInit(): void {
     this.groupsComponent.getGroup(
+      undefined,
       () => {
         this.currentGroup = this.groupsComponent.currentGroup; // save the current group
         console.log(this.currentGroup);

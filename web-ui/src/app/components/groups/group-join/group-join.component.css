@@ -11,3 +11,9 @@
 .background-box {
     background-image: url("../../../../assets/background/background-groups.jpg");
 }
+
+#join-container {
+    display: none;
+    /* display: flex; */
+    flex-direction: column;
+}

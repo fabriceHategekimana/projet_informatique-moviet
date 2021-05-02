@@ -20,9 +20,10 @@ export class GroupsComponent implements OnInit {
   }
 
   // the default "then" function is empty and the default "onError" = error 404 if groupId does not exist
-  getGroup(then: () => any = () => void 0, onError: () => any = () => {this.router.navigate(['**'], { skipLocationChange: true });}): void {
-    let id = this.route.snapshot.paramMap.get('groupId'); // get the group ID
-    if (id) {
+  getGroup(id : number | string | undefined | null = undefined, then: () => any = () => void 0, onError: () => any = () => {this.router.navigate(['**'], { skipLocationChange: true });}): void {
+    if (id == undefined)
+      id = this.route.snapshot.paramMap.get('groupId'); // get the group ID
+    if (id != null && id != undefined) {
       // get the group object:
       this.groupService.getGroup(Number(id))
         .subscribe(currentGroup => {
