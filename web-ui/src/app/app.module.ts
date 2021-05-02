@@ -15,6 +15,7 @@ import { DisplayMovieComponent } from './shared/components/display-movie/display
 import { GroupGenresComponent } from './components/groups/group-genres/group-genres.component';
 import { GroupJoinComponent } from './components/groups/group-join/group-join.component';
 import { GroupInfoComponent } from './components/groups/group-info/group-info.component';
+import { GroupFindMatchComponent } from './components/groups/group-find-match/group-find-match.component';
 
 @NgModule({
   declarations: [
@@ -29,14 +30,15 @@ import { GroupInfoComponent } from './components/groups/group-info/group-info.co
     DisplayMovieComponent,
     GroupGenresComponent,
     GroupJoinComponent,
-    GroupInfoComponent
+    GroupInfoComponent,
+    GroupFindMatchComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule
   ],
-  providers: [],
+  providers: [DisplayMovieComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

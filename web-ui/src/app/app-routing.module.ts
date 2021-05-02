@@ -9,6 +9,7 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
 import { GroupInfoComponent } from './components/groups/group-info/group-info.component'
 import { GroupGenresComponent } from './components/groups/group-genres/group-genres.component'
 import { GroupJoinComponent } from './components/groups/group-join/group-join.component'
+import { GroupFindMatchComponent } from './components/groups/group-find-match/group-find-match.component'
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -23,7 +24,8 @@ const routes: Routes = [
   {path: 'groups/:groupId', component: GroupsComponent, // with parameters
     children: [
       {path: '', component: GroupInfoComponent, pathMatch: 'full'},
-      {path: 'genres' , component: GroupGenresComponent}
+      {path: 'genres' , component: GroupGenresComponent},
+      {path: 'find-match', component: GroupFindMatchComponent}
     ]
   },
   {path: 'display', component: DisplayMovieComponent }, //*! DEBUG to remove later
