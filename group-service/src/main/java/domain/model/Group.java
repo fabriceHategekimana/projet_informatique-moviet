@@ -26,7 +26,6 @@ import javax.persistence.Table;
 public class Group {
     @Id @GeneratedValue( strategy=GenerationType.IDENTITY ) // Generated Value, automatically generated following how the db was configured
     private int id;
-    // TODO: check no setter for id
     @Setter @NotNull
     private String name;
 
