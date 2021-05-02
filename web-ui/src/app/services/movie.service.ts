@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Movie } from '../shared/interfaces/movie'; // import the movie interface
+import { Movie } from '../shared/interfaces/movie' // import the movie interface
+import { Tag, Tags } from '../shared/interfaces/tags'
 import { Observable, of } from 'rxjs'; // Observable => HTTP methods return Observable objects
-import { HttpClient, HttpHeaders } from '@angular/common/http'; // http requests
-import { catchError, map, tap } from 'rxjs/operators'; // error handling
+import { HttpClient, HttpHeaders } from '@angular/common/http' // http requests
+import { catchError, map, tap } from 'rxjs/operators' // error handling
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +35,18 @@ export class MovieService {
     //   score: 8.5,
     //   genres: ["Action"]});
   }
+
+  getTags(): Observable<any> { // type any because get can return httpEvent or Observable<Tags>
+    //! return Mock
+    return of({
+      tags: [
+        // {name: "years", values: ["1990", "2000", "2010"]},
+        {name: "genre", values: ["Adventure", "Action", "Thriller", "Romance"]},
+        {name: "OtherTag", values: ["value1", "value2", "value3"]}
+      ]
+    })
+  }
+
   //** handle error function from https://angular.io/tutorial/toh-pt6
   /**
    * Handle Http operation that failed.

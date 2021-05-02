@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs'; // Observable => HTTP methods return Observable objects
-import { HttpClient, HttpHeaders } from '@angular/common/http'; // http requests
-import { catchError, map, tap } from 'rxjs/operators'; // error handling
+import { Injectable } from '@angular/core'
+import { Observable, of } from 'rxjs' // Observable => HTTP methods return Observable objects
+import { HttpClient, HttpHeaders } from '@angular/common/http' // http requests
+import { catchError, map, tap } from 'rxjs/operators' // error handling
 import { Group } from '../shared/interfaces/group'
 
 @Injectable({
