@@ -41,6 +41,22 @@ export class GroupGenresComponent implements OnInit {
     let name = el.name;
     let value = el.value;
     console.log(el.checked)
-    //TODO: update selection
+    //TODO: update selection + remove case
+    if (this.tags) {
+      if (el.checked) {
+        // check if the tag exist:
+        let tagIndex = this.selectedTags.tags.findIndex((tag) => tag.name == name);
+        if (tagIndex == -1) { // if the object doesn't exist
+          this.selectedTags.tags.push({name: name, values: [value]}) // add the new object
+          tagIndex = 0;
+        } else {
+          if (!this.selectedTags.tags[tagIndex].values.includes(value)) { // if it does not contain the value, we will add it
+            this.selectedTags.tags[tagIndex].values.push(value);
+          }
+        }
+      } else {
+  
+      }
+    }
   }
 }
