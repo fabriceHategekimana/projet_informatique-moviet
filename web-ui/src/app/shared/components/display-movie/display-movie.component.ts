@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core'
 import { MovieService } from '../../../services/movie.service'
 import { Movie } from '../../interfaces/movie'
 
@@ -17,7 +17,7 @@ export class DisplayMovieComponent implements OnInit {
     this.getMovie();
   }
 
-  getMovie() : void {
+  getMovie(): void {
     // subscribe to get the movie: async fct
     this.movieService.getMovie()
         .subscribe(movie => this.movie = movie);
