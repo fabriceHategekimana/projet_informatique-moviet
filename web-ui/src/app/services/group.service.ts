@@ -15,7 +15,7 @@ export class GroupService {
     })};
 
 
-  private groupsUrl : string = "http://localhost:10080/groups";
+  private groupsUrl : string = "http://localhost/api/v1/groups"; // url using api
 
   constructor(private http: HttpClient) { }
 
