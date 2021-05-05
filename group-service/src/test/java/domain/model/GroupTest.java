@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 // just a test for unit testing
 public class GroupTest {
-    private final Group group=new Group("hello world");
+    private final Group group = new Group("hello world");
 
     @Test
     void testGetId(){
@@ -21,8 +21,9 @@ public class GroupTest {
 
     @Test
     void testSetName(){
-        group.setName("hello universe");
-        assertEquals("hello universe", group.getName() );
+        Group tmpgroup = new Group("hello world");
+        tmpgroup.setName("hello universe");
+        assertEquals("hello universe", tmpgroup.getName() );
     }
 
     @Test
@@ -33,6 +34,11 @@ public class GroupTest {
     @Test
     void testGetNameNoArgsConstructor(){
         assertEquals(null, new Group().getName() );
+    }
+
+    @Test
+    void testToString(){
+        assertEquals("Group(id=0, name=hello world)", group.toString() );
     }
     // fail a test -> Build failure
 }
