@@ -2,7 +2,6 @@ package domain.model;
 
 // These three are from @Data but we add @Setter one by one and the constructor.
 import lombok.ToString;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import lombok.NoArgsConstructor;

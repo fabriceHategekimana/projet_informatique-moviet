@@ -21,40 +21,6 @@
     <microservice.port>10080</microservice.port> <!-- bind 8080 port of container to TCP port 10080 on localhost of the host machine-->
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>io.thorntail</groupId>
-        <artifactId>bom-all</artifactId>
-        <version>${version.thorntail}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
-  <build>
-    <finalName>${project.artifactId}</finalName>
-
-    <plugins>
-      <plugin>
-        <!-- For packaging -->
-        <groupId>io.thorntail</groupId>
-        <artifactId>thorntail-maven-plugin</artifactId>
-        <version>${version.thorntail}</version>
-        
-        <executions>
-          <execution>
-            <goals>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-    </plugins>
-  </build>
-
   <dependencies>
     <dependency>
       <groupId>io.thorntail</groupId>
@@ -114,6 +80,103 @@
       <version>${hibernate-entitymanager.version}</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
+
+  <build>
+    <finalName>${project.artifactId}</finalName>
+
+    <plugins>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unit-tests</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <!-- no IT for the moment..
+          <execution>
+            <id>pre-integration-test-prepare-agent</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+            <configuration>
+              <append>false</append>
+              <propertyName>jacoco.it.tests</propertyName>
+              <destFile>${project.build.directory}/jacoco-it.exec</destFile>
+              <address>localhost</address>
+              <output>tcpserver</output>
+              <port>10001</port>
+              <reset>false</reset>
+              <skip>${skip.dump}</skip>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>post-integration-test-prepare-agent</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>dump</goal>
+            </goals>
+            <configuration>
+              <append>false</append>
+              <propertyName>jacoco.it.tests</propertyName>
+              <destFile>${project.build.directory}/jacoco-it.exec</destFile>
+              <address>localhost</address>
+              <output>tcpserver</output>
+              <port>10001</port>
+              <reset>false</reset>
+              <skip>${skip.dump}</skip>
+            </configuration>
+          </execution>-->
+          <execution>
+            <id>merge-coverage</id>
+            <phase>install</phase>
+            <goals>
+              <goal>merge</goal>
+            </goals>
+            <configuration>
+              <destFile>${project.build.directory}/coverage-merged.exec</destFile>
+              <fileSets>
+                <fileSet>
+                  <directory>${project.build.directory}</directory>
+                  <includes>
+                    <include>*.exec</include>
+                  </includes>
+                </fileSet>
+              </fileSets>
+            </configuration>
+          </execution>
+          <execution>
+            <id>verify-report</id>
+            <phase>install</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <dataFile>${project.build.directory}/coverage-merged.exec</dataFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <!-- For packaging -->
+        <groupId>io.thorntail</groupId>
+        <artifactId>thorntail-maven-plugin</artifactId>
+        <version>${version.thorntail}</version>
+
+        <executions>
+          <execution>
+            <goals>
+              <goal>package</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

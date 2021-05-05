@@ -62,6 +62,25 @@
                 <type>pom</type>
             </dependency>
 
+            <!-- "Swagger is a JSON representation of a RESTful API,
+            typically made available over HTTP at /swagger.json. This JSON document contains information about
+            your APIs, including names, paths, endpoints, parameters, descriptions, keywords, expected responses, and more."
+            More informations can be found here: https://thorntail.io/posts/wildfly-swarm-s-got-swagger/ -->
+            <dependency>
+                <groupId>io.thorntail</groupId>
+                <artifactId>swagger</artifactId>
+                <version>${version.thorntail}</version>
+            </dependency>
+
+            <!-- https://github.com/dadrus/jpa-unit -->
+            <dependency>
+                <groupId>com.github.dadrus.jpa-unit</groupId>
+                <artifactId>jpa-unit-bom</artifactId>
+                <version>0.5.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <!-- Lombok : annotations -->
             <!-- https://projectlombok.org/setup/maven , https://projectlombok.org/features/all-->
             <!-- http://anthonywhitford.com/lombok.maven/lombok-maven-plugin/usage.html -->
