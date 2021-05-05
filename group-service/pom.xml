@@ -96,7 +96,7 @@
               <goal>prepare-agent</goal>
             </goals>
           </execution>
-
+          <!-- no IT for the moment..
           <execution>
             <id>pre-integration-test-prepare-agent</id>
             <phase>pre-integration-test</phase>
@@ -114,7 +114,7 @@
               <skip>${skip.dump}</skip>
             </configuration>
           </execution>
-          <!-- no IT for the moment..
+
           <execution>
             <id>post-integration-test-prepare-agent</id>
             <phase>post-integration-test</phase>
@@ -163,6 +163,20 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <!-- For packaging -->
+        <groupId>io.thorntail</groupId>
+        <artifactId>thorntail-maven-plugin</artifactId>
+        <version>${version.thorntail}</version>
+
+        <executions>
+          <execution>
+            <goals>
+              <goal>package</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>
