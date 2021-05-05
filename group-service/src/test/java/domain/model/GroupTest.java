@@ -10,6 +10,11 @@ public class GroupTest {
     private final Group group=new Group("hello world");
 
     @Test
+    void testGetId(){
+        assertEquals(0, group.getId() );
+    }
+    
+    @Test
     void testGetName(){
         assertEquals("hello world", group.getName() );
     }
@@ -20,5 +25,14 @@ public class GroupTest {
         assertEquals("hello universe", group.getName() );
     }
 
+    @Test
+    void testGetIdNoArgsConstructor(){
+        assertEquals(0, new Group().getId() );
+    }
+
+    @Test
+    void testGetNameNoArgsConstructor(){
+        assertEquals(null, new Group().getName() );
+    }
     // fail a test -> Build failure
 }

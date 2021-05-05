@@ -20,7 +20,6 @@ import javax.persistence.Table;
 
 @ToString
 @Getter
-@EqualsAndHashCode
 @NoArgsConstructor // need this otherwise can have some problems with PUT (create) requests
 @Entity @Table( name="T_groups")// JPA, mapping class - table
 public class Group {
