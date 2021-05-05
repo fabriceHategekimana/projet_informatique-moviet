@@ -15,11 +15,27 @@ import domain.model.Group;
 // service
 import domain.service.GroupService;
 
+/*
+https://thorntail.io/posts/wildfly-swarm-s-got-swagger/
+
+In simple terms, Swagger is a JSON representation of a RESTful API, typically made available over HTTP at /swagger.json.
+This JSON document contains information about your APIs, including names, paths, endpoints, parameters, descriptions,
+keywords, expected responses, and more.
+Per the Open API Specification, the goal of Swagger is to "define a standard, language-agnostic interface to REST APIs
+which allows both humans and computers to discover and understand the capabilities of the service without access to
+source code, documentation, or through network traffic inspection".
+
+ */
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 
 // https://www.restapitutorial.com/lessons/httpmethods.html
 
 @ApplicationScoped // singleton
 @Path("/groups")
+@Api(value = "group")
+@Produces({"application/json", "application/xml"})
 public class GroupRestService {
     // Endpoint
 
@@ -30,18 +46,18 @@ public class GroupRestService {
 
 
     // http://localhost:10080/groups
-    // GET a list of all groups
     @GET
-    @Produces(MediaType.APPLICATION_JSON) // TODO: reduce the number of groups that we return
+    @Produces(MediaType.APPLICATION_JSON) // TODO: reduce the number of groups that we
+    @ApiOperation(value = "GET a list of all groups")
     public Response getAllGroups() {
         return Response.ok(groupService.getAllGroups()).build(); // we can even add headers using .header() before .build()
     }
 
     // http://localhost:10080/groups/{id}
-    // GET a particular group
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "GET a particular group")
     public Response getGroup(@PathParam("id") String str_id) {
         try {
             int id = Integer.parseInt(str_id);
@@ -64,9 +80,10 @@ public class GroupRestService {
     Just to try something : Response.ok(groupService.getGroup(id)).header("hello",42).build();
     */
 
-    // Create, add a group to the existing groups
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Create, add a group to the existing groups")
     public Response createGroup(Group group){
         /*
         Create a group and returns HTTP status code and the location of the newly created object. It's possible to create multiple
@@ -86,9 +103,10 @@ public class GroupRestService {
         return Response.status(Response.Status.CREATED).header("Location", current_link.concat(String.valueOf(returnedGroup.getId()))).build(); // 201
     }
 
-    // Update existing group
     @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Update existing group")
     public Response updateGroup(Group group){
         /*
         Update existing group. Need to know the id to update. Return modified object.
@@ -110,9 +128,9 @@ public class GroupRestService {
         return  Response.ok(returnedGroup).header("Location", current_link.concat(String.valueOf(group.getId()))).build(); // 200
     }
 
-    // Delete existing group
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Delete existing group")
     public Response deleteGroup(String str_id){
         /*
         Delete existing group and return the deleted group.
