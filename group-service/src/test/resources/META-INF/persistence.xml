@@ -12,7 +12,7 @@
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
             <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://group-service-database:5432/group-service"/>
-            <!--H2 database : http://www.h2database.com/html/features.html#in_memory_databases -->
+            <!--H2 in memory database : http://www.h2database.com/html/features.html#in_memory_databases -->
             <!--property name="javax.persistence.jdbc.url"
                       value="jdbc:h2:mem:serviceEnablerDB;DB_CLOSE_DELAY=-1" /-->
             <property name="javax.persistence.jdbc.user" value="group-service" />
