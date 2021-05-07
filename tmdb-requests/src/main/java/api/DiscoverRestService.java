@@ -172,7 +172,7 @@ public class DiscoverRestService {
 
         public DiscoverFilter.Separator stringToSeparator(String s) {
             if (s == null) {
-                throw new IllegalArgumentException();
+                return DiscoverFilter.Separator.AND;
             }
             switch (s) {
                 case "AND":

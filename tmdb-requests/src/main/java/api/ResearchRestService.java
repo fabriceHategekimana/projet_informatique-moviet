@@ -146,9 +146,9 @@ public class ResearchRestService {
     @GET
     @Path("/movie/{query}/{page}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response researchMoviePage(@PathParam("query") String query, @QueryParam("year") Integer year, @QueryParam("primaryReleaseYear") Integer primaryReleaseYear) {
+    public Response researchMoviePage(@PathParam("query") String query, @PathParam("page") Integer page, @QueryParam("year") Integer year, @QueryParam("primaryReleaseYear") Integer primaryReleaseYear) {
 
-        MovieResultsPage movieResultsPage = searchRequester.searchMovie(query, null, searchRequester.language, searchRequester.region, searchRequester.includeAdult, year, primaryReleaseYear);
+        MovieResultsPage movieResultsPage = searchRequester.searchMovie(query, page, searchRequester.language, searchRequester.region, searchRequester.includeAdult, year, primaryReleaseYear);
 
         if (movieResultsPage == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
