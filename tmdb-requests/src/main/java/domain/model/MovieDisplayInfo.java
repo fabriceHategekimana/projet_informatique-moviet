@@ -25,6 +25,7 @@ public class MovieDisplayInfo {
         this.poster_url = poster_url;
         this.backdrop_url = backdrop_url;
         this.genres = genres;
+        // TODO Add overview
     }
 
     private static String getBaseUrl() {
