@@ -3,11 +3,11 @@
 
 curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=group-service" --data-urlencode "url=http://group-service:8080/groups"
 curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=movie-service-mock" --data-urlencode "url=http://movie-service:8080/Mock_movies"
-curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=movie-service-service" --data-urlencode "url=http://movie-service:8080/movies"
+curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=movie-service" --data-urlencode "url=http://movie-service:8080/movies"
 
 curl -S -s -i -X POST  --url http://api-gateway:8001/services/group-service/routes --data-urlencode "paths[]=/api/v1/groups" 
 curl -S -s -i -X POST  --url http://api-gateway:8001/services/movie-service-mock/routes --data-urlencode "paths[]=/api/v1/Mock_movies"
-curl -S -s -i -X POST  --url http://api-gateway:8001/services/movie-service-service/routes --data-urlencode "paths[]=/api/v1/movies"
+curl -S -s -i -X POST  --url http://api-gateway:8001/services/movie-service/routes --data-urlencode "paths[]=/api/v1/movies"
 
 
 #Enable the Open ID Plugin
