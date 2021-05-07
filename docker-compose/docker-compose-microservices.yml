@@ -14,7 +14,7 @@ services:
       interval: 30s # wait 30 seconds, try connecting
       timeout: 30s # if cannot connect, wait timeout before retrying
       retries: 3
-    volumes: # need to see in more details
+    volumes: # like mounting a folder from the host machine to the container, see docker volume inspect <volume_name>
       - postgresql-db-group-service:/var/lib/postgresql/data # careful, do not add a space in between
       - ./data/groups/:/docker-entrypoint-initdb.d/
     restart: on-failure
@@ -24,12 +24,13 @@ services:
   group-service:
     image: unige/group-service # use already built image that we've built from Maven
     container_name: group-service # name of container we'll see in docker ps
+    hostname: group-service
     ports:
       - "10080:8080" # port mapping from host to container port
     networks:
       - backend-network
     environment: # for thorntail
-      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_CONNECTION_DASH_URL: "jdbc:postgresql://group-service-database:5432/group-service" # it should be the name of the database !
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_CONNECTION_DASH_URL: "jdbc:postgresql://group-service-database:5432/group-service" # it should be the name of the database ! 5432 is a port defined by pg
       THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_DRIVER_DASH_NAME: 'postgresql'
       THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_USER_DASH_NAME: 'group-service'
       THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_PASSWORD: 'group-service'
@@ -39,13 +40,14 @@ services:
   tmdb-requests:
     image: unige/tmdb-requests # use already built image that we've built from Maven
     container_name: tmdb-requests # name of container we'll see in docker ps
+    hostname: tmdb-requests-service
     ports:
       - "10081:8080" # port mapping from host to container port
     networks:
       - backend-network
     # no database or not yet
 
-networks:
+networks: # networks isolates communication between some containers
   backend-network:
     driver: bridge
 

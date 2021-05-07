@@ -12,6 +12,10 @@ import { LoginComponent } from './components/login/login.component';
 import { GroupsComponent } from './components/groups/groups.component';
 import { RegisterComponent } from './components/register/register.component';
 import { DisplayMovieComponent } from './shared/components/display-movie/display-movie.component';
+import { GroupGenresComponent } from './components/groups/group-genres/group-genres.component';
+import { GroupJoinComponent } from './components/groups/group-join/group-join.component';
+import { GroupInfoComponent } from './components/groups/group-info/group-info.component';
+import { GroupFindMatchComponent } from './components/groups/group-find-match/group-find-match.component';
 
 @NgModule({
   declarations: [
@@ -23,14 +27,18 @@ import { DisplayMovieComponent } from './shared/components/display-movie/display
     LoginComponent,
     GroupsComponent,
     RegisterComponent,
-    DisplayMovieComponent
+    DisplayMovieComponent,
+    GroupGenresComponent,
+    GroupJoinComponent,
+    GroupInfoComponent,
+    GroupFindMatchComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule
   ],
-  providers: [],
+  providers: [DisplayMovieComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -2,7 +2,6 @@ package domain.model;
 
 // These three are from @Data but we add @Setter one by one and the constructor.
 import lombok.ToString;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import lombok.NoArgsConstructor;
@@ -20,13 +19,11 @@ import javax.persistence.Table;
 
 @ToString
 @Getter
-@EqualsAndHashCode
 @NoArgsConstructor // need this otherwise can have some problems with PUT (create) requests
 @Entity @Table( name="T_groups")// JPA, mapping class - table
 public class Group {
     @Id @GeneratedValue( strategy=GenerationType.IDENTITY ) // Generated Value, automatically generated following how the db was configured
     private int id;
-    // TODO: check no setter for id
     @Setter @NotNull
     private String name;
 

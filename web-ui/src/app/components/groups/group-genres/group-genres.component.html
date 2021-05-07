@@ -1,0 +1,15 @@
+<ng-container *ngIf="tags"><!-- only show the tags if they exist -->
+<div class="justify-content-center" id="preferences-container">
+    <div class="mt-5 d-flex flex-column" *ngFor="let tag of tags.tags">
+        <h2>{{tag.name}}</h2>
+        <div class="d-flex flex-inline tag-values-container">
+            <div class="btn-container btn-group btn-group-toggle" *ngFor="let value of tag.values">
+                <label class="ml-5 btn btn-outline-primary" [class.active]="checkboxInput.checked" (click)="checkBtn(checkboxInput)">
+                    <input class="btn-check" #checkboxInput type="checkbox" [name]="tag.name" [value]="value" autocomplete="off">{{value}}
+                </label>
+            </div>
+        </div>       
+    </div>
+    <div type="button" class="btn btn-primary btn-lg btn-block mt-5" id="btn-start" (click)="processPreferences()">Start</div>
+</div>
+</ng-container>

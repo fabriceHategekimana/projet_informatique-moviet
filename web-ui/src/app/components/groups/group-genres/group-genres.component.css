@@ -1,0 +1,14 @@
+.btn-container {
+    display: flex;
+    margin-left: 0.5em;
+}
+
+#preferences-container {
+    text-align: center;
+    justify-content: center;
+}
+
+.tag-values-container {
+    text-align: center;
+    justify-content: center;
+}
