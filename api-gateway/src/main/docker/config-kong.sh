@@ -2,14 +2,12 @@
 
 
 curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=group-service" --data-urlencode "url=http://group-service:8080/groups"
-
-
-#Creates the routes
-#curl -S -s -i -X POST  --url http://api-gateway:8001/services/group-service/routes --data "name=group-route-get&paths[]=/api/v1/groups&methods[]=GET"
-#curl -S -s -i -X POST  --url http://api-gateway:8001/services/group-service/routes --data "name=group-route-mod&paths[]=/api/v1/groups&methods[]=POST&methods[]=DELETE&methods[]=PUT"
-
+curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=tmdb-requests-mock" --data-urlencode "url=http://tmdb-requests-service:8080/Mock_movies"
+curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=tmdb-requests-service" --data-urlencode "url=http://tmdb-requests-service:8080/movies"
 
 curl -S -s -i -X POST  --url http://api-gateway:8001/services/group-service/routes --data-urlencode "paths[]=/api/v1/groups" 
+curl -S -s -i -X POST  --url http://api-gateway:8001/services/tmdb-requests-mock/routes --data-urlencode "paths[]=/api/v1/Mock_movies"
+curl -S -s -i -X POST  --url http://api-gateway:8001/services/tmdb-requests-service/routes --data-urlencode "paths[]=/api/v1/movies"
 
 
 #Enable the Open ID Plugin

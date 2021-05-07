@@ -40,6 +40,7 @@ services:
   tmdb-requests:
     image: unige/tmdb-requests # use already built image that we've built from Maven
     container_name: tmdb-requests # name of container we'll see in docker ps
+    hostname: tmdb-requests-service
     ports:
       - "10081:8080" # port mapping from host to container port
     networks:
