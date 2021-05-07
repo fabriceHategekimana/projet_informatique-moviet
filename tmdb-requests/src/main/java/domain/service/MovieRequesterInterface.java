@@ -12,5 +12,6 @@ public interface MovieRequesterInterface {
     MovieDisplayInfo getDisplayInfo(int id);
     List<Genre> getGenres();
     MovieResultsPage discover(DiscoverRequest request, @Nullable Integer page);
+    // Todo add method that returns Movie with a representation specifically to be compared with other in the poll algorithm
 
 }
