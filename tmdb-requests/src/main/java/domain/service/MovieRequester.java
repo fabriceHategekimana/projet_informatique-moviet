@@ -1,19 +1,25 @@
 package domain.service;
 
+import com.uwetrottmann.tmdb2.DiscoverMovieBuilder;
+import com.uwetrottmann.tmdb2.entities.Genre;
+import com.uwetrottmann.tmdb2.entities.GenreResults;
 import com.uwetrottmann.tmdb2.entities.Movie;
+import com.uwetrottmann.tmdb2.entities.MovieResultsPage;
+import com.uwetrottmann.tmdb2.services.DiscoverService;
+import com.uwetrottmann.tmdb2.services.GenresService;
 import com.uwetrottmann.tmdb2.services.MoviesService;
+import domain.model.DiscoverRequest;
 import domain.model.MovieDisplayInfo;
+import org.jetbrains.annotations.Nullable;
+import retrofit2.Call;
 import retrofit2.Response;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class MovieRequester implements MovieRequesterInterface {
-    private static final Logger LOGGER = Logger.getLogger(TmdbConfiguration.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MovieRequester.class.getName());
 
     public final String language;
     private final TmdbConfiguration tmdbConfiguration;
@@ -40,20 +46,8 @@ public class MovieRequester implements MovieRequesterInterface {
             if (response.isSuccessful()) {
                 Movie movie = response.body();
 
-                if (movie != null && movie.release_date != null) {
-                    String title = movie.title;
-                    LocalDate localDate = movie.release_date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                    int release_year = localDate.getYear();
-                    Double score = movie.vote_average;
-                    String poster_url = tmdbConfiguration.getBaseUrl() + this.poster_size + movie.poster_path;
-                    String backdrop_url = tmdbConfiguration.getBaseUrl() + this.backdrop_size + movie.backdrop_path;
-
-                    List<String> genres = null;
-                    if (movie.genres != null) {
-                        genres = movie.genres.stream().map(genre -> genre.name).collect(Collectors.toList());
-                    }
-
-                    displayInfo = new MovieDisplayInfo(id, title, release_year, score, poster_url, backdrop_url, genres);
+                if (movie != null) {
+                    displayInfo = new MovieDisplayInfo(movie, poster_size, backdrop_size);
                 }
             }
         } catch (Exception e) {
@@ -61,5 +55,59 @@ public class MovieRequester implements MovieRequesterInterface {
         }
 
         return displayInfo;
+    }
+
+    @Override
+    public List<Genre> getGenres() {
+        List<Genre> genres = null;
+
+        GenresService genreService = tmdbConfiguration.getTmdb().genreService();
+
+        try {
+            Response<GenreResults> response = genreService
+                    .movie(language)
+                    .execute();
+            if (response.isSuccessful()) {
+                GenreResults genreResults = response.body();
+
+                if (genreResults != null) {
+                    genres = genreResults.genres;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, String.format("Couldn't retrieve possible genres. (language: %s)", language), e);
+        }
+
+        return genres;
+
+    }
+
+    @Override
+    public MovieResultsPage discover(DiscoverRequest request, @Nullable Integer page) {
+        MovieResultsPage movieResultsPage = null;
+
+        DiscoverService discoverService = tmdbConfiguration.getTmdb().discoverService();
+        DiscoverMovieBuilder discoverMovieBuilder = new DiscoverMovieBuilder(discoverService);
+
+        try {
+            Call<MovieResultsPage> call = discoverMovieBuilder
+                    .sort_by(request.sortBy)
+                    .page(page)
+                    .release_date_gte(request.release_date_gte)
+                    .release_date_lte(request.release_date_lte)
+                    .with_genres(request.genres_formula)
+                    .with_keywords(request.keywords_formula)
+                    .without_genres(request.banned_genres_formula)
+                    .without_keywords(request.banned_keywords_formula)
+                    .build();
+            Response<MovieResultsPage> response = call.execute();
+            if (response.isSuccessful()) {
+                movieResultsPage = response.body();
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Discover Request didn't succeed.", e);
+        }
+
+        return movieResultsPage;
     }
 }
