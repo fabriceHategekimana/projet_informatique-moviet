@@ -31,7 +31,6 @@
 }
 
 .poster-img {
-    flex-shrink: 0; /* prevent the image to be resized */
     min-width: 100%;
     min-height: 100%
 }
