@@ -1,7 +1,12 @@
 package domain.model;
 
-import java.time.Year;
+import com.uwetrottmann.tmdb2.entities.Movie;
+import domain.service.TmdbConfiguration;
+
+import java.time.ZoneId;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MovieDisplayInfo {
     public final int id;
@@ -20,5 +25,25 @@ public class MovieDisplayInfo {
         this.poster_url = poster_url;
         this.backdrop_url = backdrop_url;
         this.genres = genres;
+    }
+
+    private static String getBaseUrl() {
+        return TmdbConfiguration.getInstance().getBaseUrl();
+    }
+
+    public MovieDisplayInfo(Movie movie, String poster_size, String backdrop_size){
+        this(
+                Objects.requireNonNull(movie.id),
+                movie.title,
+                Objects.requireNonNull(movie.release_date).toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getYear(),
+                movie.vote_average,
+                getBaseUrl() + poster_size + movie.poster_path,
+                getBaseUrl() + backdrop_size + movie.backdrop_path,
+                Objects.requireNonNull(movie.genres).stream().map(genre -> genre.name).collect(Collectors.toList())
+        );
+    }
+
+    public MovieDisplayInfo(Movie movie){
+        this(movie, "original", "original");
     }
 }
