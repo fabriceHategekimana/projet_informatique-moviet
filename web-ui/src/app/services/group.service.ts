@@ -22,8 +22,9 @@ export class GroupService {
     observe: 'response' as 'response'
   };
 
-  // private groupsUrl : string = "http://localhost/api/v1/groups"; // url using api
-  private groupsUrl : string = "http://localhost:10080/groups";
+  private groupsUrl : string = "http://localhost/api/v1/groups"; // url using api
+  //private groupsUrl : string = "http://localhost:10080/groups";
+  
   constructor(private http: HttpClient) { }
 
   getGroup(id : number): Observable<any> { // type any because get can return httpEvent or Observable<Movie>
