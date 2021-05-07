@@ -25,10 +25,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Unit test -->
-        <!-- -->
-        <version.junit>5.6.0</version.junit>
-
-        <!-- Mockito -->
+        <version.junit>5.7.0</version.junit>
         <mockito.version>3.3.0</mockito.version>
 
         <java-ee-api.version>8.0.1</java-ee-api.version>
@@ -36,10 +33,8 @@
         <!-- DB: Used in the pom of modules + and can be in resources, module.xml-->
         <postgresql.jdbc.driver.version>42.2.14</postgresql.jdbc.driver.version>
         <hibernate-entitymanager.version>5.4.27.Final</hibernate-entitymanager.version>
-        <!--  -->
 
         <version.thorntail>2.7.0.Final</version.thorntail> <!-- careful about the version -->
-
         <!-- used to bypass some warning, say to maven that we do not need web xml -->
         <failOnMissingWebXml>false</failOnMissingWebXml>
 
@@ -56,23 +51,12 @@
         <dependencies>
             <dependency>
                 <groupId>io.thorntail</groupId>
-                <artifactId>bom-all</artifactId>
+                <artifactId>bom</artifactId>
                 <version>${version.thorntail}</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
-
-            <!-- "Swagger is a JSON representation of a RESTful API,
-            typically made available over HTTP at /swagger.json. This JSON document contains information about
-            your APIs, including names, paths, endpoints, parameters, descriptions, keywords, expected responses, and more."
-            More informations can be found here: https://thorntail.io/posts/wildfly-swarm-s-got-swagger/ -->
-            <dependency>
-                <groupId>io.thorntail</groupId>
-                <artifactId>swagger</artifactId>
-                <version>${version.thorntail}</version>
-            </dependency>
-
-            <!-- https://github.com/dadrus/jpa-unit -->
+            <!-- https://github.com/dadrus/jpa-unit , testing db-->
             <dependency>
                 <groupId>com.github.dadrus.jpa-unit</groupId>
                 <artifactId>jpa-unit-bom</artifactId>
@@ -105,21 +89,42 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- Also restassured used to test REST services (integration test) -->
-            <!-- https://github.com/crystalzenchi/microservices/blob/master/counterparty-service/src/test/java/api/CounterpartyRestServiceIT.java -->
+            <!-- "Swagger is a JSON representation of a RESTful API,
+            typically made available over HTTP at /swagger.json. This JSON document contains information about
+            your APIs, including names, paths, endpoints, parameters, descriptions, keywords, expected responses, and more."
+            More informations can be found here: https://thorntail.io/posts/wildfly-swarm-s-got-swagger/ -->
             <dependency>
-                <groupId>io.rest-assured</groupId>
-                <artifactId>rest-assured</artifactId>
-                <version>4.3.3</version>
-                <scope>test</scope>
+                <groupId>io.thorntail</groupId>
+                <artifactId>swagger</artifactId>
+                <version>${version.thorntail}</version>
             </dependency>
 
             <!-- Unit Testing -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${version.junit}</version>
+                <scope>test</scope>
+                <type>pom</type>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>${version.junit}</version>
+                <scope>test</scope>
+            </dependency>
             <!-- http://maven.apache.org/surefire/maven-surefire-plugin/examples/junit-platform.html -->
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
                 <version>${version.junit}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-launcher</artifactId>
+                <version>1.7.0</version>
                 <scope>test</scope>
             </dependency>
 
@@ -135,12 +140,27 @@
                 <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
-
             <!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-junit-jupiter</artifactId>
                 <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!--<dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>2.3.1</version>
+                <scope>test</scope>
+            </dependency>-->
+
+            <!-- Also restassured used to test REST services (integration test) -->
+            <!-- https://github.com/crystalzenchi/microservices/blob/master/counterparty-service/src/test/java/api/CounterpartyRestServiceIT.java -->
+            <dependency>
+                <groupId>io.rest-assured</groupId>
+                <artifactId>rest-assured</artifactId>
+                <version>4.3.3</version>
                 <scope>test</scope>
             </dependency>
 

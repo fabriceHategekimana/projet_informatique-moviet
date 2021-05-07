@@ -46,10 +46,12 @@
       <groupId>javax.enterprise</groupId>
       <artifactId>cdi-api</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.jboss.spec.javax.ws.rs</groupId>
       <artifactId>${jboss-jaxrs-api.artifactId}</artifactId>
     </dependency>
+
     <dependency>
       <groupId>io.thorntail</groupId>
       <artifactId>datasources</artifactId>
@@ -80,6 +82,39 @@
       <version>${hibernate-entitymanager.version}</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>com.github.dadrus.jpa-unit</groupId>
+      <artifactId>jpa-unit5</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- "For all relational databases the jpa-unit-rdbms dependency needs to be added" https://github.com/dadrus/jpa-unit#rdbms-databases-->
+    <dependency>
+      <groupId>com.github.dadrus.jpa-unit</groupId>
+      <artifactId>jpa-unit-rdbms</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-all</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -87,6 +122,7 @@
 
     <plugins>
       <plugin>
+        <!-- Java Code Coverage-->
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <executions>
