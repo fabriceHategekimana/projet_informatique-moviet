@@ -36,4 +36,21 @@ export class GroupsComponent implements OnInit {
         });
     }
   }
+
+  createGroup(then: () => any = () => void 0, onError: () => any = () => void 0): void {
+    let groupID = 0
+    // get the group object:
+    this.groupService.createGroup()
+      .subscribe(data => {
+        // groupID = data.id;
+        // TODO: create group and catch error
+        try {
+          groupID = Number(data.headers.get('Location').split(/.*[\/|\\]/)[1]);
+          this.getGroup(groupID, then, onError);
+        } catch (error) {
+          onError();
+        }
+      });
+  }
+
 }

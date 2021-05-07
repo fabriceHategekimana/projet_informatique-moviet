@@ -42,4 +42,18 @@ export class GroupJoinComponent implements OnInit {
       }      
     )
   }
+
+  createGroup() {
+    this.groupsComponent.createGroup(
+      () => { // then
+        this.currentGroup = this.groupsComponent.currentGroup; // save the current group
+        // join the group:
+        console.log(this.groupsComponent.currentGroup);
+        this.router.navigate([this.currentGroup!.id], { relativeTo: this.route });
+      },
+      () => { // if error
+        console.log("Error creating group: the group doesn't exist");
+      }      
+    )
+  }
 }

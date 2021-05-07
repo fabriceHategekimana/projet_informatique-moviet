@@ -9,18 +9,31 @@ import { Group } from '../shared/interfaces/group'
 })
 export class GroupService {
   // http options for the request
-  private httpOptions = {
+  private httpOptionsGet = {
     headers: new HttpHeaders({
+      'Content-Type': 'application/json',
+    }),
+  };
 
-    })};
-
+  private httpOptionsPost = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json',
+    }),
+    observe: 'response' as 'response'
+  };
 
   private groupsUrl : string = "http://localhost/api/v1/groups"; // url using api
-
+  //private groupsUrl : string = "http://localhost:10080/groups";
+  
   constructor(private http: HttpClient) { }
 
   getGroup(id : number): Observable<any> { // type any because get can return httpEvent or Observable<Movie>
-    return this.http.get<Group>(this.groupsUrl + "/" + id, this.httpOptions)
+    return this.http.get<Group>(this.groupsUrl + "/" + id, this.httpOptionsGet)
+                  .pipe(catchError(this.handleError<Group>('getGroup', undefined)));
+  }
+
+  createGroup(): Observable<any> { // type any because get can return httpEvent or Observable<Movie>
+    return this.http.post<Group>(this.groupsUrl, {name: 'newGroup'}, this.httpOptionsPost)
                   .pipe(catchError(this.handleError<Group>('getGroup', undefined)));
   }
 
