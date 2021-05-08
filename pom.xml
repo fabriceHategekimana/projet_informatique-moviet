@@ -42,7 +42,7 @@
 
         <!-- Added for building docker images, only building for modules, /!\ need to set to false for modules -->
         <skip-docker-build>true</skip-docker-build>
-        <skip-ITs>true</skip-ITs>
+        <skip-ITs>false</skip-ITs> <!-- cannot skip the pre-integration test and post-integration test in submodules apart for Jacoco-->
         <!-- has to set it to true in the super-pom because do not want to build a Docker image for it but false in modules pom-->
         <dockerHost>tcp://localhost:2375</dockerHost> <!-- need to search why these values in particular -->
 

@@ -216,7 +216,7 @@
           </execution>
         </executions>
       </plugin>
-      <!-- For packaging -->
+      <!-- For packaging, starting war and stopping war for IT -->
       <plugin>
         <groupId>io.thorntail</groupId>
         <artifactId>thorntail-maven-plugin</artifactId>
@@ -243,7 +243,6 @@
             </goals>
           </execution>
           <!-- Starting the .war -->
-          <!--
           <execution>
             <id>pre-integration-test-start</id>
             <phase>pre-integration-test</phase>
@@ -254,20 +253,16 @@
               <jvmArguments>
                 <jvmArgument>${jacoco.it.tests}</jvmArgument>
               </jvmArguments>
-              <skip>${skip-ITs}</skip>
             </configuration>
           </execution>
-
+          <!-- After IT, stop .war-->
           <execution>
             <id>verify-stop</id>
             <phase>verify</phase>
             <goals>
               <goal>stop</goal>
             </goals>
-            <configuration>
-              <skip>${skip-ITs}</skip>
-            </configuration>
-          </execution>--><!-- After IT, stop .war-->
+          </execution>
         </executions>
       </plugin>
       <!-- setup temporary db for IT. Autocommit true -->
