@@ -90,14 +90,16 @@ public class GroupServiceImplTest {
         assertThrows(NullPointerException.class, ()-> groupServiceImpl.createGroup(grp)); // due to @NotNull annotation in Impl
     }
 
-    /*
+
     @Test
     void testCreateWithIdGroup() {
-        Group group = getRandomGroupNoName();
-        Group returned_group = groupServiceImpl.createGroup(group);
-        assertNull(returned_group); // check if null because trying to create group without name
+        initDataStore();  // create new groups
+        List<Group> groups = groupServiceImpl.getAllGroups(); // get list of groups through the business service
+        int random_choice = (int) (Math.random() * groups.size());
+        Group group = groups.get(random_choice);
+        assertNull(groupServiceImpl.createGroup(group)); // check if null because trying to create group with an id
     }
-    */
+
 
     @Test
     void testUpdateGroup() { // TODO: test Group input entered in updateGroup in Impl
@@ -118,7 +120,21 @@ public class GroupServiceImplTest {
     void testUpdateNonExistantGroup() {
         initDataStore();  // create new groups
         List<Group> groups = groupServiceImpl.getAllGroups(); // get list of groups through the business service
-        Group grp= groupServiceImpl.getGroup(groups.size() + 1); // get non existant group
+        // delete the last one
+        Group old_group = groups.get(groups.size() - 1);  // get last group
+        assertNotNull(old_group);
+        int id = old_group.getId();
+        groupServiceImpl.deleteGroup(id);
+        Group group = groupServiceImpl.getGroup(id);
+        assertNull(group); // check that the group disappeared
+
+        // old_group was deleted, try to update it
+        assertNull(groupServiceImpl.updateGroup(old_group)); // due to @NotNull annotation in Impl
+    }
+
+    @Test
+    void testUpdateNullGroup() {
+        Group grp = null;
         assertThrows(NullPointerException.class, ()-> groupServiceImpl.updateGroup(grp)); // due to @NotNull annotation in Impl
     }
 

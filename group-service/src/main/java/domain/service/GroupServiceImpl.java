@@ -11,8 +11,6 @@ import lombok.NonNull;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import javax.persistence.EntityTransaction;
-
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.transaction.Transactional;  // needed otherwise TransactionRequiredException will be thrown
