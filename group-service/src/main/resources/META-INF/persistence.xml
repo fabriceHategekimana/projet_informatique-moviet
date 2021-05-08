@@ -17,7 +17,7 @@
             <property name="hibernate.format_sql" value="true" /> <!-- Show SQL formatted -->
             <property name="hibernate.dialect"
                       value="org.hibernate.dialect.H2Dialect" />
-            <property name="hibernate.id.new_generator_mappings" value="true" />
+            <!-- property name="hibernate.id.new_generator_mappings" value="true" /-->
             <property name="hibernate.hbm2ddl.charset_name" value="UTF-8"/>
             <!-- For IT -->
             <property name="javax.persistence.sql-load-script-source" value="META-INF/groups_test.sql"/>

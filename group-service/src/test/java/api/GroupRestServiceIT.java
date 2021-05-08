@@ -145,7 +145,9 @@ class GroupRestServiceIT {
         when().
             put("/").
         then().
-            statusCode(200);
+            statusCode(200).
+            body("id", equalTo(2),
+                    "name", equalTo("ethan"));
     }
 
     @Test
@@ -191,11 +193,12 @@ class GroupRestServiceIT {
     /*
     IT for deleteGroup
      */
-    /*
+
     @Test
     void testDeleteGroup_ok(){ // DELETE, always the group number 3
         given().
-            param("3"). // id
+            contentType(ContentType.JSON).
+            body("3"). // id
         when().
             delete("/").
         then().
@@ -207,7 +210,8 @@ class GroupRestServiceIT {
     @Test
     void testDeleteGroup_not_found(){ // DELETE
         given().
-            param("id", "100000000000").
+            contentType(ContentType.JSON).
+            body(String.valueOf(Integer.MAX_VALUE)). // id
         when().
             delete("/").
         then().
@@ -217,12 +221,12 @@ class GroupRestServiceIT {
     @Test
     void testDeleteGroup_bad_request(){ // DELETE
         given().
-            param("id", "$").
+            contentType(ContentType.JSON).
+            body(""). // id
         when().
             delete("/").
         then().
             statusCode(400); // BAD REQUEST
     }
-    */
 
 }
