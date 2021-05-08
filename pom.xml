@@ -42,6 +42,7 @@
 
         <!-- Added for building docker images, only building for modules, /!\ need to set to false for modules -->
         <skip-docker-build>true</skip-docker-build>
+        <skip-ITs>true</skip-ITs>
         <!-- has to set it to true in the super-pom because do not want to build a Docker image for it but false in modules pom-->
         <dockerHost>tcp://localhost:2375</dockerHost> <!-- need to search why these values in particular -->
 
@@ -325,7 +326,7 @@
                 <configuration>
                     <runOrder>filesystem</runOrder> <!-- alphabetic order.. -->
                     <!-- can use <skipITs>true</skipITs> to skip IT-->
-                    <skipITs>true</skipITs>
+                    <skipITs>${skip-ITs}</skipITs>
                 </configuration>
                 <executions>
                     <execution>

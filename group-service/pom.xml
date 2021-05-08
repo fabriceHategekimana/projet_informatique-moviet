@@ -140,7 +140,7 @@
 
     <plugins>
       <plugin>
-        <!-- Java Code Coverage-->
+        <!-- Java Code Coverage -->
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <executions>
@@ -164,10 +164,10 @@
               <output>tcpserver</output>
               <port>10001</port>
               <reset>false</reset>
-              <skip>${skip.dump}</skip>
+              <!--skip>${skip.dump}</skip-->
+              <skip>${skip-ITs}</skip>
             </configuration>
           </execution>
-
           <execution>
             <id>post-integration-test-prepare-agent</id>
             <phase>post-integration-test</phase>
@@ -182,7 +182,8 @@
               <output>tcpserver</output>
               <port>10001</port>
               <reset>false</reset>
-              <skip>${skip.dump}</skip>
+              <!--skip>${skip.dump}</skip-->
+              <skip>${skip-ITs}</skip>
             </configuration>
           </execution>
           <execution>
@@ -227,8 +228,12 @@
           <!-- offset from 8080. Port inside container-->
           <!--
           <properties>
+            <thorntail.port.offset>20000</thorntail.port.offset>
             <java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
           </properties>-->
+          <properties>
+            <java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
+          </properties>
         </configuration>
         <executions>
           <!-- For packaging -->
@@ -249,6 +254,7 @@
               <jvmArguments>
                 <jvmArgument>${jacoco.it.tests}</jvmArgument>
               </jvmArguments>
+              <skip>${skip-ITs}</skip>
             </configuration>
           </execution>
 
@@ -258,10 +264,13 @@
             <goals>
               <goal>stop</goal>
             </goals>
+            <configuration>
+              <skip>${skip-ITs}</skip>
+            </configuration>
           </execution>--><!-- After IT, stop .war-->
         </executions>
       </plugin>
-      <!-- setup db for IT. Autocommit true -->
+      <!-- setup temporary db for IT. Autocommit true -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>sql-maven-plugin</artifactId>
@@ -279,7 +288,8 @@
           <username>sa</username>
           <password>sa</password>
           <autocommit>true</autocommit>
-          <skip>${maven.test.skip}</skip>
+          <!--skip>${maven.test.skip}</-->
+          <skip>${skip-ITs}</skip>
         </configuration>
         <executions>
           <execution>
