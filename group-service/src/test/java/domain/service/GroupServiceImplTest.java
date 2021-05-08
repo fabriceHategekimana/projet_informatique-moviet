@@ -20,13 +20,17 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(JpaUnit.class) // see documentation of dadrus jpa unit, junit 5
 @ExtendWith(MockitoExtension.class)
 public class GroupServiceImplTest {
     /*
+    Recall that tests are not always run with the same order as in the code..
+
     Create random groups and :
     - check if can get all by counting how many
     - check if can get a particular group by getting all groups and comparing a random group with a group obtained
@@ -51,7 +55,7 @@ public class GroupServiceImplTest {
     void testGetGroup() {
         initDataStore();  // create new groups
         List<Group> groups = groupServiceImpl.getAllGroups(); // get list of groups through the business service
-        int random_choice = (int) (Math.random() * groups.size()); // between
+        int random_choice = (int) (Math.random() * groups.size());
         int id = groups.get(random_choice).getId(); // get the id through Java object ! (list of groups)
 
         Group grp= groupServiceImpl.getGroup(id); // get the specific group through the business service
@@ -63,30 +67,14 @@ public class GroupServiceImplTest {
     void testGetNonExistantGroup() {
         initDataStore();  // create new groups
         List<Group> groups = groupServiceImpl.getAllGroups(); // get list of groups through the business service
-        Group grp= groupServiceImpl.getGroup(groups.size() + 1); // get non existant group
-        assertNull(grp); // check if null
+        assertNull(groupServiceImpl.getGroup(groups.size() + 1)); // check if null (when we get a non existant group)
     }
 
-    /*
     @Test
     void testCreateGroup() { // TODO: test Group input entered in createGroup in Impl
-
-        initDataStore();  // create new groups
-        List<Group> groups = groupServiceImpl.getAllGroups(); // get list of groups through the business service
-        int random_choice = (int) (Math.random() * groups.size()); // between
-        int id = groups.get(random_choice).getId(); // get the id through Java object ! (list of groups)
-
-        Group grp= groupServiceImpl.getGroup(id); // get the specific group through the business service
-        assertEquals(groups.get(random_choice).getId(), grp.getId()); // check the ids
-        assertEquals(groups.get(random_choice).getName(), grp.getName());
-    }
-    */
-
-    @Test
-    void testCreateGroup() {
         Group group = getRandomGroup();
         Group returned_group = groupServiceImpl.createGroup(group);
-        assertNotNull(returned_group.getId()); // check if id not null
+        assertNotEquals(0, returned_group.getId()); // check if id not 0 (meaning that the id was incremented and initialized)
     }
 
     @Test
@@ -94,6 +82,12 @@ public class GroupServiceImplTest {
         Group group = getRandomGroupNoName();
         Group returned_group = groupServiceImpl.createGroup(group);
         assertNull(returned_group); // check if null because trying to create group without name
+    }
+
+    @Test
+    void testCreateNullGroup(){
+        Group grp = null;
+        assertThrows(NullPointerException.class, ()-> groupServiceImpl.createGroup(grp)); // due to @NotNull annotation in Impl
     }
 
     /*
@@ -105,16 +99,50 @@ public class GroupServiceImplTest {
     }
     */
 
-    /*
     @Test
-    void testCreateDuplicate() {
-        Instrument instrument = getRandomInstrument();
-        instrumentService.create(instrument);
-        assertThrows(IllegalArgumentException.class, () -> {
-            instrumentService.create(instrument);
-        });
+    void testUpdateGroup() { // TODO: test Group input entered in updateGroup in Impl
+        // create a group and modify its name
+        groupServiceImpl.createGroup(getRandomGroup());
+        List<Group> groups = groupServiceImpl.getAllGroups(); // get list of groups through the business service
+        Group group = groups.get(groups.size() - 1);  // get last group
+
+        assertNotNull(group);
+        int id = group.getId();
+        group.setName("XXX");
+        groupServiceImpl.updateGroup(group);
+        group = groupServiceImpl.getGroup(id);
+        assertEquals("XXX", group.getName());
     }
-    */
+
+    @Test
+    void testUpdateNonExistantGroup() {
+        initDataStore();  // create new groups
+        List<Group> groups = groupServiceImpl.getAllGroups(); // get list of groups through the business service
+        Group grp= groupServiceImpl.getGroup(groups.size() + 1); // get non existant group
+        assertThrows(NullPointerException.class, ()-> groupServiceImpl.updateGroup(grp)); // due to @NotNull annotation in Impl
+    }
+
+    @Test
+    void testDeleteGroup() {
+        // create a group and then delete one of the groups
+        groupServiceImpl.createGroup(getRandomGroup());
+        List<Group> groups = groupServiceImpl.getAllGroups(); // get list of groups through the business service
+        Group group = groups.get(groups.size() - 1);  // get last group
+
+        assertNotNull(group);
+        int id = group.getId();
+        groupServiceImpl.deleteGroup(id);
+        group = groupServiceImpl.getGroup(id);
+        assertNull(group); // check that the group disappeared
+    }
+
+    @Test
+    void testDeleteNonExistantGroup() {
+        initDataStore();  // create new groups
+        List<Group> groups = groupServiceImpl.getAllGroups(); // get list of groups through the business service
+        assertNull(groupServiceImpl.deleteGroup(groups.size() + 1));  // check that we "cannot delete" non existant group
+    }
+
 
     private List<Group> getGroups() {
         List<Group> groups = new ArrayList<>();
