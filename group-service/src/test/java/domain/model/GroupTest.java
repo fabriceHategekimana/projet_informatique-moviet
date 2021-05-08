@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 // just a test for unit testing
-public class GroupTest {
+class GroupTest {
     private final Group group = new Group("hello world");
 
     @Test

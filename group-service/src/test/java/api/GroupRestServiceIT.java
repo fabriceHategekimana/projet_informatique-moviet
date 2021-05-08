@@ -12,7 +12,9 @@ https://github.com/rest-assured/rest-assured/wiki/Usage#static-imports
 
 The names of the tests start with a letter for the alphabetic runOrder of maven failsafe plugin
 
-INTEGRATION TESTS SHOULD BE RUNNED WHILE SERVER IS RUNNING
+INTEGRATION TESTS SHOULD BE RUNNED WHILE SERVER IS RUNNING. (Either run docker containers or .war etc.)
+
+We use H2 database for the IT, the test database based on META-INF/groups_test.sql
  */
 import io.restassured.RestAssured;
 
@@ -22,13 +24,15 @@ import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.BeforeAll;
 
-public class GroupRestServiceIT {
-
+class GroupRestServiceIT {
+    /* TODO: sometime unit tests do not work, maybe concurrency problem ? + IT when they fail we have to kill manually processes..
+    sudo netstat -plten | grep java and killing the process with 0.0.0.0:28080
+    https://stackoverflow.com/questions/12737293/how-do-i-resolve-the-java-net-bindexception-address-already-in-use-jvm-bind
+     */
     @BeforeAll
     public static void setup() {
-        //RestAssured.baseURI = "http://localhost:10080";
-        RestAssured.port = 10080;
-        RestAssured.basePath = "/groups";
+        RestAssured.baseURI = "http://localhost:10080/groups";
+        RestAssured.port = 8080; // see the pom.xml file
         // https://github.com/rest-assured/rest-assured/wiki/Usage#default-values
     }
 
@@ -45,19 +49,19 @@ public class GroupRestServiceIT {
     IT for getGroup, a single group
      */
     @Test
-    void A_testGetGroup_ok(){ // GET
+    void testGetGroup_ok(){ // GET
         // https://rest-assured.io
         get("/{id}", 1).
         then().
             statusCode(200). // OK
-            body("id", equalTo("1"),
+            body("id", equalTo(1),
                     "name", equalTo("erwan"));
     }
 
     @Test
-    void B_testGetGroup_not_found(){ // GET
+    void testGetGroup_not_found(){ // GET
         when().
-            get("/{id}",100).
+            get("/{id}",Integer.MAX_VALUE).
         then().
             statusCode(404); // NOT FOUND
     }

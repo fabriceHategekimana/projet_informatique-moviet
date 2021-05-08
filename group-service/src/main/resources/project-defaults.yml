@@ -7,7 +7,15 @@ thorntail:
         driver-module-name: org.postgresql
     data-sources:
       groupds:
-        driver-name: postgresql
-        connection-url: jdbc:postgresql://group-service-database:5432/group-service # name of the database, not table
-        user-name: group-service
-        password: group-service
+        driver-name: myh2
+        connection-url: jdbc:h2:${java.io.tmpdir}/target/GroupDB;AUTO_SERVER=TRUE;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+        user-name: sa
+        password: sa
+
+# This datasource replaces H2 database if run from docker-compose.. Why ? Because we use h2 for tests. Unit tests AND Integration tests
+# Informations about this datasource are in the docker-compose
+#      groupds:
+#        driver-name: postgresql
+#        connection-url: jdbc:postgresql://group-service-database:5432/group-service # name of the database, not table
+#        user-name: group-service
+#        password: group-service
