@@ -55,8 +55,9 @@ public class GroupServiceImpl implements GroupService{
         /*
         Can always create.. no restriction due to auto increment of unique identifier / primary key
          */
-        if (group.getId() != 0){ // if non initialized
-            throw new IllegalArgumentException("Group id is auto-incremented. Please do not create using the id of the group: " + group.getId());
+        if ((group.getId() != 0)|| (group.getName() == null)){ // if non initialized
+            // to put Only other attributes than id are (must be) initialized: " + group in the logs
+            return null;
         }
         em.persist(group);
         return group;
