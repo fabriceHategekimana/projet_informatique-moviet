@@ -19,6 +19,7 @@
   <properties> <!-- overrides super pom properties -->
     <skip-docker-build>false</skip-docker-build> <!-- false -->
     <microservice.port>10080</microservice.port> <!-- bind 8080 port of container to TCP port 10080 on localhost of the host machine-->
+    <slf4j.version>1.7.30</slf4j.version> <!-- http://www.slf4j.org/index.html. It removes one of the warnings..-->
   </properties>
 
   <dependencies>
@@ -46,10 +47,12 @@
       <groupId>javax.enterprise</groupId>
       <artifactId>cdi-api</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.jboss.spec.javax.ws.rs</groupId>
       <artifactId>${jboss-jaxrs-api.artifactId}</artifactId>
     </dependency>
+
     <dependency>
       <groupId>io.thorntail</groupId>
       <artifactId>datasources</artifactId>
@@ -57,6 +60,22 @@
     <dependency>
       <groupId>io.thorntail</groupId>
       <artifactId>logging</artifactId>
+    </dependency>
+    <!-- H2 in memory database used for tests-->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
+    <!-- http://www.slf4j.org/codes.html#StaticLoggerBinder -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${slf4j.version}</version>
     </dependency>
 
     <dependency>
@@ -80,6 +99,39 @@
       <version>${hibernate-entitymanager.version}</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>com.github.dadrus.jpa-unit</groupId>
+      <artifactId>jpa-unit5</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- "For all relational databases the jpa-unit-rdbms dependency needs to be added" https://github.com/dadrus/jpa-unit#rdbms-databases-->
+    <dependency>
+      <groupId>com.github.dadrus.jpa-unit</groupId>
+      <artifactId>jpa-unit-rdbms</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-all</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -87,6 +139,7 @@
 
     <plugins>
       <plugin>
+        <!-- Java Code Coverage-->
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <executions>
@@ -177,6 +230,42 @@
           </execution>
         </executions>
       </plugin>
+      <!-- setup db for IT ?-->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>sql-maven-plugin</artifactId>
+        <version>1.5</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${version.h2}</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <driver>org.h2.Driver</driver>
+          <url>jdbc:h2:${java.io.tmpdir}/target/GroupDB;AUTO_SERVER=TRUE</url>
+          <username>sa</username>
+          <password>sa</password>
+          <autocommit>true</autocommit>
+          <skip>${maven.test.skip}</skip>
+        </configuration>
+        <executions>
+          <execution>
+            <id>create-db</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <srcFiles>
+                <srcFile>${project.basedir}/src/test/resources/META-INF/groups_test.sql</srcFile>
+              </srcFiles>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
+
   </build>
 </project>
