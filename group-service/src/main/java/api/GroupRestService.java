@@ -4,9 +4,9 @@ package api;
 import javax.inject.Inject; // dependency injection
 import javax.ws.rs.*;
 
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
+
 // MediaType
-import javax.ws.rs.core.MediaType;
 import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singleton
 
 //  import classes of domain
@@ -43,7 +43,13 @@ public class GroupRestService {
 
     @Inject
     private GroupService groupService; // no more instantiation in the constructor
+    // https://www.logicbig.com/tutorials/java-ee-tutorial/jax-rs/uri-info.html
+    /*
+    @Context
+    private final UriInfo uriInfo;
+    */
 
+    public GroupRestService() { }
 
     // http://localhost:10080/groups
     @GET
@@ -84,7 +90,7 @@ public class GroupRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create, add a group to the existing groups")
-    public Response createGroup(Group group){
+    public Response createGroup(Group group, final @Context UriInfo uriInfo){
         /*
         Create a group and returns HTTP status code and the location of the newly created object. It's possible to create multiple
         groups with same name. The unique identifier is its id that auto increments. We cannot input a group having an id !!
@@ -102,7 +108,10 @@ public class GroupRestService {
         if (returnedGroup == null){ // same earlier.. just in case
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : only other attributes than id are (must be) initialized: " + group).build();
         }
-        return Response.status(Response.Status.CREATED).header("Location", current_link.concat(String.valueOf(returnedGroup.getId()))).build(); // 201
+        //return Response.status(Response.Status.CREATED).header("Location", current_link.concat(String.valueOf(returnedGroup.getId()))).build(); // 201
+        UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
+        uriBuilder.path(Integer.toString(returnedGroup.getId()));
+        return Response.created(uriBuilder.build()).entity(returnedGroup).build(); // 201
     }
 
     @PUT
@@ -127,7 +136,7 @@ public class GroupRestService {
             return Response.status(Response.Status.NOT_FOUND).build(); // 404
         }
 
-        return  Response.ok(returnedGroup).header("Location", current_link.concat(String.valueOf(group.getId()))).build(); // 200
+        return Response.ok(returnedGroup).header("Location", current_link.concat(String.valueOf(group.getId()))).build(); // 200
     }
 
     @DELETE
@@ -150,7 +159,7 @@ public class GroupRestService {
                 // group does not exist already
                 return Response.status(Response.Status.NOT_FOUND).build(); // 404
             }
-            return  Response.ok(returnedGroup).build(); // 200
+            return Response.ok(returnedGroup).build(); // 200
         }
         catch(NumberFormatException e){ // invalid id
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid id, it should be numerical: id = " + str_id).build();

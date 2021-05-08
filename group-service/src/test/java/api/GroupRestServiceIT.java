@@ -25,13 +25,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 
 class GroupRestServiceIT {
-    /* TODO: sometime unit tests do not work, maybe concurrency problem ? + IT when they fail we have to kill manually processes..
+    /* TODO: IT when they fail we have to kill manually processes ?
     sudo netstat -plten | grep java and killing the process with 0.0.0.0:28080
     https://stackoverflow.com/questions/12737293/how-do-i-resolve-the-java-net-bindexception-address-already-in-use-jvm-bind
      */
     @BeforeAll
     public static void setup() {
-        RestAssured.baseURI = "http://localhost:10080/groups";
+        RestAssured.baseURI = "http://localhost:8080/groups";  // port of the container !! in the pom, if we change offset, it changes here. Offset 0 currently
         RestAssured.port = 8080;
         // https://github.com/rest-assured/rest-assured/wiki/Usage#default-values
     }
@@ -41,8 +41,9 @@ class GroupRestServiceIT {
     IT for getAllGroups
      */
     @Test
-    void testGetAllGroups(){ // GET
+    void testGetAllGroups_ok(){ // GET
         // https://github.com/rest-assured/rest-assured/wiki/Usage#deserialization-with-generics
+
     }
 
     /* --------------------------------------------------------
@@ -51,6 +52,7 @@ class GroupRestServiceIT {
     @Test
     void testGetGroup_ok(){ // GET
         // https://rest-assured.io
+        // we won't modify/delete the group with id 1 in the rest of the tests otherwise we might have errors
         get("/{id}", 1).
         then().
             statusCode(200). // OK
@@ -78,26 +80,9 @@ class GroupRestServiceIT {
     /* --------------------------------------------------------
     IT for createGroup
      */
-    /*
     @Test
-    void D_testCreateGroup_conflict(){ // POST
-        String myJson="{\"id\": 1,\"name\":\"don\" }";
-        given().
-            contentType(ContentType.JSON).
-            body(myJson). // conflict about existing id .param("id", "1").param("name", "don")
-        when().
-            post("/").
-        then().
-            statusCode(409); // CONFLICT
-    }
-    */
-    // IT up to this comment work if we first start the docker containers then run integration tests
-    // and also works if run my other profile mvn clean verify -Ppackage-docker-image-with-IT (with wait) and doing in parallel
-    // but slightly a bit later mvn clean verify -Ppackage-docker-image -> integration tests pass
-    /*
-    @Test
-    void E_testCreateGroup_created(){ // POST
-        String myJson="{"id": "100","name":"ethan" }";
+    void testCreateGroup_created(){ // POST
+        String myJson="{\"name\":\"new_group\"}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -105,57 +90,138 @@ class GroupRestServiceIT {
             post("/").
         then().
             statusCode(201).
-            body("id", equalTo(100),
-                    "name", equalTo("ethan"));
-        // have to remove the group created afterward... we do it in the testDeleteGroup()
+            body("id", notNullValue(),
+                    "name", equalTo("new_group"));
     }
 
-    // TODO: Maybe add BAD_REQUEST test for createGroup when id is null
+    @Test
+    void testCreateGroup_bad_request_id_name(){ // POST
+        String myJson="{\"id\": 100,\"name\":\"ethan\" }";
+        given().
+            contentType(ContentType.JSON).
+            body(myJson).
+        when().
+            post("/").
+        then().
+            statusCode(400);
+    }
 
-    // TODO: IT for updateGroup
-    // --------------------------------------------------------
+    @Test
+    void testCreateGroup_bad_request_id(){ // POST
+        String myJson="{\"id\": 100}";
+        given().
+            contentType(ContentType.JSON).
+            body(myJson).
+        when().
+            post("/").
+        then().
+            statusCode(400);
+    }
+
+    /*
+    @Test
+    void testCreateGroup_bad_request_name(){ // POST, null name..
+        String myJson="{}";
+        given().
+            contentType(ContentType.JSON).
+            body(myJson).
+        when().
+            post("/").
+        then().
+            statusCode(400);
+    }
+    */
+
+    // -------------------------------------------------------
+    /*
     IT for updateGroup
+     */
+    @Test
+    void testUpdateGroup_ok(){
+        String myJson="{\"id\": 2,\"name\":\"ethan\" }"; // no other test will delete this group otherwise we can have errors
+        given().
+            contentType(ContentType.JSON).
+            body(myJson).
+        when().
+            put("/").
+        then().
+            statusCode(200);
+    }
 
     @Test
-    void F_testUpdateGroup(){
-        // nothing yet
+    void testUpdateGroup_not_found(){
+        // no other test will delete this group otherwise we can have errors
+        String myJson="{\"id\": ".concat(String.valueOf(Integer.MAX_VALUE)).concat(" ,\"name\":\"ethan\" }");
+        given().
+            contentType(ContentType.JSON).
+            body(myJson).
+        when().
+            put("/").
+        then().
+            statusCode(404);
     }
+
+    @Test
+    void testUpdateGroup_bad_request_name(){
+        String myJson="{\"name\": \"new_name\"}";
+        given().
+            contentType(ContentType.JSON).
+            body(myJson).
+        when().
+            put("/").
+        then().
+            statusCode(400);
+    }
+
+    @Test
+    void testUpdateGroup_bad_request_id(){
+        String myJson="{\"id\": 0}";
+        given().
+            contentType(ContentType.JSON).
+            body(myJson).
+        when().
+            put("/").
+        then().
+            statusCode(400);
+    }
+
 
 
     // --------------------------------------------------------
+    /*
     IT for deleteGroup
-
+     */
+    /*
     @Test
-    void G_testDeleteGroup_ok(){ // DELETE
-        //String myJson="{"id": "100","name":"ethan" }";
+    void testDeleteGroup_ok(){ // DELETE, always the group number 3
         given().
-                param("100"). // id
-                when().
-                delete("/").
-                then().
-                statusCode(200). // OK
-                body("id", equalTo(100), // also returns body
-                "name", equalTo("ethan"));
+            param("3"). // id
+        when().
+            delete("/").
+        then().
+            statusCode(200). // OK
+            body("id", equalTo(3), // also returns body
+            "name", notNullValue());
     }
 
     @Test
-    void H_testDeleteGroup_not_found(){ // DELETE
+    void testDeleteGroup_not_found(){ // DELETE
         given().
-                param("id", "100").
-                when().
-                delete("/").
-                then().
-                statusCode(404); // NOT FOUND
+            param("id", "100000000000").
+        when().
+            delete("/").
+        then().
+            statusCode(404); // NOT FOUND
     }
 
     @Test
-    void I_testDeleteGroup_bad_request(){ // DELETE
+    void testDeleteGroup_bad_request(){ // DELETE
         given().
-                param("id", "$").
-                when().
-                delete("/").
-                then().
-                statusCode(400); // BAD REQUEST
+            param("id", "$").
+        when().
+            delete("/").
+        then().
+            statusCode(400); // BAD REQUEST
     }
     */
 
