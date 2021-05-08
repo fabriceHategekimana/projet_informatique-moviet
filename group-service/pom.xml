@@ -19,6 +19,7 @@
   <properties> <!-- overrides super pom properties -->
     <skip-docker-build>false</skip-docker-build> <!-- false -->
     <microservice.port>10080</microservice.port> <!-- bind 8080 port of container to TCP port 10080 on localhost of the host machine-->
+    <slf4j.version>1.7.30</slf4j.version> <!-- http://www.slf4j.org/index.html. It removes one of the warnings..-->
   </properties>
 
   <dependencies>
@@ -59,6 +60,22 @@
     <dependency>
       <groupId>io.thorntail</groupId>
       <artifactId>logging</artifactId>
+    </dependency>
+    <!-- H2 in memory database used for tests-->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
+    <!-- http://www.slf4j.org/codes.html#StaticLoggerBinder -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${slf4j.version}</version>
     </dependency>
 
     <dependency>
@@ -213,6 +230,42 @@
           </execution>
         </executions>
       </plugin>
+      <!-- setup db for IT ?-->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>sql-maven-plugin</artifactId>
+        <version>1.5</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${version.h2}</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <driver>org.h2.Driver</driver>
+          <url>jdbc:h2:${java.io.tmpdir}/target/GroupDB;AUTO_SERVER=TRUE</url>
+          <username>sa</username>
+          <password>sa</password>
+          <autocommit>true</autocommit>
+          <skip>${maven.test.skip}</skip>
+        </configuration>
+        <executions>
+          <execution>
+            <id>create-db</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <srcFiles>
+                <srcFile>${project.basedir}/src/test/resources/META-INF/groups_test.sql</srcFile>
+              </srcFiles>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
+
   </build>
 </project>

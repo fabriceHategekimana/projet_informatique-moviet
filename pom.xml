@@ -33,6 +33,8 @@
         <!-- DB: Used in the pom of modules + and can be in resources, module.xml-->
         <postgresql.jdbc.driver.version>42.2.14</postgresql.jdbc.driver.version>
         <hibernate-entitymanager.version>5.4.27.Final</hibernate-entitymanager.version>
+        <!-- H2 in memory database used for tests-->
+        <version.h2>1.4.200</version.h2>
 
         <version.thorntail>2.7.0.Final</version.thorntail> <!-- careful about the version -->
         <!-- used to bypass some warning, say to maven that we do not need web xml -->
@@ -87,6 +89,13 @@
                 <artifactId>${jboss-jaxrs-api.artifactId}</artifactId>
                 <version>1.0.1.Final</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <!-- H2 in memory database used for tests-->
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${version.h2}</version>
             </dependency>
 
             <!-- "Swagger is a JSON representation of a RESTful API,
@@ -267,7 +276,12 @@
                     <version>3.0.0-M4</version>
                 </plugin>
                 <!-- http://maven.apache.org/surefire/maven-failsafe-plugin/ -->
-
+                <!-- Java Code Coverage-->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.6</version>
+                </plugin>
                 <plugin>
                     <groupId>io.thorntail</groupId>
                     <artifactId>thorntail-maven-plugin</artifactId>
