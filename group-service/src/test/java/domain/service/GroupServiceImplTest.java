@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(JpaUnit.class) // see documentation of dadrus jpa unit, junit 5
 @ExtendWith(MockitoExtension.class)
-public class GroupServiceImplTest {
+class GroupServiceImplTest {
     /*
     Recall that tests are not always run with the same order as in the code..
 
@@ -65,9 +65,7 @@ public class GroupServiceImplTest {
 
     @Test
     void testGetNonExistantGroup() {
-        initDataStore();  // create new groups
-        List<Group> groups = groupServiceImpl.getAllGroups(); // get list of groups through the business service
-        assertNull(groupServiceImpl.getGroup(groups.size() + 1)); // check if null (when we get a non existant group)
+        assertNull(groupServiceImpl.getGroup(Integer.MAX_VALUE)); // check if null (when we get a non existant group)
     }
 
     @Test
@@ -154,9 +152,7 @@ public class GroupServiceImplTest {
 
     @Test
     void testDeleteNonExistantGroup() {
-        initDataStore();  // create new groups
-        List<Group> groups = groupServiceImpl.getAllGroups(); // get list of groups through the business service
-        assertNull(groupServiceImpl.deleteGroup(groups.size() + 1));  // check that we "cannot delete" non existant group
+        assertNull(groupServiceImpl.deleteGroup(Integer.MAX_VALUE));  // check that we "cannot delete" non existant group
     }
 
 

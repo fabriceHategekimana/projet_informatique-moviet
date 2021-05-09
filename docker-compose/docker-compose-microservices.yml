@@ -29,7 +29,7 @@ services:
       - "10080:8080" # port mapping from host to container port
     networks:
       - backend-network
-    environment: # for thorntail
+    environment: # it will replace the H2 in memory db that we use for IT.. when we run containers..
       THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_CONNECTION_DASH_URL: "jdbc:postgresql://group-service-database:5432/group-service" # it should be the name of the database ! 5432 is a port defined by pg
       THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_DRIVER_DASH_NAME: 'postgresql'
       THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_USER_DASH_NAME: 'group-service'

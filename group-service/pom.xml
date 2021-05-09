@@ -20,6 +20,7 @@
     <skip-docker-build>false</skip-docker-build> <!-- false -->
     <microservice.port>10080</microservice.port> <!-- bind 8080 port of container to TCP port 10080 on localhost of the host machine-->
     <slf4j.version>1.7.30</slf4j.version> <!-- http://www.slf4j.org/index.html. It removes one of the warnings..-->
+    <!-- https://stackoverflow.com/questions/7421612/slf4j-failed-to-load-class-org-slf4j-impl-staticloggerbinder -->
   </properties>
 
   <dependencies>
@@ -139,7 +140,7 @@
 
     <plugins>
       <plugin>
-        <!-- Java Code Coverage-->
+        <!-- Java Code Coverage -->
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <executions>
@@ -149,7 +150,6 @@
               <goal>prepare-agent</goal>
             </goals>
           </execution>
-          <!-- no IT for the moment..
           <execution>
             <id>pre-integration-test-prepare-agent</id>
             <phase>pre-integration-test</phase>
@@ -164,10 +164,10 @@
               <output>tcpserver</output>
               <port>10001</port>
               <reset>false</reset>
-              <skip>${skip.dump}</skip>
+              <!--skip>${skip.dump}</skip-->
+              <skip>${skip-ITs}</skip>
             </configuration>
           </execution>
-
           <execution>
             <id>post-integration-test-prepare-agent</id>
             <phase>post-integration-test</phase>
@@ -182,9 +182,10 @@
               <output>tcpserver</output>
               <port>10001</port>
               <reset>false</reset>
-              <skip>${skip.dump}</skip>
+              <!--skip>${skip.dump}</skip-->
+              <skip>${skip-ITs}</skip>
             </configuration>
-          </execution>-->
+          </execution>
           <execution>
             <id>merge-coverage</id>
             <phase>install</phase>
@@ -215,22 +216,56 @@
           </execution>
         </executions>
       </plugin>
-
+      <!-- For packaging, starting war and stopping war for IT -->
       <plugin>
-        <!-- For packaging -->
         <groupId>io.thorntail</groupId>
         <artifactId>thorntail-maven-plugin</artifactId>
         <version>${version.thorntail}</version>
-
+        <configuration>
+          <jvmArguments>
+            <jvmArgument>${jacoco.it.tests}</jvmArgument>
+          </jvmArguments>
+          <!-- offset from 8080. Port inside container-->
+          <!--
+          <properties>
+            <thorntail.port.offset>20000</thorntail.port.offset>
+            <java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
+          </properties>-->
+          <properties>
+            <java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
+          </properties>
+        </configuration>
         <executions>
+          <!-- For packaging -->
           <execution>
             <goals>
               <goal>package</goal>
             </goals>
           </execution>
+          <!-- Starting the .war -->
+          <execution>
+            <id>pre-integration-test-start</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>start</goal>
+            </goals>
+            <configuration>
+              <jvmArguments>
+                <jvmArgument>${jacoco.it.tests}</jvmArgument>
+              </jvmArguments>
+            </configuration>
+          </execution>
+          <!-- After IT, stop .war-->
+          <execution>
+            <id>verify-stop</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>stop</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
-      <!-- setup db for IT ?-->
+      <!-- setup temporary db for IT. Autocommit true -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>sql-maven-plugin</artifactId>
@@ -248,7 +283,8 @@
           <username>sa</username>
           <password>sa</password>
           <autocommit>true</autocommit>
-          <skip>${maven.test.skip}</skip>
+          <!--skip>${maven.test.skip}</-->
+          <skip>${skip-ITs}</skip>
         </configuration>
         <executions>
           <execution>
@@ -259,7 +295,7 @@
             </goals>
             <configuration>
               <srcFiles>
-                <srcFile>${project.basedir}/src/test/resources/META-INF/groups_test.sql</srcFile>
+                <srcFile>${project.basedir}/src/main/resources/META-INF/groups_test.sql</srcFile>
               </srcFiles>
             </configuration>
           </execution>
