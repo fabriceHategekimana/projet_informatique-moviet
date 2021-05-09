@@ -43,11 +43,14 @@ class GroupRestServiceIT {
     @Test
     void testGetAllGroups_ok(){ // GET
         // https://github.com/rest-assured/rest-assured/wiki/Usage#deserialization-with-generics
-
+        get("/").
+        then().
+            statusCode(200). // OK
+            body(containsStringIgnoringCase("erwan"));
     }
 
     /* --------------------------------------------------------
-    IT for getGroup, a single group
+    IT for getGroup, a single group. Id 0 will always result in 404 not found.
      */
     @Test
     void testGetGroup_ok(){ // GET
@@ -95,8 +98,22 @@ class GroupRestServiceIT {
     }
 
     @Test
-    void testCreateGroup_bad_request_id_name(){ // POST
-        String myJson="{\"id\": 100,\"name\":\"ethan\" }";
+    void testCreateGroup_created_id_0(){ // POST
+        String myJson="{\"id\": 0, \"name\":\"new_group\"}";  // id 0 is like not even adding id in the JSON
+        given().
+            contentType(ContentType.JSON).
+            body(myJson).
+        when().
+            post("/").
+        then().
+            statusCode(201).
+            body("id", notNullValue(),
+                    "name", equalTo("new_group"));
+    }
+
+    @Test
+    void testCreateGroup_bad_request_name(){ // POST, null name.. Id 0 is okay
+        String myJson="{\"id\": 0}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -108,7 +125,7 @@ class GroupRestServiceIT {
 
     @Test
     void testCreateGroup_bad_request_id(){ // POST
-        String myJson="{\"id\": 100}";
+        String myJson="{\"id\": 100,\"name\":\"ethan\" }";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -118,10 +135,9 @@ class GroupRestServiceIT {
             statusCode(400);
     }
 
-    /*
     @Test
-    void testCreateGroup_bad_request_name(){ // POST, null name..
-        String myJson="{}";
+    void testCreateGroup_bad_request_id_name(){ // POST
+        String myJson="{\"id\": 4}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -130,7 +146,6 @@ class GroupRestServiceIT {
         then().
             statusCode(400);
     }
-    */
 
     // -------------------------------------------------------
     /*
@@ -165,7 +180,7 @@ class GroupRestServiceIT {
 
     @Test
     void testUpdateGroup_bad_request_name(){
-        String myJson="{\"name\": \"new_name\"}";
+        String myJson="{\"id\": 4}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -177,7 +192,7 @@ class GroupRestServiceIT {
 
     @Test
     void testUpdateGroup_bad_request_id(){
-        String myJson="{\"id\": 0}";
+        String myJson="{\"name\": \"new_name\"}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -187,7 +202,17 @@ class GroupRestServiceIT {
             statusCode(400);
     }
 
-
+    @Test
+    void testUpdateGroup_bad_request_id_name(){
+        String myJson="{\"id\": 0}";
+        given().
+            contentType(ContentType.JSON).
+            body(myJson).
+        when().
+            put("/").
+        then().
+            statusCode(400);
+    }
 
     // --------------------------------------------------------
     /*

@@ -105,9 +105,7 @@ public class GroupRestService {
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : only other attributes than id are (must be) initialized: " + group).build();
         }
         Group returnedGroup=groupService.createGroup(group); // can never have conflict if id are auto-incremented.
-        if (returnedGroup == null){ // same earlier.. just in case
-            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : only other attributes than id are (must be) initialized: " + group).build();
-        }
+        // returnedGroup can be null in general but we tested the input before so it's not null.. otherwise bad request..
         //return Response.status(Response.Status.CREATED).header("Location", current_link.concat(String.valueOf(returnedGroup.getId()))).build(); // 201
         UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
         uriBuilder.path(Integer.toString(returnedGroup.getId()));
