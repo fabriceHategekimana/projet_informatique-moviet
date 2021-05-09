@@ -15,8 +15,9 @@
             <!--property name="hibernate.hbm2ddl.auto" value="update" /--> <!-- used to create automatically new db etc. not used in prod-->
             <property name="hibernate.show_sql" value="true" /> <!-- Show SQL in console -->
             <property name="hibernate.format_sql" value="true" /> <!-- Show SQL formatted -->
-            <property name="hibernate.dialect"
-                      value="org.hibernate.dialect.H2Dialect" />
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL95Dialect" />
+            <!--property name="hibernate.dialect"
+                      value="org.hibernate.dialect.H2Dialect" /-->
             <!-- property name="hibernate.id.new_generator_mappings" value="true" /-->
             <property name="hibernate.hbm2ddl.charset_name" value="UTF-8"/>
             <!-- For IT -->

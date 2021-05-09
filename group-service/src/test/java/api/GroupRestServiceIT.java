@@ -94,7 +94,8 @@ class GroupRestServiceIT {
         then().
             statusCode(201).
             body("id", notNullValue(),
-                    "name", equalTo("new_group"));
+                    "name", equalTo("new_group")).
+            header("Location", notNullValue());
     }
 
     @Test

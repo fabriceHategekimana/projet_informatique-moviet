@@ -28,26 +28,19 @@ source code, documentation, or through network traffic inspection".
  */
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
+import lombok.extern.java.Log;
 
 // https://www.restapitutorial.com/lessons/httpmethods.html
 
+@Log // lombok log
 @ApplicationScoped // singleton
 @Path("/groups")
 @Api(value = "group")
 @Produces({"application/json", "application/xml"})
 public class GroupRestService {
     // Endpoint
-
-    private final String current_link="http://localhost:10080/groups/"; // for link informations
-
     @Inject
     private GroupService groupService; // no more instantiation in the constructor
-    // https://www.logicbig.com/tutorials/java-ee-tutorial/jax-rs/uri-info.html
-    /*
-    @Context
-    private final UriInfo uriInfo;
-    */
 
     public GroupRestService() { }
 
@@ -56,6 +49,7 @@ public class GroupRestService {
     @Produces(MediaType.APPLICATION_JSON) // TODO: reduce the number of groups that we
     @ApiOperation(value = "GET a list of all groups")
     public Response getAllGroups() {
+        log.info("Trying to get all groups");
         return Response.ok(groupService.getAllGroups()).build(); // we can even add headers using .header() before .build()
     }
 
@@ -66,6 +60,7 @@ public class GroupRestService {
     @ApiOperation(value = "GET a particular group")
     public Response getGroup(@PathParam("id") String str_id) {
         try {
+            log.info("Trying to get a group using: id=" + str_id);
             int id = Integer.parseInt(str_id);
             Group group=groupService.getGroup(id);
             if (group == null) { // group not found
@@ -100,14 +95,15 @@ public class GroupRestService {
 
          Then you use GET to see the created object
         */
+        log.info("Trying to create using Group: " + group);
         // only want non init id and non null name, otherwise bad request
         if ((group.getId() != 0) || (group.getName() == null)){
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : only other attributes than id are (must be) initialized: " + group).build();
         }
+
         Group returnedGroup=groupService.createGroup(group); // can never have conflict if id are auto-incremented.
         // returnedGroup can be null in general but we tested the input before so it's not null.. otherwise bad request..
-        //return Response.status(Response.Status.CREATED).header("Location", current_link.concat(String.valueOf(returnedGroup.getId()))).build(); // 201
-        UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
+        UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder(); // https://www.logicbig.com/tutorials/java-ee-tutorial/jax-rs/uri-info.html
         uriBuilder.path(Integer.toString(returnedGroup.getId()));
         return Response.created(uriBuilder.build()).entity(returnedGroup).build(); // 201
     }
@@ -123,6 +119,7 @@ public class GroupRestService {
         Example:
         - curl --verbose -H "Content-Type: application/json" -X PUT http://localhost:10080/groups -d '{"id":3,"name":"fabrice"}'
          */
+        log.info("Trying to update using Group: " + group);
         // only want initialized id and non null name, otherwise bad request
         if ((group.getId() == 0) || (group.getName() == null)){
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : all attributes need to be instantiated: " + group).build();
@@ -133,8 +130,7 @@ public class GroupRestService {
             // group does not exist already
             return Response.status(Response.Status.NOT_FOUND).build(); // 404
         }
-
-        return Response.ok(returnedGroup).header("Location", current_link.concat(String.valueOf(group.getId()))).build(); // 200
+        return Response.ok(returnedGroup).build(); // 200
     }
 
     @DELETE
@@ -150,6 +146,7 @@ public class GroupRestService {
         This does not work : '{"id":youridhere}'
          */
         try {
+            log.info("Trying to delete a group using: id=" + str_id);
             int id = Integer.parseInt(str_id);
             Group returnedGroup=groupService.deleteGroup(id); // get all groups and check if group inside groups
             // will delete the group if exists, otherwise return null
