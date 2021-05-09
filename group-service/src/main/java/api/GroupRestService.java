@@ -42,18 +42,14 @@ public class GroupRestService {
     @Inject
     private GroupService groupService; // no more instantiation in the constructor
 
-    public GroupRestService() { }
-
-    // http://localhost:10080/groups
     @GET
-    @Produces(MediaType.APPLICATION_JSON) // TODO: reduce the number of groups that we
+    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "GET a list of all groups")
     public Response getAllGroups() {
         log.info("Trying to get all groups");
         return Response.ok(groupService.getAllGroups()).build(); // we can even add headers using .header() before .build()
     }
 
-    // http://localhost:10080/groups/{id}
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -77,8 +73,6 @@ public class GroupRestService {
     https://stackoverflow.com/questions/4687271/jax-rs-how-to-return-json-and-http-status-code-together
     https://docs.oracle.com/javaee/7/api/javax/ws/rs/core/Response.Status.html
     https://docs.oracle.com/javaee/7/api/javax/ws/rs/core/Response.html
-
-    Just to try something : Response.ok(groupService.getGroup(id)).header("hello",42).build();
     */
 
     @POST
