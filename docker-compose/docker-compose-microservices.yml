@@ -30,10 +30,10 @@ services:
     networks:
       - backend-network
     environment: # it will replace the H2 db that we use for IT.. when we run containers..
-      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_CONNECTION_DASH_URL: "jdbc:postgresql://user-service-database:5432/user-service" # it should be the name of the database ! 5432 is a port defined by pg
-      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_DRIVER_DASH_NAME: 'postgresql'
-      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_USER_DASH_NAME: 'user-service'
-      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_PASSWORD: 'user-service'
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_USERDS_CONNECTION_DASH_URL: "jdbc:postgresql://user-service-database:5432/user-service" # it should be the name of the database ! 5432 is a port defined by pg
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_USERDS_DRIVER_DASH_NAME: 'postgresql'
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_USERDS_USER_DASH_NAME: 'user-service'
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_USERDS_PASSWORD: 'user-service'
     depends_on:
       - user-service-database
 

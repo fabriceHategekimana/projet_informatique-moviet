@@ -7,4 +7,5 @@ CREATE TABLE T_users (id serial primary key, name varchar(255) not null);
 TRUNCATE TABLE T_users;
 INSERT INTO T_users (name) VALUES ('erwan');
 INSERT INTO T_users (name) VALUES ('mohsen');
+INSERT INTO T_users (name) VALUES ('ethan');
 INSERT INTO T_users (name) VALUES ('raphael');

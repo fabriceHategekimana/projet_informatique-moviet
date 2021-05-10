@@ -9,4 +9,5 @@ CREATE TABLE T_users (
 TRUNCATE TABLE T_users;
 INSERT INTO T_users (name) VALUES ('erwan');
 INSERT INTO T_users (name) VALUES ('mohsen');
+INSERT INTO T_users (name) VALUES ('ethan');
 INSERT INTO T_users (name) VALUES ('raphael');
