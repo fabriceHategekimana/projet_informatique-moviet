@@ -28,6 +28,8 @@ public class MovieRestServiceMock {
                 299534,
                 "Avengers : Endgame",
                 2019,
+                "Rien ne peut vous préparer pour la fin.",
+                "Après leur défaite face au Titan Thanos qui dans le film précédent s'est approprié toutes les pierres du Gant de l'infini , les Avengers et les Gardiens de la Galaxie ayant survécu à son claquement de doigts qui a pulvérisé « la moitié de toute forme de vie dans l'Univers », Captain America, Thor, Bruce Banner, Natasha Romanoff, War Machine, Tony Stark, Nébula et Rocket, vont essayer de trouver une solution pour ramener leurs coéquipiers disparus et vaincre Thanos en se faisant aider par Ronin alias Clint Barton, Captain Marvel et Ant-Man.",
                 8.3,
                 "https://image.tmdb.org/t/p/original/k9hd0dhvRNIQaXuiyniGSa0Mllr.jpg",
                 "https://image.tmdb.org/t/p/original/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg",
