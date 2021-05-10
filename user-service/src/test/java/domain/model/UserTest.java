@@ -6,39 +6,39 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 // just a test for unit testing
-class GroupTest {
-    private final Group group = new Group("hello world");
+class UserTest {
+    private final User user = new User("hello world");
 
     @Test
     void testGetId(){
-        assertEquals(0, group.getId() );
+        assertEquals(0, user.getId() );
     }
     
     @Test
     void testGetName(){
-        assertEquals("hello world", group.getName() );
+        assertEquals("hello world", user.getName() );
     }
 
     @Test
     void testSetName(){
-        Group tmpgroup = new Group("hello world");
-        tmpgroup.setName("hello universe");
-        assertEquals("hello universe", tmpgroup.getName() );
+        User tmpuser = new User("hello world");
+        tmpuser.setName("hello universe");
+        assertEquals("hello universe", tmpuser.getName() );
     }
 
     @Test
     void testGetIdNoArgsConstructor(){
-        assertEquals(0, new Group().getId() );
+        assertEquals(0, new User().getId() );
     }
 
     @Test
     void testGetNameNoArgsConstructor(){
-        assertEquals(null, new Group().getName() );
+        assertEquals(null, new User().getName() );
     }
 
     @Test
     void testToString(){
-        assertEquals("Group(id=0, name=hello world)", group.toString() );
+        assertEquals("User(id=0, name=hello world)", user.toString() );
     }
     // fail a test -> Build failure
 }

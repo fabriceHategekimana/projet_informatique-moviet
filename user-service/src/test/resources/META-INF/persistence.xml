@@ -3,11 +3,11 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.1"
         xmlns="http://xmlns.jcp.org/xml/ns/persistence"
         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
-    <persistence-unit name="GroupPUTest"
-                      transaction-type="RESOURCE_LOCAL"> <!-- PU for persistence, name is used in GroupServiceImplTest-->
+    <persistence-unit name="UserPUTest"
+                      transaction-type="RESOURCE_LOCAL"> <!-- PU for persistence, name is used in UserServiceImplTest-->
         <!-- transaction-type RESOURCE_LOCAL not JTA (see documentation of dadrus jpa unit)!! Need to learn more about it-->
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <class>domain.model.Group</class> <!-- we need this otherwise, it thinks group is not an entity -->
+        <class>domain.model.User</class> <!-- we need this otherwise, it thinks group is not an entity -->
         <!-- https://youtu.be/FeZ5BC0PirQ, https://gist.github.com/SergioDiniz/886723272d9fd95dd17ecb79b35b66e1 -->
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
@@ -17,7 +17,7 @@
             use jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"
             -->
             <property name="javax.persistence.jdbc.url"
-                      value="jdbc:h2:mem:GroupDB;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=TRUE" />
+                      value="jdbc:h2:mem:UserDB;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=TRUE" />
             <property name="javax.persistence.jdbc.user" value="sa" />
             <property name="javax.persistence.jdbc.password" value="sa" />
 
@@ -30,7 +30,7 @@
 
             <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/> <!-- create / create-drop / update -->
             <property name="javax.persistence.schema-generation.create-source" value="script"/>
-            <property name="javax.persistence.schema-generation.create-script-source" value="META-INF/groups_test.sql" />
+            <property name="javax.persistence.schema-generation.create-script-source" value="META-INF/users_test.sql" />
         </properties>
     </persistence-unit>
 </persistence>

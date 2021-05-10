@@ -20,14 +20,14 @@ import javax.persistence.Table;
 @ToString
 @Getter
 @NoArgsConstructor // need this otherwise can have some problems with PUT (create) requests
-@Entity @Table( name="T_groups")// JPA, mapping class - table
-public class Group {
+@Entity @Table( name="T_users")// JPA, mapping class - table
+public class User {
     @Id @GeneratedValue( strategy=GenerationType.IDENTITY ) // Generated Value, automatically generated following how the db was configured
     private int id;
     @Setter @NotNull
     private String name;
 
-    public Group(String name){
+    public User(String name){
         this.name = name;
     }
 }
