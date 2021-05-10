@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.1"
+    xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+    <persistence-unit name="UserPU"
+                      transaction-type="JTA"> <!-- PU for persistence, name is used in UserServiceImplementation-->
+        <!-- need to search what is transaction-type JTA -->
+        <!-- H2 db will be replaced by postgres through user-service-database when run from docker-compose-->
+        <!-- This is done like this because we run the .war using thorntail-maven-plugin before the IT-->
+        <jta-data-source>java:jboss/datasources/userds</jta-data-source>
+        <class>domain.model.User</class> <!-- we need this otherwise, it thinks user is not an entity -->
+        <!-- https://youtu.be/FeZ5BC0PirQ, https://gist.github.com/SergioDiniz/886723272d9fd95dd17ecb79b35b66e1 -->
+        <properties>
+            <!--property name="hibernate.hbm2ddl.auto" value="update" /--> <!-- used to create automatically new db etc. not used in prod-->
+            <property name="hibernate.show_sql" value="true" /> <!-- Show SQL in console -->
+            <property name="hibernate.format_sql" value="true" /> <!-- Show SQL formatted -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL95Dialect" />
+            <!--property name="hibernate.dialect"
+                      value="org.hibernate.dialect.H2Dialect" /-->
+            <!-- property name="hibernate.id.new_generator_mappings" value="true" /-->
+            <property name="hibernate.hbm2ddl.charset_name" value="UTF-8"/>
+            <!-- For IT -->
+            <property name="javax.persistence.sql-load-script-source" value="META-INF/users_test.sql"/>
+        </properties>
+    </persistence-unit>
+</persistence>

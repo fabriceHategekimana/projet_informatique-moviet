@@ -1,5 +1,42 @@
 version: "3.8"
 services:
+  user-service-database:
+    image: postgres:13 # name of image to pull from docker hub
+    container_name: user-service-database # name of container we'll see in docker ps
+    networks:
+      - backend-network
+    environment:
+      POSTGRES_USER: user-service
+      POSTGRES_PASSWORD: user-service
+      POSTGRES_DB: user-service
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "user-service", "-d", "user-service" ] # user, db
+      interval: 30s # wait 30 seconds, try connecting
+      timeout: 30s # if cannot connect, wait timeout before retrying
+      retries: 3
+    volumes: # like mounting a folder from the host machine to the container, see docker volume inspect <volume_name>
+      - postgresql-db-user-service:/var/lib/postgresql/data # careful, do not add a space in between
+      - ./data/users/:/docker-entrypoint-initdb.d/
+    restart: on-failure
+    stdin_open: true
+    tty: true
+
+  user-service:
+    image: unige/user-service # use already built image that we've built from Maven
+    container_name: user-service # name of container we'll see in docker ps
+    hostname: user-service
+    ports:
+      - "10082:8080" # port mapping from host to container port
+    networks:
+      - backend-network
+    environment: # it will replace the H2 db that we use for IT.. when we run containers..
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_USERDS_CONNECTION_DASH_URL: "jdbc:postgresql://user-service-database:5432/user-service" # it should be the name of the database ! 5432 is a port defined by pg
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_USERDS_DRIVER_DASH_NAME: 'postgresql'
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_USERDS_USER_DASH_NAME: 'user-service'
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_USERDS_PASSWORD: 'user-service'
+    depends_on:
+      - user-service-database
+
   group-service-database:
     image: postgres:13 # name of image to pull from docker hub
     container_name: group-service-database # name of container we'll see in docker ps
@@ -29,13 +66,14 @@ services:
       - "10080:8080" # port mapping from host to container port
     networks:
       - backend-network
-    environment: # it will replace the H2 in memory db that we use for IT.. when we run containers..
+    environment: # it will replace the H2 db that we use for IT.. when we run containers..
       THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_CONNECTION_DASH_URL: "jdbc:postgresql://group-service-database:5432/group-service" # it should be the name of the database ! 5432 is a port defined by pg
       THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_DRIVER_DASH_NAME: 'postgresql'
       THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_USER_DASH_NAME: 'group-service'
       THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_GROUPDS_PASSWORD: 'group-service'
     depends_on:
       - group-service-database
+    # maybe add user services
 
   tmdb-requests:
     image: unige/tmdb-requests # use already built image that we've built from Maven
@@ -53,6 +91,7 @@ networks: # networks isolates communication between some containers
 
 volumes:
   postgresql-db-group-service:
+  postgresql-db-user-service:
 
 # to build/pull/use existing images and start containers, use:
 # docker-compose -f docker-compose-microservices.yml up -d to build/pull/use existing images and start containers
