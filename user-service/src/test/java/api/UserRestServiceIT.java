@@ -60,7 +60,7 @@ class UserRestServiceIT {
         then().
             statusCode(200). // OK
             body("id", equalTo(1),
-                    "firstName", equalTo("erwan"));
+                    "firstName", containsStringIgnoringCase("Stephane"));
     }
 
     @Test
@@ -85,7 +85,7 @@ class UserRestServiceIT {
      */
     @Test
     void testCreateUser_created(){ // POST
-        String myJson="{\"firstName\": new, \"lastName\":\"user, \"age\": 42}";
+        String myJson="{\"firstName\": \"new\", \"lastName\":\"user\", \"age\": \"42\"}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -102,7 +102,7 @@ class UserRestServiceIT {
 
     @Test
     void testCreateUser_created_id_0(){ // POST
-        String myJson="{\"id\": 0,\"firstName\": new, \"lastName\":\"user, \"age\": 42}";  // id 0 is like not even adding id in the JSON
+        String myJson="{\"id\": 0,\"firstName\": \"new\", \"lastName\":\"user\", \"age\": \"42\"}";  // id 0 is like not even adding id in the JSON
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -130,7 +130,7 @@ class UserRestServiceIT {
 
     @Test
     void testCreateUser_bad_request_id(){ // POST
-        String myJson="{\"id\": 100,\"firstName\": new, \"lastName\":\"user, \"age\": 42}";
+        String myJson="{\"id\": 100,\"firstName\": \"new\", \"lastName\":\"user\", \"age\": \"42\"}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -154,7 +154,7 @@ class UserRestServiceIT {
 
     @Test
     void testCreateUser_bad_request_age_negative(){ // POST
-        String myJson="{\"firstName\": new, \"lastName\":\"user, \"age\": -1}";
+        String myJson="{\"firstName\": \"new\", \"lastName\":\"user, \"age\": \"-1\"}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -170,7 +170,7 @@ class UserRestServiceIT {
      */
     @Test
     void testUpdateUser_ok(){
-        String myJson="{\"id\": 2,\"firstName\": Ethan, \"lastName\":\"Icet, \"age\": 20}"; // no other test will delete this user otherwise we can have errors
+        String myJson="{\"id\": 2,\"firstName\": \"Ethan\", \"lastName\":\"Icet\", \"age\": \"20\"}"; // no other test will delete this user otherwise we can have errors
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -187,7 +187,7 @@ class UserRestServiceIT {
     @Test
     void testUpdateUser_not_found(){
         // no other test will delete this user otherwise we can have errors
-        String myJson="{\"id\": ".concat(String.valueOf(Integer.MAX_VALUE)).concat(" ,\"firstName\": Ethan, \"lastName\":\"Icet, \"age\": 20}");
+        String myJson="{\"id\": ".concat(String.valueOf(Integer.MAX_VALUE)).concat(" ,\"firstName\": \"Ethan\", \"lastName\":\"Icet\", \"age\": \"20\"}");
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -235,7 +235,7 @@ class UserRestServiceIT {
 
     @Test
     void testUpdateUser_bad_request_age_negative(){
-        String myJson="{\"id\": 2,\"firstName\": Ethan, \"lastName\":\"Icet, \"age\": -20}";
+        String myJson="{\"id\": 2,\"firstName\": \"Ethan\", \"lastName\":\"Icet\", \"age\": \"-20\"}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
