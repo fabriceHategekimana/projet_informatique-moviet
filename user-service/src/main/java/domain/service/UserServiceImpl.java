@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService{
         /*
         Can always create.. no restriction due to auto increment of unique identifier / primary key
          */
-        if ((user.getId() != 0)|| (user.getName() == null)){ // if non initialized.
+        if ((user.getId() != 0) || (user.getFirstName() == null) || (user.getLastName() == null)){ // if non initialized.
             // Actually if we do not check. SQL will throw an error because NOT NULL for the attributein the table
             // To put Only other attributes than id are (must be) initialized: " + user in the logs
             return null;

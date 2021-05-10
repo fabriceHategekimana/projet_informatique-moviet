@@ -60,7 +60,9 @@ class UserServiceImplTest {
 
         User usr= userServiceImpl.getUser(id); // get the specific user through the business service
         assertEquals(users.get(random_choice).getId(), usr.getId()); // check the ids
-        assertEquals(users.get(random_choice).getName(), usr.getName());
+        assertEquals(users.get(random_choice).getFirstName(), usr.getFirstName());
+		assertEquals(users.get(random_choice).getLastName(), usr.getLastName());
+		assertEquals(users.get(random_choice).getAge(), usr.getAge());
     }
 
     @Test
@@ -79,7 +81,7 @@ class UserServiceImplTest {
     void testCreateNoNameUser() {
         User user = getRandomUserNoName();
         User returned_user = userServiceImpl.createUser(user);
-        assertNull(returned_user); // check if null because trying to create user without name
+        assertNull(returned_user); // check if null because trying to create user without attributes
     }
 
     @Test
@@ -98,9 +100,8 @@ class UserServiceImplTest {
         assertNull(userServiceImpl.createUser(user)); // check if null because trying to create user with an id
     }
 
-
     @Test
-    void testUpdateUser() { // TODO: test User input entered in updateUser in Impl
+    void testUpdateUserFirstName() { // TODO: test User input entered in updateUser in Impl
         // create a user and modify its name
         userServiceImpl.createUser(getRandomUser());
         List<User> users = userServiceImpl.getAllUsers(); // get list of users through the business service
@@ -108,10 +109,40 @@ class UserServiceImplTest {
 
         assertNotNull(user);
         int id = user.getId();
-        user.setName("XXX");
+        user.setFirstName("XXX");
         userServiceImpl.updateUser(user);
         user = userServiceImpl.getUser(id);
-        assertEquals("XXX", user.getName());
+        assertEquals("XXX", user.getFirstName());
+    }
+
+    @Test
+    void testUpdateUserLastName() { // TODO: test User input entered in updateUser in Impl
+        // create a user and modify its name
+        userServiceImpl.createUser(getRandomUser());
+        List<User> users = userServiceImpl.getAllUsers(); // get list of users through the business service
+        User user = users.get(users.size() - 1);  // get last user
+
+        assertNotNull(user);
+        int id = user.getId();
+        user.setLastName("XXX");
+        userServiceImpl.updateUser(user);
+        user = userServiceImpl.getUser(id);
+        assertEquals("XXX", user.getLastName());
+    }
+
+    @Test
+    void testUpdateUserAge() { // TODO: test User input entered in updateUser in Impl
+        // create a user and modify its name
+        userServiceImpl.createUser(getRandomUser());
+        List<User> users = userServiceImpl.getAllUsers(); // get list of users through the business service
+        User user = users.get(users.size() - 1);  // get last user
+
+        assertNotNull(user);
+        int id = user.getId();
+        user.setAge("20");
+        userServiceImpl.updateUser(user);
+        user = userServiceImpl.getUser(id);
+        assertEquals("20", user.getAge());
     }
 
     @Test
@@ -158,8 +189,8 @@ class UserServiceImplTest {
 
     private List<User> getUsers() {
         List<User> users = new ArrayList<>();
-        long numberOfNewGrp = Math.round((Math.random() * 10)) + 5;
-        for (int i = 0; i < numberOfNewGrp; i++) {
+        long numberOfNewUsr = Math.round((Math.random() * 10)) + 5;
+        for (int i = 0; i < numberOfNewUsr; i++) {
             users.add(getRandomUser());
         }
         return users;
@@ -168,20 +199,23 @@ class UserServiceImplTest {
     private int initDataStore() {
         int size = userServiceImpl.getAllUsers().size();
         List<User> newUsers = getUsers();
-        for (User g : newUsers) {
-            em.persist(g);
+        for (User u : newUsers) {
+            em.persist(u);
         }
         return size + newUsers.size();
     }
 
     private User getRandomUser() {
-        User g = new User();
-        g.setName(UUID.randomUUID().toString());  // random name
-        return g;
+        User u = new User();
+	int rand_num = (int) Math.random() * 10000;
+        u.setFirstName(UUID.randomUUID().toString());  // random name first name/last name/age
+		u.setLastName(UUID.randomUUID().toString());
+		u.setAge(String.valueOf(rand_num));
+        return u;
     }
 
     private User getRandomUserNoName() {
-        User g = new User();
-        return g;
+        User u = new User();
+        return u;
     }
 }

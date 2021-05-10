@@ -25,9 +25,21 @@ public class User {
     @Id @GeneratedValue( strategy=GenerationType.IDENTITY ) // Generated Value, automatically generated following how the db was configured
     private int id;
     @Setter @NotNull
-    private String name;
+    private String firstName;
+	@Setter @NotNull
+	private String lastName;
 
-    public User(String name){
-        this.name = name;
+	@Setter @NotNull
+	private String age;
+
+//	private ArrayList<String> prefs;
+
+    public User(String firstName, String lastName, String age){
+        this.firstName = firstName;
+		this.lastName = lastName;
+		this.age = age;
+
+		
+//		this.prefs = new ArrayList<String>();
     }
 }

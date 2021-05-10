@@ -85,14 +85,14 @@ public class UserRestService {
         users with same name. The unique identifier is its id that auto increments. We cannot input a user having an id !!
 
         Example with curl:
-        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/users -d '{"name":"test"}'
+        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10082/users -d '{"name":"test"}'
 
          Then you use GET to see the created object
         */
         log.info("Trying to create using User: " + user);
-        // only want non init id and non null name, otherwise bad request
-        if ((user.getId() != 0) || (user.getName() == null)){
-            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : only other attributes than id are (must be) initialized: " + user).build();
+        // only want non init id and non null first/last names, otherwise bad request
+        if ((user.getId() != 0) || (user.getFirstName() == null) || (user.getLastName() == null) || (user.getAge() == null) || !(Integer.parseInt(user.getAge()) > 0)){
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : other attributes than id must be initialized correctly: " + user).build();
         }
 
         User returnedUser=userService.createUser(user); // can never have conflict if id are auto-incremented.
@@ -114,9 +114,9 @@ public class UserRestService {
         - curl --verbose -H "Content-Type: application/json" -X PUT http://localhost:10080/users -d '{"id":3,"name":"fabrice"}'
          */
         log.info("Trying to update using User: " + user);
-        // only want initialized id and non null name, otherwise bad request
-        if ((user.getId() == 0) || (user.getName() == null)){
-            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : all attributes need to be instantiated: " + user).build();
+        // only want initialized id and non null names, otherwise bad request
+        if ((user.getId() == 0) || (user.getFirstName() == null) || (user.getLastName() == null) || (user.getAge() == null) || !(Integer.parseInt(user.getAge()) > 0)){
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : all attributes need to be correctly instantiated: " + user).build();
         }
         User returnedUser=userService.updateUser(user); // get all users and check if user inside list of users
         // will update the User if exists, otherwise return null
@@ -135,7 +135,7 @@ public class UserRestService {
         Delete existing user and return the deleted user.
 
         Example:
-        - curl --verbose -H "Content-Type: application/json" -X DELETE http://localhost:10080/users -d 4
+        - curl --verbose -H "Content-Type: application/json" -X DELETE http://localhost:10082/users -d 4
 
         This does not work : '{"id":youridhere}'
          */
