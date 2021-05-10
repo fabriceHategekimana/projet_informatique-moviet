@@ -1,11 +1,6 @@
 DROP TABLE if exists T_users;
 CREATE TABLE T_users (
     id serial primary key,
-    name varchar(255) not null
-);
-
-CREATE TABLE T_users (
-    id serial primary key,
     firstName varchar(255) not null,
     lastName varchar(255) not null,
     age varchar(255) not null
