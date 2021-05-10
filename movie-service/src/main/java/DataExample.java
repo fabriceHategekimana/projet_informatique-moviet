@@ -84,6 +84,8 @@ public class DataExample {
 
                 MovieExternalIds external_ids = movie.external_ids;
                 String title = movie.title ;
+                String overview = movie.overview;
+                String tagline = movie.tagline;
                 Date release_date = movie.release_date;
                 String original_language = movie.original_language;
                 Translations translations = movie.translations;
@@ -98,6 +100,7 @@ public class DataExample {
                 Integer rating = movie.rating;
                 Double vote_average = movie.vote_average;
                 ReviewResultsPage reviews = movie.reviews;
+                MovieResultsPage similar = movie.similar;
                 MovieResultsPage recommendations = movie.recommendations;
 
                 assert external_ids != null;
@@ -109,6 +112,8 @@ public class DataExample {
 
                 System.out.println("title: " + title);
                 System.out.println("release_date: " + release_date);
+                System.out.println("tagline: " + tagline);
+                System.out.println("overview: " + overview);
                 System.out.println("original_language: " + original_language);
 
                 System.out.println("translations: ");
@@ -185,6 +190,13 @@ public class DataExample {
                     System.out.println("\t• " + r.url);
                 }
 
+                System.out.println("similar: ");
+                assert similar != null;
+                assert similar.results != null;
+                for (BaseMovie r: similar.results) {
+                    System.out.println("\t• " + r.title);
+                }
+
                 System.out.println("recommendations: ");
                 assert recommendations != null;
                 assert recommendations.results != null;
@@ -196,7 +208,7 @@ public class DataExample {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();  // Plz handle it better on real implementation
+            // :D
         }
     }
 }
