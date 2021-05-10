@@ -15,6 +15,7 @@
         <module>group-service</module>
         <module>tmdb-requests</module>
         <module>api-gateway</module>
+        <module>user-service</module>
         <!-- Add here if need to add a module ! In the module, you have to define the parent -->
     </modules>
 
