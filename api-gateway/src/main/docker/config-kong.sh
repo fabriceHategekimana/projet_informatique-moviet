@@ -2,7 +2,7 @@
 
 
 curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=group-service" --data-urlencode "url=http://group-service:8080/groups"
-curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=user-service" --data-urlencode "url=http://group-service:8080/users"
+curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=user-service" --data-urlencode "url=http://user-service:8080/users"
 curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=tmdb-requests-mock" --data-urlencode "url=http://tmdb-requests-service:8080/Mock_movies"
 curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=tmdb-requests-service" --data-urlencode "url=http://tmdb-requests-service:8080/movies"
 
