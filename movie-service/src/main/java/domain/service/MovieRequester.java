@@ -5,6 +5,7 @@ import com.uwetrottmann.tmdb2.entities.Genre;
 import com.uwetrottmann.tmdb2.entities.GenreResults;
 import com.uwetrottmann.tmdb2.entities.Movie;
 import com.uwetrottmann.tmdb2.entities.MovieResultsPage;
+import com.uwetrottmann.tmdb2.enumerations.SortBy;
 import com.uwetrottmann.tmdb2.services.DiscoverService;
 import com.uwetrottmann.tmdb2.services.GenresService;
 import com.uwetrottmann.tmdb2.services.MoviesService;
@@ -14,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import retrofit2.Call;
 import retrofit2.Response;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -80,6 +82,26 @@ public class MovieRequester implements MovieRequesterInterface {
 
         return genres;
 
+    }
+
+    @Override
+    public List<SortBy> getSortKeys() {
+        return Arrays.asList(
+                SortBy.POPULARITY_ASC,
+                SortBy.POPULARITY_DESC,
+                SortBy.RELEASE_DATE_ASC,
+                SortBy.RELEASE_DATE_DESC,
+                SortBy.REVENUE_ASC,
+                SortBy.REVENUE_DESC,
+                SortBy.PRIMARY_RELEASE_DATE_ASC,
+                SortBy.PRIMARY_RELEASE_DATE_DESC,
+                SortBy.ORIGINAL_TITLE_ASC,
+                SortBy.ORIGINAL_TITLE_DESC,
+                SortBy.VOTE_AVERAGE_ASC,
+                SortBy.VOTE_AVERAGE_DESC,
+                SortBy.VOTE_COUNT_ASC,
+                SortBy.VOTE_COUNT_DESC
+        );
     }
 
     @Override
