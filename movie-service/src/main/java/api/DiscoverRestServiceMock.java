@@ -1,6 +1,7 @@
 package api;
 
 import com.uwetrottmann.tmdb2.entities.BaseMovie;
+import com.uwetrottmann.tmdb2.entities.Genre;
 import com.uwetrottmann.tmdb2.entities.MovieResultsPage;
 import com.uwetrottmann.tmdb2.entities.TmdbDate;
 import com.uwetrottmann.tmdb2.enumerations.SortBy;
@@ -92,6 +93,67 @@ public class DiscoverRestServiceMock {
         );
 
         return Response.ok(movieDisplayInfoList).build();
+    }
+
+    @GET
+    @Path("/config/genres")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getGenres() {
+
+        List<Genre> genres = Arrays.asList(
+                buildGenre("Action", 28),
+                buildGenre("Aventure", 12),
+                buildGenre("Animation", 16),
+                buildGenre("Comédie", 35),
+                buildGenre("Crime", 80),
+                buildGenre("Documentaire", 99),
+                buildGenre("Drame", 18),
+                buildGenre("Familial", 10751),
+                buildGenre("Fantastique", 14),
+                buildGenre("Histoire", 36),
+                buildGenre("Horreur", 27),
+                buildGenre("Musique", 10402),
+                buildGenre("Mystère", 9648),
+                buildGenre("Romance", 10749),
+                buildGenre("Science-Fiction", 878),
+                buildGenre("Téléfilm", 10770),
+                buildGenre("Thriller", 53),
+                buildGenre("Guerre", 10752),
+                buildGenre("Western", 37));
+
+        return Response.ok(genres).build();
+    }
+
+    @GET
+    @Path("/config/sortKeys")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getSortKeys() {
+
+        List<SortBy> genres = Arrays.asList(
+                SortBy.POPULARITY_ASC,
+                SortBy.POPULARITY_DESC,
+                SortBy.RELEASE_DATE_ASC,
+                SortBy.RELEASE_DATE_DESC,
+                SortBy.REVENUE_ASC,
+                SortBy.REVENUE_DESC,
+                SortBy.PRIMARY_RELEASE_DATE_ASC,
+                SortBy.PRIMARY_RELEASE_DATE_DESC,
+                SortBy.ORIGINAL_TITLE_ASC,
+                SortBy.ORIGINAL_TITLE_DESC,
+                SortBy.VOTE_AVERAGE_ASC,
+                SortBy.VOTE_AVERAGE_DESC,
+                SortBy.VOTE_COUNT_ASC,
+                SortBy.VOTE_COUNT_DESC
+        );
+
+        return Response.ok(genres).build();
+    }
+
+    private Genre buildGenre(String name, Integer id) {
+        Genre genre = new Genre();
+        genre.name = name;
+        genre.id = id;
+        return genre;
     }
 
     private BaseMovie buildBaseMovie(

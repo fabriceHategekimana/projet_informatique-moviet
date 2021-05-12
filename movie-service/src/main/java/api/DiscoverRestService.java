@@ -1,6 +1,7 @@
 package api;
 
 import com.uwetrottmann.tmdb2.entities.DiscoverFilter;
+import com.uwetrottmann.tmdb2.entities.Genre;
 import com.uwetrottmann.tmdb2.entities.MovieResultsPage;
 import com.uwetrottmann.tmdb2.entities.TmdbDate;
 import com.uwetrottmann.tmdb2.enumerations.SortBy;
@@ -126,6 +127,35 @@ public class DiscoverRestService {
         }
 
         return Response.ok(movieDisplayInfoList).build();
+    }
+
+
+    @GET
+    @Path("/config/genres")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getGenres() {
+
+        List<Genre> genres = movieRequester.getGenres();
+
+        if (genres == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(genres).build();
+    }
+
+    @GET
+    @Path("/config/sortKeys")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getSortKeys() {
+
+        List<SortBy> genres = movieRequester.getSortKeys();
+
+        if (genres == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(genres).build();
     }
 
     public static class Query {
