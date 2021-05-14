@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Movie } from '../shared/interfaces/movie' // import the movie interface
+import { Genre } from '../shared/interfaces/genre' // import the genre interface
 import { Tag, Tags } from '../shared/interfaces/tags'
 import { Observable, of } from 'rxjs'; // Observable => HTTP methods return Observable objects
 import { HttpClient, HttpHeaders } from '@angular/common/http' // http requests
@@ -18,6 +19,7 @@ export class MovieService {
 
 
   private movieUrl : string = "http://localhost/api/v1/movie-service/Mock_movies/0"; //! MOCK
+  private genresUrl : string = "http://localhost/api/v1/movie-service/Mock_movies/genres" //! MOCK
 
   constructor(private http: HttpClient) { }
 
@@ -45,6 +47,12 @@ export class MovieService {
         {name: "OtherTag", values: ["value1", "value2", "value3"]}
       ]
     })
+  }
+
+  getGenres(): Observable<any> { // type any because get can return httpEvent or Observable<Genre[]>
+    //! return Mock
+    return this.http.get<Genre[]>(this.genresUrl, this.httpOptions)
+                  .pipe(catchError(this.handleError<Movie>('getGenres', undefined)));
   }
 
   //** handle error function from https://angular.io/tutorial/toh-pt6

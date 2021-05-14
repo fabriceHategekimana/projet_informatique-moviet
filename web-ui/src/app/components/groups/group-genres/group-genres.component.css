@@ -8,7 +8,14 @@
     justify-content: center;
 }
 
-.tag-values-container {
+.genres-container {
     text-align: center;
     justify-content: center;
+    flex-flow: row wrap;
+    max-width: 50em;
+    margin: 0 auto;
+}
+
+.genre {
+    margin-top: 0.5em;
 }

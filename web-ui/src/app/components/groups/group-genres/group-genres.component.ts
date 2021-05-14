@@ -3,6 +3,7 @@ import { GroupsComponent } from '../groups.component'
 import { Group } from '../../../shared/interfaces/group'
 import { ActivatedRoute, Router } from '@angular/router';
 import { Tag, Tags } from '../../../shared/interfaces/tags'
+import { Genre } from '../../../shared/interfaces/genre'
 import { MovieService } from '../../../services/movie.service'
 
 @Component({
@@ -14,6 +15,8 @@ export class GroupGenresComponent implements OnInit {
 
   currentGroup?: Group;
   tags?: Tags;
+  genres?: Genre[];
+  selectedGenres: Genre[] = [];
   selectedTags: Tags = {tags: []};
 
   constructor(private movieService: MovieService, private groupsComponent : GroupsComponent, private router: Router, private route: ActivatedRoute) { }
@@ -29,6 +32,8 @@ export class GroupGenresComponent implements OnInit {
     
     // get the tags
     this.getTags();
+
+    this.getGenres();
   }
 
   getTags(): void {
@@ -37,33 +42,27 @@ export class GroupGenresComponent implements OnInit {
         .subscribe(tags => this.tags = tags);
   }
 
+  getGenres(): void {
+    // subscribe to get the genres: async fct
+    this.movieService.getGenres()
+        .subscribe(genres => this.genres = genres);
+  }
+
   checkBtn(el: any) { // check the checkbox and update selected tags
     el.checked = !el.checked;
     let name = el.name;
-    let value = el.value;
+    let id = el.value;
     console.log(el.checked)
-    if (this.tags) {
-      // check if the tag exist:
-      let tagIndex = this.selectedTags.tags.findIndex((tag) => tag.name == name);
-      if (el.checked) { // we want to add the tag
-        if (tagIndex == -1) { // if the tagname doesn't exist
-          this.selectedTags.tags.push({name: name, values: [value]}) // add the new object
-        } else { // tag name already exist
-          if (!this.selectedTags.tags[tagIndex].values.includes(value)) { // if it does not contain the value, we will add it
-            this.selectedTags.tags[tagIndex].values.push(value);
-          }
+    if (this.genres) {
+      // check if the genre exist:
+      let genreIndex = this.genres.findIndex((genre) => genre.name == name);
+      if (el.checked) { // we want to add the genre
+        if (genreIndex == -1) { // if the genre name doesn't exist
+          this.selectedGenres.push({name: name, id: id}) // add the new genre object
         }
-      } else { // we want to remove the tag
-        if (tagIndex != -1) { // if the tagname exist
-          let valueIndex = this.selectedTags.tags[tagIndex].values.findIndex((tagValue) => tagValue == value); // add the new object
-          if (valueIndex != -1) { // if value exist
-            // remove the value:
-            this.selectedTags.tags[tagIndex].values.splice(valueIndex, 1); // remove the value
-            // if the tag values is empty, we remove the tag from the lis:
-            if (this.selectedTags.tags[tagIndex].values.length == 0) {
-              this.selectedTags.tags.splice(tagIndex, 1); // remove the tag
-            }
-          }
+      } else { // we want to remove the genre
+        if (genreIndex != -1) { // if the genre exist
+          this.selectedGenres.splice(genreIndex, 1); // remove the genre
         }
       }
     }
