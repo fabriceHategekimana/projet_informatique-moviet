@@ -10,6 +10,25 @@
             </div>
         </div>       
     </div>
+    <div class="mt-5 d-flex flex-column">
+        <h2>Keywords</h2>
+        <div>
+            <div class="d-flex flex-inline selected-keywords-container">
+                <div *ngFor="let keyword of selectedKeywords">
+                    <div class="btn btn-primary btn-sm selected-keyword" [attr.keyword-id]="keyword.id" [attr.keyword-name]="keyword.name"  (click)="removeKeyword($event)">
+                        <span class="selected-keyword-name">{{keyword.name}}</span>
+                        <span class="btn-close"></span>
+                    </div>
+                </div>
+            </div>
+            <input type="text" name="input-keywords" id="input-keywords" placeholder="keyword"  autocomplete="off" (keyup)="updateKeywords($event)">
+        </div>
+        <div *ngFor="let keyword of proposedKeywords">
+            <div class="proposed-keyword" [attr.keyword-id]="keyword.id" [attr.keyword-name]="keyword.name" (click)="addKeyword($event)">
+                {{keyword.name}}
+            </div>
+        </div>
+    </div>
     <div type="button" class="btn btn-primary btn-lg btn-block mt-5" id="btn-start" (click)="processPreferences()">Start</div>
 </div>
 </ng-container>

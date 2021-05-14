@@ -19,3 +19,20 @@
 .genre {
     margin-top: 0.5em;
 }
+
+/* .proposed-keyword {
+    
+} */
+
+.selected-keywords-container {
+    margin: 0.5em auto;
+    justify-content: center;
+}
+
+.selected-keyword {
+    margin-left: 0.5em;
+}
+
+.selected-keyword-name {
+    margin-right: 0.5em;
+}

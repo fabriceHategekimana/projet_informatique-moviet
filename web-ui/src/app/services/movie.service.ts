@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Movie } from '../shared/interfaces/movie' // import the movie interface
 import { Genre } from '../shared/interfaces/genre' // import the genre interface
+import { Keyword, KeywordResults } from '../shared/interfaces/keyword' // import keyword interface
 import { Tag, Tags } from '../shared/interfaces/tags'
 import { Observable, of } from 'rxjs'; // Observable => HTTP methods return Observable objects
 import { HttpClient, HttpHeaders } from '@angular/common/http' // http requests
@@ -19,7 +20,8 @@ export class MovieService {
 
 
   private movieUrl : string = "http://localhost/api/v1/movie-service/Mock_movies/0"; //! MOCK
-  private genresUrl : string = "http://localhost/api/v1/movie-service/Mock_movies/genres" //! MOCK
+  private genresUrl : string = "http://localhost/api/v1/movie-service/Mock_movies/genres"; //! MOCK
+  private keywordUrl : string = "http://localhost/api/v1/movie-service/Mock_search/keyword"; //! MOCK
 
   constructor(private http: HttpClient) { }
 
@@ -53,6 +55,15 @@ export class MovieService {
     //! return Mock
     return this.http.get<Genre[]>(this.genresUrl, this.httpOptions)
                   .pipe(catchError(this.handleError<Movie>('getGenres', undefined)));
+  }
+
+  getKeywords(input: string): Observable<any> { // type any because get can return httpEvent or Observable<Genre[]>
+    //! return Mock
+    if (input.length != 0) { // if input is empty
+      input = '*';
+    }
+    return this.http.get<KeywordResults>(this.keywordUrl + '/' + input, this.httpOptions)
+                  .pipe(catchError(this.handleError<Movie>('getKeywords', undefined)));
   }
 
   //** handle error function from https://angular.io/tutorial/toh-pt6

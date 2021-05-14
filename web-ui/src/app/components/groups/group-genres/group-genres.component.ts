@@ -4,6 +4,7 @@ import { Group } from '../../../shared/interfaces/group'
 import { ActivatedRoute, Router } from '@angular/router';
 import { Tag, Tags } from '../../../shared/interfaces/tags'
 import { Genre } from '../../../shared/interfaces/genre'
+import { Keyword, KeywordResults } from '../../../shared/interfaces/keyword' // import keyword interface
 import { MovieService } from '../../../services/movie.service'
 
 @Component({
@@ -14,10 +15,16 @@ import { MovieService } from '../../../services/movie.service'
 export class GroupGenresComponent implements OnInit {
 
   currentGroup?: Group;
+
   tags?: Tags;
   genres?: Genre[];
   selectedGenres: Genre[] = [];
   selectedTags: Tags = {tags: []};
+
+  selectedKeywords: Keyword[] = [];
+  proposedKeywords: Keyword[] = []; // proposed keywords from the query
+
+  keywordInput: string = ""; // input for the keywords
 
   constructor(private movieService: MovieService, private groupsComponent : GroupsComponent, private router: Router, private route: ActivatedRoute) { }
 
@@ -26,7 +33,7 @@ export class GroupGenresComponent implements OnInit {
       undefined,
       () => {
         this.currentGroup = this.groupsComponent.currentGroup; // save the current group
-        console.log(this.currentGroup);
+        // console.log(this.currentGroup);
       }
     );
     
@@ -48,14 +55,39 @@ export class GroupGenresComponent implements OnInit {
         .subscribe(genres => this.genres = genres);
   }
 
+  getKeywords(input: string): void {
+    // subscribe to get the keywords: async fct
+    this.movieService.getKeywords(input)
+        .subscribe(keywordResults => this.proposedKeywords = keywordResults['results']);
+  }
+
+  addKeyword(event: any) { // select a keyword and add it to the list
+    let id = Number(event.currentTarget.getAttribute('keyword-id'));
+    let name = event.currentTarget.getAttribute('keyword-name');
+    if (this.selectedKeywords.findIndex((el) => el.id == id) == -1) { // if the keyword isn't in the list
+      this.selectedKeywords.push({id: id, name: name})
+    }
+    console.log(id);
+  }
+
+  removeKeyword(event: any) { // remove a keyword from the list of the selected keywords
+    let id = Number(event.currentTarget.getAttribute('keyword-id'));
+    let name = event.currentTarget.getAttribute('keyword-name');
+    let keywordIndex = this.selectedKeywords.findIndex((el) => el.id == id);
+    if (keywordIndex != -1) { // if the keyword is in the list
+      this.selectedKeywords.splice(keywordIndex, 1) // remove the keyword
+    }
+    console.log(event.currentTarget)
+  }
+
   checkBtn(el: any) { // check the checkbox and update selected tags
     el.checked = !el.checked;
     let name = el.name;
     let id = el.value;
-    console.log(el.checked)
+    // console.log(el.checked)
     if (this.genres) {
       // check if the genre exist:
-      let genreIndex = this.genres.findIndex((genre) => genre.name == name);
+      let genreIndex = this.genres.findIndex((genre) => genre.id == id);
       if (el.checked) { // we want to add the genre
         if (genreIndex == -1) { // if the genre name doesn't exist
           this.selectedGenres.push({name: name, id: id}) // add the new genre object
@@ -66,7 +98,14 @@ export class GroupGenresComponent implements OnInit {
         }
       }
     }
-    console.log(this.selectedTags);
+    // console.log(this.selectedTags);
+  }
+
+  updateKeywords(event: any) { // call the fct when we type in the keyword input filed
+    this.keywordInput = event.target.value;
+    if (this.keywordInput.length != 0) { // if input is empty
+      this.getKeywords(this.keywordInput); // get the keywords
+    }
   }
 
   goToFindMatch() { // go to the find-match page
