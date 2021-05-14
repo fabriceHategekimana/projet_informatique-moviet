@@ -27,6 +27,7 @@
 .selected-keywords-container {
     margin: 0.5em auto;
     justify-content: center;
+    max-width: 50em;
 }
 
 .selected-keyword {
