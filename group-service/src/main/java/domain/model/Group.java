@@ -1,7 +1,7 @@
 package domain.model;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 
 // These three are from @Data but we add @Setter one by one and the constructor.
 import lombok.ToString;
@@ -43,15 +43,24 @@ public class Group {
     @Setter @NotNull
     private String name;
 
-    @ManyToMany(fetch= FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "T_groups_users",
-            joinColumns={@JoinColumn(name="user_id", referencedColumnName="group_id")},
-            inverseJoinColumns={@JoinColumn(name="group_id", referencedColumnName="user_id")})
+            joinColumns={@JoinColumn(name="group_id", referencedColumnName="group_id")},
+            inverseJoinColumns={@JoinColumn(name="user_id", referencedColumnName="user_id")})
     @Setter @JsonManagedReference
-    private List<User> users = new ArrayList<>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
-
-
+    private Set<User> users = new HashSet<User>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
+    // https://thorben-janssen.com/6-hibernate-mappings-you-should-avoid-for-high-performance-applications/
     public Group(String name){
         this.name = name;
+    }
+
+    public void addUser(User user) {
+        this.users.add(user);
+        user.getGroups().add(this);
+    }
+
+    public void removeUser(User user) {
+        this.users.remove(user);
+        user.getGroups().remove(this);
     }
 }

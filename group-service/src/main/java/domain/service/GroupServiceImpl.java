@@ -18,6 +18,10 @@ import javax.transaction.Transactional;  // needed otherwise TransactionRequired
 // See https://www.baeldung.com/jpa-hibernate-persistence-context for more informations
 import java.lang.Exception;
 
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Root;
+import javax.persistence.NoResultException;
+
 @Log // lombok log
 @ApplicationScoped
 public class GroupServiceImpl implements GroupService{
@@ -40,15 +44,14 @@ public class GroupServiceImpl implements GroupService{
     public List<Group> getAllGroups(){
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Group> criteria = builder.createQuery( Group.class );
-        criteria.from(Group.class);
-        log.info("AAAAAAAAAAAAAAAAAAAA");
-        List<Group> groups = em.createQuery( criteria ).getResultList();
-        /*
-        for (Group group : groups){
-            log.info(group.getId() + " " + group.getName() + " " + group.getUsers());
-        }
-        */
-        log.info("BBBBBBBBBBBBBBB");
+        // One solution was to use FetchType EAGER but we prefer not to use it
+        Root<Group> root = criteria.from(Group.class);
+        root.fetch("users", JoinType.LEFT);
+        criteria.select(root);
+
+        // List<Group> groups = em.createQuery( criteria ).getResultList();
+        // https://www.netsurfingzone.com/hibernate/failed-to-lazily-initialize-a-collection-of-role-could-not-initialize-proxy-no-session/
+        // https://www.logicbig.com/tutorials/java-ee-tutorial/jpa/criteria-api-fetch-joins.html
         return em.createQuery( criteria ).getResultList();
     }
 
@@ -59,7 +62,23 @@ public class GroupServiceImpl implements GroupService{
         if not in the list return null, the Rest Service will take care of returning some HTTP code (404 not found here)
         https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html#find-java.lang.Class-java.lang.Object-
         */
-        return em.find(Group.class, id); // null if not found, 404
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<Group> criteria = builder.createQuery( Group.class );
+
+        Root<Group> root = criteria.from(Group.class);
+        root.fetch("users", JoinType.LEFT);
+        criteria.select(root);
+        criteria.where(builder.equal(root.get("id"), id));
+        // https://www.initgrep.com/posts/java/jpa/select-values-in-criteria-queries
+        Group group = null;
+        try {
+            group = em.createQuery(criteria).getSingleResult();
+        }
+        catch (NoResultException nre){
+            group = null; // null if not found, 404
+        }
+
+        return group; // null if not found, 404
     }
 
     // create a group using only the name

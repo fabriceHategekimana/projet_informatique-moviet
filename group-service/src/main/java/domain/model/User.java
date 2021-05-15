@@ -1,7 +1,7 @@
 package domain.model;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 
 // These three are from @Data but we add @Setter one by one and the constructor.
 import lombok.ToString;
@@ -32,7 +32,6 @@ import domain.model.Group;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-
 @ToString
 @Getter
 @NoArgsConstructor // need this otherwise can have some problems with PUT (create) requests
@@ -44,14 +43,24 @@ public class User {
     @Setter @NotNull
     private String name;
 
-    @ManyToMany(fetch= FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "T_groups_users",
-            inverseJoinColumns={@JoinColumn(name="user_id", referencedColumnName="group_id")},
-            joinColumns={@JoinColumn(name="group_id", referencedColumnName="user_id")})
+            joinColumns={@JoinColumn(name="user_id", referencedColumnName="user_id")},
+            inverseJoinColumns={@JoinColumn(name="group_id", referencedColumnName="group_id")})
     @Setter @JsonBackReference
-    private List<Group> groups = new ArrayList<>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
-
+    private Set<Group> groups = new HashSet<Group>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
+    // https://thorben-janssen.com/6-hibernate-mappings-you-should-avoid-for-high-performance-applications/
     public User(String name){
         this.name = name;
+    }
+
+    public void addGroup(Group group) {
+        this.groups.add(group);
+        group.getUsers().add(this);
+    }
+
+    public void removeGroup(Group group) {
+        this.groups.remove(group);
+        group.getUsers().remove(this);
     }
 }

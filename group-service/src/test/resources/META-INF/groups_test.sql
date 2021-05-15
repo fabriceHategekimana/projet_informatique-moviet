@@ -24,5 +24,7 @@ CREATE TABLE T_groups_users (group_id int NOT NULL REFERENCES T_users(user_id), 
 TRUNCATE TABLE T_groups_users;
 INSERT INTO T_groups_users (group_id, user_id) VALUES (1, 1);
 INSERT INTO T_groups_users (group_id, user_id) VALUES (1, 2);
+INSERT INTO T_groups_users (group_id, user_id) VALUES (2, 1);
+INSERT INTO T_groups_users (group_id, user_id) VALUES (2, 2);
 INSERT INTO T_groups_users (group_id, user_id) VALUES (2, 3);
 INSERT INTO T_groups_users (group_id, user_id) VALUES (2, 4);
