@@ -38,7 +38,7 @@ class GroupTest {
 
     @Test
     void testToString(){
-        assertEquals("Group(id=0, name=hello world)", group.toString() );
+        assertEquals("Group(id=0, name=hello world, users=[])", group.toString() );
     }
     // fail a test -> Build failure
 }

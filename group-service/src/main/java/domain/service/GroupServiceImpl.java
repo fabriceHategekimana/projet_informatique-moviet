@@ -6,6 +6,7 @@ import domain.model.Group;
 
 import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singleton
 import lombok.NonNull;
+import lombok.extern.java.Log;
 
 // JPA
 import javax.persistence.EntityManager;
@@ -15,8 +16,9 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.transaction.Transactional;  // needed otherwise TransactionRequiredException will be thrown
 // See https://www.baeldung.com/jpa-hibernate-persistence-context for more informations
+import java.lang.Exception;
 
-
+@Log // lombok log
 @ApplicationScoped
 public class GroupServiceImpl implements GroupService{
     /*
@@ -30,15 +32,28 @@ public class GroupServiceImpl implements GroupService{
     @PersistenceContext(unitName = "GroupPU") // name is the same as in persistence.xml file
     private EntityManager em;
 
-
+    /*
+    https://stackoverflow.com/questions/10740021/transactionalpropagation-propagation-required
+    https://stackoverflow.com/questions/11746499/how-to-solve-the-failed-to-lazily-initialize-a-collection-of-role-hibernate-ex
+     */
+    @Transactional
     public List<Group> getAllGroups(){
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Group> criteria = builder.createQuery( Group.class );
         criteria.from(Group.class);
+        log.info("AAAAAAAAAAAAAAAAAAAA");
+        List<Group> groups = em.createQuery( criteria ).getResultList();
+        /*
+        for (Group group : groups){
+            log.info(group.getId() + " " + group.getName() + " " + group.getUsers());
+        }
+        */
+        log.info("BBBBBBBBBBBBBBB");
         return em.createQuery( criteria ).getResultList();
     }
 
     // find by ID, names are not unique
+    @Transactional
     public Group getGroup(int id){
         /* Need to find the group then return it, Id's are unique
         if not in the list return null, the Rest Service will take care of returning some HTTP code (404 not found here)

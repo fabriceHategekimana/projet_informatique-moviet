@@ -27,31 +27,31 @@ import javax.persistence.JoinTable;
 import javax.persistence.FetchType;
 // https://youtu.be/FeZ5BC0PirQ
 
-import domain.model.User;
+import domain.model.Group;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+
 @ToString
 @Getter
 @NoArgsConstructor // need this otherwise can have some problems with PUT (create) requests
-@Entity @Table( name="T_groups")// JPA, mapping class - table
-public class Group {
+@Entity @Table( name="T_users")// JPA, mapping class - table
+public class User {
     @Id @GeneratedValue( strategy=GenerationType.IDENTITY ) // Generated Value, automatically generated following how the db was configured
-    @Column(name="group_id")
+    @Column(name="user_id")
     private int id;
     @Setter @NotNull
     private String name;
 
     @ManyToMany(fetch= FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "T_groups_users",
-            joinColumns={@JoinColumn(name="user_id", referencedColumnName="group_id")},
-            inverseJoinColumns={@JoinColumn(name="group_id", referencedColumnName="user_id")})
-    @Setter @JsonManagedReference
-    private List<User> users = new ArrayList<>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
+            inverseJoinColumns={@JoinColumn(name="user_id", referencedColumnName="group_id")},
+            joinColumns={@JoinColumn(name="group_id", referencedColumnName="user_id")})
+    @Setter @JsonBackReference
+    private List<Group> groups = new ArrayList<>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
 
-
-    public Group(String name){
+    public User(String name){
         this.name = name;
     }
 }
