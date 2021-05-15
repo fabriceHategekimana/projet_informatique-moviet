@@ -7,6 +7,9 @@ import static org.hamcrest.Matchers.*;
 
 import io.restassured.http.ContentType;
 
+import domain.model.User;
+import domain.model.Group;
+
 /*
 https://github.com/rest-assured/rest-assured/wiki/Usage#static-imports
 
@@ -56,11 +59,13 @@ class GroupRestServiceIT {
     void testGetGroup_ok(){ // GET
         // https://rest-assured.io
         // we won't modify/delete the group with id 1 in the rest of the tests otherwise we might have errors
+
         get("/{id}", 1).
         then().
             statusCode(200). // OK
             body("id", equalTo(1),
-                    "name", equalTo("erwan"));
+                    "name", equalTo("erwan"),
+                    "users", containsStringIgnoringCase("user-erwan"));
     }
 
     @Test

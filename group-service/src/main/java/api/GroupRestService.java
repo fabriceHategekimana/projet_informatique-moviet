@@ -11,9 +11,13 @@ import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singlet
 
 //  import classes of domain
 import domain.model.Group;
+import domain.model.User;
 
 // service
 import domain.service.GroupService;
+
+import java.util.Set;
+import java.util.HashSet;
 
 /*
 https://thorntail.io/posts/wildfly-swarm-s-got-swagger/
@@ -95,11 +99,52 @@ public class GroupRestService {
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : only other attributes than id are (must be) initialized: " + group).build();
         }
 
+        if (group.getUsers() == null){
+            group.setUsers(new HashSet<User>()); // empty set
+        }
+
         Group returnedGroup=groupService.createGroup(group); // can never have conflict if id are auto-incremented.
         // returnedGroup can be null in general but we tested the input before so it's not null.. otherwise bad request..
         UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder(); // https://www.logicbig.com/tutorials/java-ee-tutorial/jax-rs/uri-info.html
         uriBuilder.path(Integer.toString(returnedGroup.getId()));
         return Response.created(uriBuilder.build()).entity(returnedGroup).build(); // 201
+    }
+
+    @PUT
+    @Path("/{group_id}/users/")  // TODO: maybe add another HTTP method for get {group_id}/users/{user_id}
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Adding a new user to an existing group")
+    public Response addUserToGroup(@PathParam("id") String str_id, User user){
+        /*
+        Add a new user to an existing group. Need to know the id of the group to update. Return modified object.
+         */
+
+        try {
+            log.info("Trying to add user " + user + "in a Group having id=" + str_id);
+            int id = Integer.parseInt(str_id);
+
+            // only want initialized id and non null name, otherwise bad request
+            if ((user.getId() == 0) || (user.getName() == null)){
+                return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : all attributes need to be instantiated: " + user).build();
+            }
+
+            if (user.getGroups() == null){
+                user.setGroups(new HashSet<Group>()); // empty set
+            }
+
+            Group returnedGroup=groupService.addUserToGroup(id, user);
+            // will add user if the Group if exists, otherwise return null
+            if (returnedGroup == null){
+                // group does not exist already
+                return Response.status(Response.Status.NOT_FOUND).build(); // 404
+            }
+            return Response.ok(returnedGroup).build(); // 200
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id, it should be numerical: id = " + str_id).build();
+        }
+
     }
 
     @PUT
@@ -118,6 +163,11 @@ public class GroupRestService {
         if ((group.getId() == 0) || (group.getName() == null)){
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : all attributes need to be instantiated: " + group).build();
         }
+
+        if (group.getUsers() == null){
+            group.setUsers(new HashSet<User>()); // empty set
+        }
+
         Group returnedGroup=groupService.updateGroup(group); // get all groups and check if group inside list of groups
         // will update the Group if exists, otherwise return null
         if (returnedGroup == null){
@@ -151,7 +201,7 @@ public class GroupRestService {
             return Response.ok(returnedGroup).build(); // 200
         }
         catch(NumberFormatException e){ // invalid id
-            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid id, it should be numerical: id = " + str_id).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id, it should be numerical: id = " + str_id).build();
         }
     }
 }
