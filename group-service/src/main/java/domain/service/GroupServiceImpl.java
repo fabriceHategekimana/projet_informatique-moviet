@@ -10,6 +10,7 @@ import domain.model.User;
 import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singleton
 import lombok.NonNull;
 import lombok.extern.java.Log;
+import org.hibernate.Session;
 
 // JPA
 import javax.persistence.EntityManager;
@@ -25,7 +26,6 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
 import javax.persistence.NoResultException;
 
-import javax.hibernate.Session;
 
 @Log // lombok log
 @ApplicationScoped
@@ -46,20 +46,24 @@ public class GroupServiceImpl implements GroupService{
     https://stackoverflow.com/questions/11746499/how-to-solve-the-failed-to-lazily-initialize-a-collection-of-role-hibernate-ex
      */
     @Transactional
-    public Set<Group> getAllGroups(){
+    public Set<Group> getAllGroups() {
         CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Group> criteria = builder.createQuery( Group.class );
+        CriteriaQuery<Group> criteria = builder.createQuery(Group.class);
         // One solution was to use FetchType EAGER but we prefer not to use it
         Root<Group> root = criteria.from(Group.class);
         root.fetch("users", JoinType.LEFT);
         criteria.select(root);
 
-        Session sessin = (Session)entityManager.unwrap(Session.class);
+        Set<Group> groups = new HashSet<Group>(em.createQuery(criteria).getResultList());
+        Session sessin = (Session) em.unwrap(Session.class);
+        for (Group group : groups) {
+            getUsers(group);
+        }
         sessin.close();
         // Set<Group> groups = em.createQuery( criteria ).getResultList();
         // https://www.netsurfingzone.com/hibernate/failed-to-lazily-initialize-a-collection-of-role-could-not-initialize-proxy-no-session/
         // https://www.logicbig.com/tutorials/java-ee-tutorial/jpa/criteria-api-fetch-joins.html
-        return new HashSet<>(em.createQuery( criteria ).getResultList());
+        return groups;
     }
 
     // find by ID, names are not unique
@@ -189,5 +193,11 @@ public class GroupServiceImpl implements GroupService{
         log.info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         em.remove(group);
         return group;
+    }
+
+    private Set<User> getUsers(Group group){
+        Set<User> users = group.getUsers();
+        users.size();
+        return users;
     }
 }

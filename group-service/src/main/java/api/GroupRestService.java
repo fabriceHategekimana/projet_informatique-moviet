@@ -83,7 +83,7 @@ public class GroupRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create, add a group to the existing groups")
-    public Response createGroup(Group group, final @Context UriInfo uriInfo){
+    public Response createGroup(Group group, final @Context UriInfo uriInfo){ // TODO: make it work with users (no auto increment id for users ?) and with the intermediate join table
         /*
         Create a group and returns HTTP status code and the location of the newly created object. It's possible to create multiple
         groups with same name. The unique identifier is its id that auto increments. We cannot input a group having an id !!
@@ -115,7 +115,7 @@ public class GroupRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Adding a new user to an existing group")
-    public Response addUserToGroup(@PathParam("id") String str_id, User user){
+    public Response addUserToGroup(@PathParam("group_id") String str_id, User user){
         /*
         Add a new user to an existing group. Need to know the id of the group to update. Return modified object.
          */
@@ -155,8 +155,9 @@ public class GroupRestService {
         /*
         Update existing group. Need to know the id to update. Return modified object.
 
-        Example:
+        Examples:
         - curl --verbose -H "Content-Type: application/json" -X PUT http://localhost:10080/groups -d '{"id":3,"name":"fabrice"}'
+        - curl --verbose -H "Content-Type: application/json" -X PUT http://localhost:10080/groups -d '{"id":3,"name":"fabrice", "users": [{"name": "hello"}]}'
          */
         log.info("Trying to update using Group: " + group);
         // only want initialized id and non null name, otherwise bad request

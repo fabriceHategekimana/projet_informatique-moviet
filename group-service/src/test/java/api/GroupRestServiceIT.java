@@ -23,6 +23,7 @@ import io.restassured.RestAssured;
 
 // Unit/Component testing using JUnit 5
 // https://junit.org/junit5/docs/current/user-guide/#writing-tests
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -65,7 +66,11 @@ class GroupRestServiceIT {
             statusCode(200). // OK
             body("id", equalTo(1),
                     "name", equalTo("erwan"),
-                    "users", containsStringIgnoringCase("user-erwan"));
+                    "users", hasItem(allOf(
+                        Matchers.<User>hasProperty("id", is("1")),
+                        Matchers.<User>hasProperty("user-name", is("user-erwan"))))
+                    );
+        // https://stackoverflow.com/questions/50182922/hamcrest-matchers-hasproperty-how-to-check-if-a-list-of-objects-contains-an-o
     }
 
     @Test

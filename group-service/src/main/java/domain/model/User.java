@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.HashSet;
 
 // These three are from @Data but we add @Setter one by one and the constructor.
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.ToString;
 import lombok.Getter;
 
@@ -46,7 +47,7 @@ public class User {
     private String name;
 
     @ManyToMany(mappedBy = "users")
-    @Setter
+    @Setter @JsonIgnore
     private Set<Group> groups = new HashSet<Group>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
     // https://thorben-janssen.com/6-hibernate-mappings-you-should-avoid-for-high-performance-applications/
     public User(String name){
