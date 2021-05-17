@@ -37,3 +37,16 @@
 .selected-keyword-name {
     margin-right: 0.5em;
 }
+
+.proposed-keyword {
+    text-decoration: none;
+}
+
+.proposed-keyword:hover {
+    cursor: pointer;
+}
+
+.proposed-keywords-container {
+    width: fit-content;
+    margin: 0 auto;
+}

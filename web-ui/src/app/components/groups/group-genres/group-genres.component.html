@@ -22,10 +22,10 @@
                 </div>
             </div>
             <input type="text" name="input-keywords" id="input-keywords" placeholder="keyword"  autocomplete="off" (keyup)="updateKeywords($event)">
-        </div>
-        <div *ngFor="let keyword of proposedKeywords">
-            <div class="proposed-keyword" [attr.keyword-id]="keyword.id" [attr.keyword-name]="keyword.name" (click)="addKeyword($event)">
-                {{keyword.name}}
+            <div class="list-group proposed-keywords-container">
+                <div *ngFor="let keyword of proposedKeywords | slice:0:10" class="proposed-keyword list-group-item list-group-item-action" [attr.keyword-id]="keyword.id" [attr.keyword-name]="keyword.name" (click)="addKeyword($event)">
+                    <span class="proposed-keyword-name">{{keyword.name}}</span>
+                </div>
             </div>
         </div>
     </div>
