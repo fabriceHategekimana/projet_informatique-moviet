@@ -1,3 +1,8 @@
+/* variables: */
+/* :root {
+    --input-height: 2em;
+} */
+/** --------------- */
 .btn-container {
     display: flex;
     margin-left: 0.5em;
@@ -46,7 +51,48 @@
     cursor: pointer;
 }
 
-.proposed-keywords-container {
+#input-keywords {
+    height: 2em;
+}
+
+#input-container {
     width: fit-content;
     margin: 0 auto;
+    justify-content: center;
+    height: 7em;
+    overflow: visible;
 }
+
+.proposed-keywords-container {
+    width: fit-content;
+    margin-left: 0;
+    max-height: 7em;
+    overflow-y: scroll;
+}
+
+/* display the scroll bar: */
+.proposed-keywords-container::-webkit-scrollbar {
+    all: unset;
+}
+
+/* width */
+.proposed-keywords-container::-webkit-scrollbar {
+    width: 0.5em;
+}
+
+/* Track */
+.proposed-keywords-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+.proposed-keywords-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 0.5em;
+}
+
+/* Handle on hover */
+.proposed-keywords-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+

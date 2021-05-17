@@ -66,12 +66,13 @@ export class GroupGenresComponent implements OnInit {
     let name = event.currentTarget.getAttribute('keyword-name');
     if (this.selectedKeywords.findIndex((el) => el.id == id) == -1) { // if the keyword isn't in the list
       this.selectedKeywords.push({id: id, name: name})
-      // remove keyword from the proposed keywords
-      let removeIndex = this.proposedKeywords.findIndex((k) => k.id == id);
-      if (removeIndex != -1) {
-        this.proposedKeywords.splice(removeIndex, 1); // remove the keyword
-        // this.getKeywords(this.keywordInput); // reset keywords
-      }
+      //* -----------------------------------------------
+      // // remove keyword from the proposed keywords
+      // let removeIndex = this.proposedKeywords.findIndex((k) => k.id == id);
+      // if (removeIndex != -1) {
+      //   this.proposedKeywords.splice(removeIndex, 1); // remove the keyword
+      //   // this.getKeywords(this.keywordInput); // reset keywords
+      // }
     }
     console.log(id);
   }
