@@ -25,6 +25,8 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
 import javax.persistence.NoResultException;
 
+import javax.hibernate.Session;
+
 @Log // lombok log
 @ApplicationScoped
 public class GroupServiceImpl implements GroupService{
@@ -52,6 +54,8 @@ public class GroupServiceImpl implements GroupService{
         root.fetch("users", JoinType.LEFT);
         criteria.select(root);
 
+        Session sessin = (Session)entityManager.unwrap(Session.class);
+        sessin.close();
         // Set<Group> groups = em.createQuery( criteria ).getResultList();
         // https://www.netsurfingzone.com/hibernate/failed-to-lazily-initialize-a-collection-of-role-could-not-initialize-proxy-no-session/
         // https://www.logicbig.com/tutorials/java-ee-tutorial/jpa/criteria-api-fetch-joins.html

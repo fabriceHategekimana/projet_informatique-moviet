@@ -48,7 +48,7 @@ public class Group {
     @JoinTable(name = "T_groups_users",
             joinColumns={@JoinColumn(name="group_id", referencedColumnName="group_id")},
             inverseJoinColumns={@JoinColumn(name="user_id", referencedColumnName="user_id")})
-    @Setter @JsonManagedReference
+    @Setter
     private Set<User> users = new HashSet<User>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
     // https://thorben-janssen.com/6-hibernate-mappings-you-should-avoid-for-high-performance-applications/
     public Group(String name){

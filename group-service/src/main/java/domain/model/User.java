@@ -46,7 +46,7 @@ public class User {
     private String name;
 
     @ManyToMany(mappedBy = "users")
-    @Setter @JsonBackReference
+    @Setter
     private Set<Group> groups = new HashSet<Group>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
     // https://thorben-janssen.com/6-hibernate-mappings-you-should-avoid-for-high-performance-applications/
     public User(String name){
