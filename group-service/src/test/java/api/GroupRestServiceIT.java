@@ -66,9 +66,7 @@ class GroupRestServiceIT {
             statusCode(200). // OK
             body("id", equalTo(1),
                     "name", equalTo("erwan"),
-                    "users", hasItem(allOf(
-                        Matchers.<User>hasProperty("id", is("1")),
-                        Matchers.<User>hasProperty("user-name", is("user-erwan"))))
+                    "users", notNullValue()
                     );
         // https://stackoverflow.com/questions/50182922/hamcrest-matchers-hasproperty-how-to-check-if-a-list-of-objects-contains-an-o
     }
