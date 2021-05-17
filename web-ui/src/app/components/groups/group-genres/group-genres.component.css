@@ -96,3 +96,11 @@
     background: #555;
 }
 
+.dates-container {
+    margin: 0 auto;
+    justify-content: center;
+}
+
+.year-input {
+    margin: 0 1em;
+}

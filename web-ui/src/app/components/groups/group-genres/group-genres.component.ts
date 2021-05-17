@@ -24,6 +24,9 @@ export class GroupGenresComponent implements OnInit {
   selectedKeywords: Keyword[] = [];
   proposedKeywords: Keyword[] = []; // proposed keywords from the query
 
+  yearFrom?: number;
+  yearTo?: number;
+
   keywordInput: string = ""; // input for the keywords
 
   constructor(private movieService: MovieService, private groupsComponent : GroupsComponent, private router: Router, private route: ActivatedRoute) { }
@@ -74,7 +77,7 @@ export class GroupGenresComponent implements OnInit {
       //   // this.getKeywords(this.keywordInput); // reset keywords
       // }
     }
-    console.log(id);
+    // console.log(id);
   }
 
   removeKeyword(event: any) { // remove a keyword from the list of the selected keywords
@@ -84,7 +87,7 @@ export class GroupGenresComponent implements OnInit {
     if (keywordIndex != -1) { // if the keyword is in the list
       this.selectedKeywords.splice(keywordIndex, 1) // remove the keyword
     }
-    console.log(event.currentTarget)
+    // console.log(event.currentTarget)
   }
 
   checkBtn(el: any) { // check the checkbox and update selected tags
