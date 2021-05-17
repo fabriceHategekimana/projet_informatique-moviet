@@ -5,4 +5,6 @@
 export interface MoviePreferences {
     keywordsId: number[],
     genresId:   number[],
+    yearFrom:   number | null,
+    yearTo:   number | null,
 }
