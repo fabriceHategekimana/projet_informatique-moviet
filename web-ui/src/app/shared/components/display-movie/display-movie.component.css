@@ -14,8 +14,8 @@
 
 .poster-container {
     position: relative;
-    width: 21em;
-    height: 30em;
+    width: 14em;
+    height: 20em;
     margin: 0 auto;
     padding: 0;
     /* border: 1px solid grey; */
@@ -37,7 +37,7 @@
 
 .movie-rating {
     position: relative;
-    width: 21em;
+    width: 14em;
     z-index: 1;
     justify-content: center;
     margin: 0 auto; /* center */
@@ -58,7 +58,7 @@
 
 .movie-title {
     position: relative;
-    width: 21em;
+    width: 14em;
     z-index: 1;
     justify-content: center;
     text-align: center;

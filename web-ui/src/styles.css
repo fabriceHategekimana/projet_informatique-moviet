@@ -4,7 +4,7 @@
 html, body {
     height: 100%;
     margin: 0;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 /* used to blur a div */
@@ -32,6 +32,8 @@ html, body {
     margin: 0;
     padding: 0;
     z-index: -9999;
+    position: fixed;
+    overflow: hidden;
 }
 
 .page-container {
