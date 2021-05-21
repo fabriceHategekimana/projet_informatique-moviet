@@ -10,15 +10,15 @@
   </parent>
 
   <!-- <groupId>ch.unige</groupId> removed -->
-  <artifactId>group-service</artifactId>
+  <artifactId>user-service</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <packaging>war</packaging>
 
-  <name>Group Service</name>
+  <name>User Service</name>
 
   <properties> <!-- overrides super pom properties -->
     <skip-docker-build>false</skip-docker-build> <!-- false -->
-    <microservice.port>10080</microservice.port> <!-- bind 8080 port of container to TCP port 10080 on localhost of the host machine-->
+    <microservice.port>10082</microservice.port> <!-- bind 8080 port of container to TCP port 10080 on localhost of the host machine-->
     <slf4j.version>1.7.30</slf4j.version> <!-- http://www.slf4j.org/index.html. It removes one of the warnings..-->
     <!-- https://stackoverflow.com/questions/7421612/slf4j-failed-to-load-class-org-slf4j-impl-staticloggerbinder -->
   </properties>
@@ -279,7 +279,7 @@
         </dependencies>
         <configuration>
           <driver>org.h2.Driver</driver>
-          <url>jdbc:h2:${java.io.tmpdir}/target/GroupDB;AUTO_SERVER=TRUE</url>
+          <url>jdbc:h2:${java.io.tmpdir}/target/UserDB;AUTO_SERVER=TRUE</url>
           <username>sa</username>
           <password>sa</password>
           <autocommit>true</autocommit>
@@ -295,7 +295,7 @@
             </goals>
             <configuration>
               <srcFiles>
-                <srcFile>${project.basedir}/src/main/resources/META-INF/groups_test.sql</srcFile>
+                <srcFile>${project.basedir}/src/main/resources/META-INF/users_test.sql</srcFile>
               </srcFiles>
             </configuration>
           </execution>
