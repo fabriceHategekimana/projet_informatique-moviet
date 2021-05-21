@@ -34,7 +34,7 @@ export class GroupFindMatchComponent implements OnInit {
         
         // update the timer:
         this.timerValue = minutes_str + ":" + seconds_str;
-        console.log(this.timerValue)
+        // console.log(this.timerValue)
   
       } else {
         this.timerValue = "00:00";
