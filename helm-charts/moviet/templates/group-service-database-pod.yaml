@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --file docker-compose-microservices.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.network/backend-network: "true"
+    io.kompose.service: group-service-database
+  name: group-service-database
+spec:
+  containers:
+    - env:
+        - name: POSTGRES_DB
+          value: group-service
+        - name: POSTGRES_PASSWORD
+          value: group-service
+        - name: POSTGRES_USER
+          value: group-service
+      image: postgres:13
+      livenessProbe:
+        exec:
+          command:
+            - pg_isready
+            - -U
+            - group-service
+            - -d
+            - group-service
+        failureThreshold: 3
+        periodSeconds: 30
+        timeoutSeconds: 30
+      name: group-service-database
+      resources: {}
+      stdin: true
+      tty: true
+      volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: postgresql-db-group-service
+        - mountPath: /docker-entrypoint-initdb.d/
+          name: group-service-database-claim1
+  restartPolicy: OnFailure
+  volumes:
+    - name: postgresql-db-group-service
+      persistentVolumeClaim:
+        claimName: postgresql-db-group-service
+    - name: group-service-database-claim1
+      persistentVolumeClaim:
+        claimName: group-service-database-claim1
+status: {}

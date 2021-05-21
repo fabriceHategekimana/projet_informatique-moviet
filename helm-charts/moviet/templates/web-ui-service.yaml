@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: web-ui-service
+spec:
+    type: NodePort
+    ports:
+      - protocol: TCP
+        targetPort: 4200
+        port: 4200
+        nodePort: 31000
+    selector:
+        app: web-ui

@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --file docker-compose-microservices.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: user-service-database
+  name: user-service-database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: user-service-database
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --file docker-compose-microservices.yml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/backend-network: "true"
+        io.kompose.service: user-service-database
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DB
+              value: user-service
+            - name: POSTGRES_PASSWORD
+              value: user-service
+            - name: POSTGRES_USER
+              value: user-service
+          image: postgres:13
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - user-service
+                - -d
+                - user-service
+            failureThreshold: 3
+            periodSeconds: 30
+            timeoutSeconds: 30
+          name: user-service-database
+          resources: {}
+          stdin: true
+          tty: true
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgresql-db-user-service
+            - mountPath: /docker-entrypoint-initdb.d/
+              name: user-service-database-claim1
+      restartPolicy: Always
+      volumes:
+        - name: postgresql-db-user-service
+          persistentVolumeClaim:
+            claimName: postgresql-db-user-service
+        - name: user-service-database-claim1
+          persistentVolumeClaim:
+            claimName: user-service-database-claim1
+status: {}

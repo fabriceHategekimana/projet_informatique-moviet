@@ -20,4 +20,3 @@ sudo docker-compose -f docker-compose/docker-compose-microservices.yml up -d
 
 # api-gateway and postgres:10
 sudo docker-compose -f docker-compose/docker-compose-api-gw.yml up -d
-

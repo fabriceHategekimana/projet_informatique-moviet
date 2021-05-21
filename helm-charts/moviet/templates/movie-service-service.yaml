@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --file docker-compose-microservices.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: movie-service
+  name: movie-service
+spec:
+  ports:
+    - name: "10081"
+      port: 10081
+      targetPort: 8080
+  selector:
+    io.kompose.service: movie-service
+status:
+  loadBalancer: {}
