@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.HashSet;
 
 // These three are from @Data but we add @Setter one by one and the constructor.
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.ToString;
 import lombok.Getter;
 
@@ -27,7 +28,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.FetchType;
 // https://youtu.be/FeZ5BC0PirQ
 
-import domain.model.User;
+import domain.model.Group;
+
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -36,35 +38,27 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @ToString
 @Getter
 @NoArgsConstructor // need this otherwise can have some problems with PUT (create) requests
-@Entity @Table( name="T_groups")// JPA, mapping class - table
-public class Group {
-    @Id @GeneratedValue( strategy=GenerationType.IDENTITY ) // Generated Value, automatically generated following how the db was configured
-    @Column(name="group_id")
+@Entity @Table( name="T_users")// JPA, mapping class - table
+public class User {
+    @Id @NotNull // no automatic generation
+    @Column(name="user_id")
     private int id;
-    @Setter @NotNull
-    private String name;
 
-    @Setter
-    private int admin_id = 0;  // id of admin of the group, 0 for none
-
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "T_groups_users",
-            joinColumns={@JoinColumn(name="group_id", referencedColumnName="group_id")},
-            inverseJoinColumns={@JoinColumn(name="user_id", referencedColumnName="user_id")})
-    @Setter
-    private Set<User> users = new HashSet<User>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
+    @ManyToMany(mappedBy = "users")
+    @Setter @JsonIgnore
+    private Set<Group> groups = new HashSet<Group>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
     // https://thorben-janssen.com/6-hibernate-mappings-you-should-avoid-for-high-performance-applications/
-    public Group(String name){
-        this.name = name;
+    public User(int id){
+        this.id=id;
     }
 
-    public void addUser(User user) {
-        this.users.add(user);
-        user.getGroups().add(this);
+    public void addGroup(Group group) {
+        this.groups.add(group);
+        group.getUsers().add(this);
     }
 
-    public void removeUser(User user) {
-        this.users.remove(user);
-        user.getGroups().remove(this);
+    public void removeGroup(Group group) {
+        this.groups.remove(group);
+        group.getUsers().remove(this);
     }
 }
