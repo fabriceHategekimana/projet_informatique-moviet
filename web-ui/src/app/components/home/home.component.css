@@ -9,7 +9,7 @@
 
 #home-title-container {
     position: relative;
-    top: 50%;
-    -webkit-transform: translateY(-60%);
-    transform: translateY(-60%);
+    margin-top: 18em;
+    /* -webkit-transform: translateY(-60%);
+    transform: translateY(-60%); */
 }
