@@ -104,7 +104,7 @@ public class GroupServiceImpl implements GroupService{
             return null;
         }
         if (group.getUsers() == null){
-            group.setUsers(new HashSet<User>()); // empty set
+            group.setUsers(new HashSet<User>()); // empty set, admin id 0 by default too
         }
         em.persist(group);
         return group;
@@ -130,6 +130,7 @@ public class GroupServiceImpl implements GroupService{
         if (group.getUsers() == null){
             group.setUsers(new HashSet<User>()); // empty set
         }
+        // TODO : check if user_id already in groups
         group.addUser(user);
         // Group need to exist.
         em.merge(group);
@@ -185,10 +186,10 @@ public class GroupServiceImpl implements GroupService{
         Iterator<User> it = group.getUsers().iterator();
         while (it.hasNext()){
             User user = it.next();
-            log.info("user id : " + user.getId() + " , username: " + user.getName() + " is being removed from users");
+            log.info("user id : " + user.getId() + " is being removed from users");
             it.remove();
             user.getGroups().remove(group);
-            log.info("user id : " + user.getId() + " , username: " + user.getName() + " removed from users");
+            log.info("user id : " + user.getId() + " removed from users");
         }
         log.info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         em.remove(group);

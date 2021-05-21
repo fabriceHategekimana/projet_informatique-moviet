@@ -115,7 +115,7 @@ public class GroupRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Adding a new user to an existing group")
-    public Response addUserToGroup(@PathParam("group_id") String str_id, User user){
+    public Response addUserToGroup(@PathParam("group_id") String str_id, User user){ // TODO: check if user already in group
         /*
         Add a new user to an existing group. Need to know the id of the group to update. Return modified object.
          */
@@ -125,7 +125,7 @@ public class GroupRestService {
             int id = Integer.parseInt(str_id);
 
             // only want initialized id and non null name, otherwise bad request
-            if ((user.getId() == 0) || (user.getName() == null)){
+            if (user.getId() == 0){
                 return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : all attributes need to be instantiated: " + user).build();
             }
 

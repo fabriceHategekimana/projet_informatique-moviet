@@ -44,6 +44,9 @@ public class Group {
     @Setter @NotNull
     private String name;
 
+    @Setter
+    private int admin_id = 0;  // id of admin of the group, 0 for none
+
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "T_groups_users",
             joinColumns={@JoinColumn(name="group_id", referencedColumnName="group_id")},

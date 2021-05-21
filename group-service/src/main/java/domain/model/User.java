@@ -40,18 +40,16 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @NoArgsConstructor // need this otherwise can have some problems with PUT (create) requests
 @Entity @Table( name="T_users")// JPA, mapping class - table
 public class User {
-    @Id @GeneratedValue( strategy=GenerationType.IDENTITY ) // Generated Value, automatically generated following how the db was configured
+    @Id @NotNull // no automatic generation
     @Column(name="user_id")
     private int id;
-    @Setter @NotNull
-    private String name;
 
     @ManyToMany(mappedBy = "users")
     @Setter @JsonIgnore
     private Set<Group> groups = new HashSet<Group>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
     // https://thorben-janssen.com/6-hibernate-mappings-you-should-avoid-for-high-performance-applications/
-    public User(String name){
-        this.name = name;
+    public User(int id){
+        this.id=id;
     }
 
     public void addGroup(Group group) {
