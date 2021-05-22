@@ -10,7 +10,6 @@ import domain.model.User;
 import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singleton
 import lombok.NonNull;
 import lombok.extern.java.Log;
-import org.hibernate.Session;
 
 // JPA
 import javax.persistence.EntityManager;
@@ -168,6 +167,7 @@ public class GroupServiceImpl implements GroupService{
 
     @Transactional
     public Group removeUserFromGroup(int group_id, int user_id){
+        // Find group
         Group group = getGroup(group_id);
         if (group == null){
             return null; // not found group..
@@ -176,32 +176,30 @@ public class GroupServiceImpl implements GroupService{
             group.setUsers(new HashSet<>()); // empty set
             return null; // cannot remove user if no users in the group
         }
-        //
+        // Find user
+        User user = getUser(user_id);
+        if (user == null){
+            return null; // not found user (if found user, need to verify if this user in the group)..
+        }
+        if (user.getGroups() == null){
+            user.setGroups(new HashSet<>()); // empty set
+            return null; // user not in a group.. so cannot remove user from the group
+        }
 
-        boolean user_already_in_group = false;
+        // Have to check if user in the group, is yes, can remove it, otherwise return null
+        boolean user_in_group = false;
         for (User usr: group.getUsers()){
-
             if (usr.getId() == user.getId()){
-                // user id already in group
-                user_already_in_group= true;
+                // user id in the group ! so we can remove later
+                user_in_group= true;
             }
         }
-        if (user_already_in_group){
-            if (getUser(user.getId()) == null){
-                // user did not exist, create user first
-                em.persist(user);
-            }
-            else{ // user already exists, merge user
-                em.merge(user);
-            }
-
-            group.addUser(user);
-            // Group need to exist.
-            em.merge(group);
+        if (user_in_group){
+            group.removeUser(user);
+            em.remove(user);
         }
         else{
-            em.merge(user);
-            em.merge(group);
+            return null; // user not in group
         }
         return group;
     }
@@ -237,6 +235,9 @@ public class GroupServiceImpl implements GroupService{
     @Transactional
     public Group deleteGroup(int group_id){
         Group group = getGroup(group_id);
+        if (group == null){
+            return null;
+        }
         // Group need to exist.
         Iterator<User> it = group.getUsers().iterator();
         while (it.hasNext()){
