@@ -15,25 +15,12 @@ import javax.validation.constraints.NotNull;
 // https://projectlombok.org/features/all
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Column;
 
 import javax.persistence.ManyToMany;
-import javax.persistence.CascadeType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.FetchType;
 // https://youtu.be/FeZ5BC0PirQ
-
-import domain.model.Group;
-
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 
 @ToString
 @Getter
@@ -46,7 +33,7 @@ public class User {
 
     @ManyToMany(mappedBy = "users")
     @Setter @JsonIgnore
-    private Set<Group> groups = new HashSet<Group>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
+    private Set<Group> groups = new HashSet();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
     // https://thorben-janssen.com/6-hibernate-mappings-you-should-avoid-for-high-performance-applications/
     public User(int id){
         this.id=id;

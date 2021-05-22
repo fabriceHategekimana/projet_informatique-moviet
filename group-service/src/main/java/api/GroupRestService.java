@@ -104,20 +104,24 @@ public class GroupRestService {
         }
 
         Group returnedGroup=groupService.createGroup(group); // can never have conflict if id are auto-incremented.
+        if (returnedGroup == null){
+            log.severe("Tried to create Group: id=" + group.getId() + " name=" +group.getId()+ " admin_id="+group.getAdmin_id() + " with some users but either id was non zero or group had null name or some of the users had user id was 1");
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Tried to create Group: id=" + group.getId() + " name=" +group.getId()+ " admin_id="+group.getAdmin_id() + " with some users but either id was non zero or group had null name or some of the users had user id was 1").build();
+        }
         // returnedGroup can be null in general but we tested the input before so it's not null.. otherwise bad request..
         UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder(); // https://www.logicbig.com/tutorials/java-ee-tutorial/jax-rs/uri-info.html
         uriBuilder.path(Integer.toString(returnedGroup.getId()));
         return Response.created(uriBuilder.build()).entity(returnedGroup).build(); // 201
     }
 
-    @PUT
+    @POST
     @Path("/{group_id}/users/")  // TODO: maybe add another HTTP method for get {group_id}/users/{user_id}
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Adding a new user to an existing group")
     public Response addUserToGroup(@PathParam("group_id") String str_id, User user){ // TODO: check if user already in group
         /*
-        Add a new user to an existing group. Need to know the id of the group to update. Return modified object.
+        Add an user to an existing group. Need to know the id of the group to update. Return modified object.
          */
 
         try {
@@ -130,7 +134,7 @@ public class GroupRestService {
             }
 
             if (user.getGroups() == null){
-                user.setGroups(new HashSet<Group>()); // empty set
+                user.setGroups(new HashSet<>()); // empty set
             }
 
             Group returnedGroup=groupService.addUserToGroup(id, user);

@@ -20,8 +20,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.transaction.Transactional;  // needed otherwise TransactionRequiredException will be thrown
 // See https://www.baeldung.com/jpa-hibernate-persistence-context for more informations
-import java.lang.Exception;
-
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
 import javax.persistence.NoResultException;
@@ -54,16 +52,9 @@ public class GroupServiceImpl implements GroupService{
         root.fetch("users", JoinType.LEFT);
         criteria.select(root);
 
-        Set<Group> groups = new HashSet<Group>(em.createQuery(criteria).getResultList());
-        Session sessin = (Session) em.unwrap(Session.class);
-        for (Group group : groups) {
-            getUsers(group);
-        }
-        sessin.close();
-        // Set<Group> groups = em.createQuery( criteria ).getResultList();
         // https://www.netsurfingzone.com/hibernate/failed-to-lazily-initialize-a-collection-of-role-could-not-initialize-proxy-no-session/
         // https://www.logicbig.com/tutorials/java-ee-tutorial/jpa/criteria-api-fetch-joins.html
-        return groups;
+        return new HashSet<>(em.createQuery(criteria).getResultList());
     }
 
     // find by ID, names are not unique
@@ -92,6 +83,25 @@ public class GroupServiceImpl implements GroupService{
         return group; // null if not found, 404
     }
 
+    private User getUser(int id){
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<User> criteria = builder.createQuery( User.class );
+
+        Root<User> root = criteria.from(User.class);
+        root.fetch("groups", JoinType.LEFT);
+        criteria.select(root);
+        criteria.where(builder.equal(root.get("id"), id));
+        // https://www.initgrep.com/posts/java/jpa/select-values-in-criteria-queries
+        User user = null;
+        try {
+            user = em.createQuery(criteria).getSingleResult();
+        }
+        catch (NoResultException nre){
+            user = null; // null if not found, 404
+        }
+        return user; // null if not found, 404
+    }
+
     // create a group using only the name
     @Transactional
     public Group createGroup(@NonNull Group group){
@@ -99,12 +109,21 @@ public class GroupServiceImpl implements GroupService{
         Can always create.. no restriction due to auto increment of unique identifier / primary key
          */
         if ((group.getId() != 0)|| (group.getName() == null)){ // if non initialized.
-            // Actually if we do not check. SQL will throw an error because NOT NULL for the attributein the table
+            // Actually if we do not check. SQL will throw an error because NOT NULL for the attribute in the table
             // To put Only other attributes than id are (must be) initialized: " + group in the logs
             return null;
         }
         if (group.getUsers() == null){
-            group.setUsers(new HashSet<User>()); // empty set, admin id 0 by default too
+            group.setUsers(new HashSet<>()); // empty set, admin id 0 by default too
+        }
+        for (User user: group.getUsers()){
+            if (getUser(user.getId()) == null){
+                // user did not exist, create user first
+                em.persist(user);
+            }
+            else{ // user already exists, merge user
+                em.merge(user);
+            }
         }
         em.persist(group);
         return group;
@@ -128,12 +147,33 @@ public class GroupServiceImpl implements GroupService{
             return null; // error 404 not found in the group
         }
         if (group.getUsers() == null){
-            group.setUsers(new HashSet<User>()); // empty set
+            group.setUsers(new HashSet<>()); // empty set
         }
-        // TODO : check if user_id already in groups
-        group.addUser(user);
-        // Group need to exist.
-        em.merge(group);
+        boolean user_already_in_group = false;
+        for (User usr: group.getUsers()){
+
+            if (usr.getId() == user.getId()){
+                // user id already in group
+                user_already_in_group= true;
+            }
+        }
+        if (!user_already_in_group){
+            if (getUser(user.getId()) == null){
+                // user did not exist, create user first
+                em.persist(user);
+            }
+            else{ // user already exists, merge user
+                em.merge(user);
+            }
+
+            group.addUser(user);
+            // Group need to exist.
+            em.merge(group);
+        }
+        else{
+            em.merge(user);
+            em.merge(group);
+        }
         return group;
     }
 
@@ -158,8 +198,19 @@ public class GroupServiceImpl implements GroupService{
             return null; // error 404 not found in the group
         }
         if (group.getUsers() == null){
-            group.setUsers(new HashSet<User>()); // empty set
+            group.setUsers(new HashSet<>()); // empty set
         }
+
+        for (User user: group.getUsers()){
+            if (getUser(user.getId()) == null){
+                // user did not exist, create user first
+                em.persist(user);
+            }
+            else{ // user already exists, merge user
+                em.merge(user);
+            }
+        }
+
         // Group need to exist.
         em.merge(group);
         return group;

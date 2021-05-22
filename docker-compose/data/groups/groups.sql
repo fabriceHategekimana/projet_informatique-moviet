@@ -27,8 +27,8 @@ INSERT INTO T_users (user_id) VALUES (4);
 
 DROP TABLE if exists T_groups_users CASCADE;
 CREATE TABLE T_groups_users (
-    group_id int NOT NULL REFERENCES T_users(user_id),
-    user_id int NOT NULL REFERENCES T_groups(group_id)
+    group_id int REFERENCES T_groups(group_id),
+    user_id int REFERENCES T_users(user_id)
 );
 TRUNCATE TABLE T_groups_users;
 INSERT INTO T_groups_users (group_id, user_id) VALUES (1, 1);
