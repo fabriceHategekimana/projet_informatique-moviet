@@ -123,6 +123,7 @@ public class GroupServiceImpl implements GroupService{
             else{ // user already exists, merge user
                 em.merge(user);
             }
+            user.addGroup(group);
         }
         em.persist(group);
         return group;
@@ -143,6 +144,7 @@ public class GroupServiceImpl implements GroupService{
             if (usr.getId() == user.getId()){
                 // user id already in group
                 user_already_in_group= true;
+                break;
             }
         }
         if (!user_already_in_group){
@@ -192,11 +194,12 @@ public class GroupServiceImpl implements GroupService{
             if (usr.getId() == user.getId()){
                 // user id in the group ! so we can remove later
                 user_in_group= true;
+                break;
             }
         }
         if (user_in_group){
-            group.removeUser(user);
-            em.remove(user);
+            group.removeUser(user);  // user can still exist, just removed from the group
+            em.merge(group);
         }
         else{
             return null; // user not in group
@@ -226,6 +229,7 @@ public class GroupServiceImpl implements GroupService{
             else{ // user already exists, merge user
                 em.merge(user);
             }
+            user.addGroup(group);
         }
         // Group need to exist.
         em.merge(group);
