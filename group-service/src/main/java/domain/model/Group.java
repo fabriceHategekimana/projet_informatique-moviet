@@ -24,14 +24,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.CascadeType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.FetchType;
 // https://youtu.be/FeZ5BC0PirQ
-
-import domain.model.User;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 
 @ToString
 @Getter
@@ -52,7 +45,7 @@ public class Group {
             joinColumns={@JoinColumn(name="group_id", referencedColumnName="group_id")},
             inverseJoinColumns={@JoinColumn(name="user_id", referencedColumnName="user_id")})
     @Setter
-    private Set<User> users = new HashSet<User>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
+    private Set<User> users = new HashSet<>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
     // https://thorben-janssen.com/6-hibernate-mappings-you-should-avoid-for-high-performance-applications/
     public Group(String name){
         this.name = name;
