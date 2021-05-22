@@ -59,7 +59,7 @@ public class GroupServiceImpl implements GroupService{
 
     // find by ID, names are not unique
     @Transactional
-    public Group getGroup(int id){
+    public Group getGroup(int group_id){
         /* Need to find the group then return it, Id's are unique
         if not in the Set return null, the Rest Service will take care of returning some HTTP code (404 not found here)
         https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html#find-java.lang.Class-java.lang.Object-
@@ -70,7 +70,7 @@ public class GroupServiceImpl implements GroupService{
         Root<Group> root = criteria.from(Group.class);
         root.fetch("users", JoinType.LEFT);
         criteria.select(root);
-        criteria.where(builder.equal(root.get("id"), id));
+        criteria.where(builder.equal(root.get("id"), group_id));
         // https://www.initgrep.com/posts/java/jpa/select-values-in-criteria-queries
         Group group = null;
         try {
@@ -83,14 +83,14 @@ public class GroupServiceImpl implements GroupService{
         return group; // null if not found, 404
     }
 
-    private User getUser(int id){
+    private User getUser(int user_id){
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<User> criteria = builder.createQuery( User.class );
 
         Root<User> root = criteria.from(User.class);
         root.fetch("groups", JoinType.LEFT);
         criteria.select(root);
-        criteria.where(builder.equal(root.get("id"), id));
+        criteria.where(builder.equal(root.get("id"), user_id));
         // https://www.initgrep.com/posts/java/jpa/select-values-in-criteria-queries
         User user = null;
         try {
@@ -130,21 +130,10 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Transactional
-    public Group addUserToGroup(int id, @NonNull User user){
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Group> criteria = builder.createQuery( Group.class );
-
-        Root<Group> root = criteria.from(Group.class);
-        root.fetch("users", JoinType.LEFT);
-        criteria.select(root);
-        criteria.where(builder.equal(root.get("id"), id));
-
-        Group group = null;
-        try {
-            group = em.createQuery(criteria).getSingleResult();
-        }
-        catch (NoResultException nre){
-            return null; // error 404 not found in the group
+    public Group addUserToGroup(int group_id, @NonNull User user){
+        Group group = getGroup(group_id);
+        if (group == null){
+            return null; // not found group..
         }
         if (group.getUsers() == null){
             group.setUsers(new HashSet<>()); // empty set
@@ -178,24 +167,54 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Transactional
+    public Group removeUserFromGroup(int group_id, int user_id){
+        Group group = getGroup(group_id);
+        if (group == null){
+            return null; // not found group..
+        }
+        if (group.getUsers() == null){
+            group.setUsers(new HashSet<>()); // empty set
+            return null; // cannot remove user if no users in the group
+        }
+        //
+
+        boolean user_already_in_group = false;
+        for (User usr: group.getUsers()){
+
+            if (usr.getId() == user.getId()){
+                // user id already in group
+                user_already_in_group= true;
+            }
+        }
+        if (user_already_in_group){
+            if (getUser(user.getId()) == null){
+                // user did not exist, create user first
+                em.persist(user);
+            }
+            else{ // user already exists, merge user
+                em.merge(user);
+            }
+
+            group.addUser(user);
+            // Group need to exist.
+            em.merge(group);
+        }
+        else{
+            em.merge(user);
+            em.merge(group);
+        }
+        return group;
+    }
+
+    @Transactional
     public Group updateGroup(@NonNull Group group){
         /*
-        Update directly the whole group..
+        Update directly the whole group.. can even remove users !
          */
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Group> criteria = builder.createQuery( Group.class );
 
-        Root<Group> root = criteria.from(Group.class);
-        root.fetch("users", JoinType.LEFT);
-        criteria.select(root);
-        criteria.where(builder.equal(root.get("id"), group.getId()));
-
-        Group g = null;
-        try {
-            g = em.createQuery(criteria).getSingleResult();
-        }
-        catch (NoResultException nre){
-            return null; // error 404 not found in the group
+        Group g = getGroup(group.getId());
+        if (g == null){
+            return null; // not found group..
         }
         if (group.getUsers() == null){
             group.setUsers(new HashSet<>()); // empty set
@@ -210,29 +229,14 @@ public class GroupServiceImpl implements GroupService{
                 em.merge(user);
             }
         }
-
         // Group need to exist.
         em.merge(group);
         return group;
     }
 
     @Transactional
-    public Group deleteGroup(int id){
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Group> criteria = builder.createQuery( Group.class );
-
-        Root<Group> root = criteria.from(Group.class);
-        root.fetch("users", JoinType.LEFT);
-        criteria.select(root);
-        criteria.where(builder.equal(root.get("id"), id));
-
-        Group group = null;
-        try {
-            group = em.createQuery(criteria).getSingleResult();
-        }
-        catch (NoResultException nre){
-            return null; // group does not exist, return null -> will be HTTP status code 404 not found
-        }
+    public Group deleteGroup(int group_id){
+        Group group = getGroup(group_id);
         // Group need to exist.
         Iterator<User> it = group.getUsers().iterator();
         while (it.hasNext()){
@@ -242,14 +246,7 @@ public class GroupServiceImpl implements GroupService{
             user.getGroups().remove(group);
             log.info("user id : " + user.getId() + " removed from users");
         }
-        log.info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         em.remove(group);
         return group;
-    }
-
-    private Set<User> getUsers(Group group){
-        Set<User> users = group.getUsers();
-        users.size();
-        return users;
     }
 }
