@@ -10,6 +10,7 @@ import { GroupInfoComponent } from './components/groups/group-info/group-info.co
 import { GroupGenresComponent } from './components/groups/group-genres/group-genres.component'
 import { GroupJoinComponent } from './components/groups/group-join/group-join.component'
 import { GroupFindMatchComponent } from './components/groups/group-find-match/group-find-match.component'
+import { GroupWaitPreferencesComponent } from './components/groups/group-wait-preferences/group-wait-preferences.component'
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -25,6 +26,7 @@ const routes: Routes = [
     children: [
       {path: '', component: GroupInfoComponent, pathMatch: 'full'},
       {path: 'genres' , component: GroupGenresComponent},
+      {path: 'wait-pref', component: GroupWaitPreferencesComponent},
       {path: 'find-match', component: GroupFindMatchComponent}
     ]
   },

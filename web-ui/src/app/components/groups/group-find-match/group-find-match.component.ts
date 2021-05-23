@@ -24,14 +24,14 @@ export class GroupFindMatchComponent implements OnInit {
     this.startTimer(maxSec);
   }
 
-  startTimer(maxSec: number = 20,  then: () => any = this.onMaybe) { // if the timer ends, send "maybe" as an answer
+  startTimer(maxSec: number = 20,  then: () => any = () => {this.onMaybe();}) { // if the timer ends, send "maybe" as an answer
     // kill the timer if it already exists:
     if (this.timer !== undefined) {
       clearInterval(this.timer);
     }
     // this.timerValue = this.microsecToTimerString(maxSec * 1000);
     let goal = new Date().getTime() + maxSec*1000;
-    let timer = setInterval(() => {
+    this.timer = setInterval(() => {
       let now = new Date().getTime();
       let diff = goal - now;
 
@@ -45,14 +45,12 @@ export class GroupFindMatchComponent implements OnInit {
         this.timerValue = "00:00";
         document.getElementById('timerValue')!.innerHTML = this.timerValue;
         // delete the timer if we are at the end of the time:
+        clearInterval(this.timer!); // clear the timer
         this.timer = undefined;
-        clearInterval(timer); // clear the timer
         // call then fct:
         then();
       }
     }, 1000);
-
-    this.timer = timer; // save the timer if we need to kill it later.
   }
 
   microsecToTimerString(sec: number): string { // convert micro seconds to string in the form min:sec
