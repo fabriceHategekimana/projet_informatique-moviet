@@ -16,7 +16,6 @@ import domain.model.User;
 // service
 import domain.service.GroupService;
 
-import java.util.Set;
 import java.util.HashSet;
 
 /*
@@ -88,8 +87,10 @@ public class GroupRestService {
         Create a group and returns HTTP status code and the location of the newly created object. It's possible to create multiple
         groups with same name. The unique identifier is its id that auto increments. We cannot input a group having an id !!
 
-        Example with curl:
+        Examples with curl:
         - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test"}'
+        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test", "admin_id": 1000}'
+        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test", "admin_id": 1000, "users": [{"id": 10}, {"id": 42}, {"id":3}, {"id":6}]}'
 
          Then you use GET to see the created object
         */

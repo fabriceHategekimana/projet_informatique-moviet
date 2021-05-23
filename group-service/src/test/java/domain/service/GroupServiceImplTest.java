@@ -59,13 +59,13 @@ class GroupServiceImplTest {
         initDataStore();  // create new groups
         // order not preserved
         Set<Group> groups = groupServiceImpl.getAllGroups(); // get set of groups through the business service
-        List<Group> list_groups = new ArrayList<>(groups);
+        List<Group> list_groups = new ArrayList<>(groups); // shallow copy
 
         int id = list_groups.get(0).getId(); // get the id through Java object ! (set of groups)
 
         Group grp = groupServiceImpl.getGroup(id); // get the specific group through the business service
 
-        assertEquals(list_groups.get(0), grp.getId()); // check the ids
+        assertEquals(list_groups.get(0).getId(), grp.getId()); // check the ids
         assertEquals(list_groups.get(0).getName(), grp.getName());
     }
 
@@ -99,7 +99,7 @@ class GroupServiceImplTest {
     void testCreateWithIdGroup() {
         initDataStore();  // create new groups
         Set<Group> groups = groupServiceImpl.getAllGroups(); // get set of groups through the business service
-        List<Group> list_groups = new ArrayList<>(groups);
+        List<Group> list_groups = new ArrayList<>(groups); // shallow copy
 
         Group group = list_groups.get(0);
         assertNull(groupServiceImpl.createGroup(group)); // check if null because trying to create group with an id
@@ -164,7 +164,7 @@ class GroupServiceImplTest {
 
 
     private Set<Group> getGroups() {
-        Set<Group> groups = new HashSet<Group>();
+        Set<Group> groups = new HashSet<>();
         long numberOfNewGrp = Math.round((Math.random() * 10)) + 5;
         for (int i = 0; i < numberOfNewGrp; i++) {
             groups.add(getRandomGroup());

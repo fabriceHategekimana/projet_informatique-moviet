@@ -109,7 +109,8 @@ public class GroupServiceImpl implements GroupService{
     @Transactional
     public Group createGroup(@NonNull Group group){
         /*
-        Can always create.. no restriction due to auto increment of unique identifier / primary key
+        Can always create but no id should be entered and need at least a name..
+        auto increment of unique identifier / primary key
          */
         if ((group.getId() != 0)|| (group.getName() == null)){ // if non initialized.
             // Actually if we do not check. SQL will throw an error because NOT NULL for the attribute in the table
@@ -119,18 +120,25 @@ public class GroupServiceImpl implements GroupService{
         if (group.getUsers() == null){
             group.setUsers(new HashSet<>()); // empty set, admin id 0 by default too
         }
+        // persist group without users then add users afterwards
+        Group tmpgroup = new Group(group.getName());
+        tmpgroup.setAdmin_id(group.getAdmin_id());
+        em.persist(tmpgroup);
+
         for (User user: group.getUsers()){
             if (getUser(user.getId()) == null){
                 // user did not exist, create user first
                 em.persist(user);
             }
             else{ // user already exists, merge user
-                em.merge(user);
+                if (!em.contains(user)){
+                    em.merge(user);
+                }
             }
-            user.addGroup(group);
+            user.addGroup(tmpgroup);
         }
-        em.persist(group);
-        return group;
+        em.merge(tmpgroup);
+        return tmpgroup;
     }
 
     @Transactional
