@@ -76,12 +76,11 @@ public class GroupServiceImpl implements GroupService{
         // https://www.initgrep.com/posts/java/jpa/select-values-in-criteria-queries
         Group group;
         try {
-            group = em.createQuery(criteria).getSingleResult();
+            group = em.createQuery(criteria).getSingleResult();  // group becomes managed
         }
         catch (NoResultException nre){
             group = null; // null if not found, 404
         }
-
         return group; // null if not found, 404
     }
 
@@ -97,7 +96,7 @@ public class GroupServiceImpl implements GroupService{
         // https://www.initgrep.com/posts/java/jpa/select-values-in-criteria-queries
         User user;
         try {
-            user = em.createQuery(criteria).getSingleResult();
+            user = em.createQuery(criteria).getSingleResult();  // user becomes managed
         }
         catch (NoResultException nre){
             user = null; // null if not found, 404
@@ -123,19 +122,11 @@ public class GroupServiceImpl implements GroupService{
         // persist group without users then add users afterwards
         Group tmpgroup = new Group(group.getName());
         tmpgroup.setAdmin_id(group.getAdmin_id());
-        em.persist(tmpgroup);
+        em.persist(tmpgroup);  // tmpgroup becomes managed
 
         for (User user: group.getUsers()){
-            if (getUser(user.getId()) == null){
-                // user did not exist, create user first
-                em.persist(user);
-            }
-            else{ // user already exists, merge user
-                if (!em.contains(user)){
-                    em.merge(user);
-                }
-            }
-            user.addGroup(tmpgroup);
+            // flushes implicitely each time, not really good in performance because doing tons of requests
+            addUserToGroup(tmpgroup.getId(), user);
         }
         em.merge(tmpgroup);
         return tmpgroup;
@@ -143,7 +134,7 @@ public class GroupServiceImpl implements GroupService{
 
     @Transactional
     public Group addUserToGroup(int group_id, @NonNull User user){
-        Group group = getGroup(group_id);
+        Group group = getGroup(group_id);  // group becomes managed
         if (group == null){
             return null; // not found group..
         }
@@ -151,7 +142,6 @@ public class GroupServiceImpl implements GroupService{
             group.setUsers(new HashSet<>()); // empty set
         }
         for (User usr: group.getUsers()){
-
             if (usr.getId() == user.getId()){
                 // user id already in group
                 em.merge(user);
@@ -176,7 +166,7 @@ public class GroupServiceImpl implements GroupService{
     @Transactional
     public Group removeUserFromGroup(int group_id, int user_id){
         // Find group
-        Group group = getGroup(group_id);
+        Group group = getGroup(group_id); // group becomes managed
         if (group == null){
             return null; // not found group..
         }
@@ -185,7 +175,7 @@ public class GroupServiceImpl implements GroupService{
             return null; // cannot remove user if no users in the group
         }
         // Find user
-        User user = getUser(user_id);
+        User user = getUser(user_id); // user becomes managed
         if (user == null){
             return null; // not found user (if found user, need to verify if this user in the group)..
         }
@@ -211,8 +201,7 @@ public class GroupServiceImpl implements GroupService{
         /*
         Update directly the whole group.. can even remove users !
          */
-
-        Group g = getGroup(group.getId());
+        Group g = getGroup(group.getId());  // g becomes managed as well as existing users in the group
         if (g == null){
             return null; // not found group..
         }
@@ -223,7 +212,7 @@ public class GroupServiceImpl implements GroupService{
         for (User user: group.getUsers()){
             if (getUser(user.getId()) == null){
                 // user did not exist, create user first
-                em.persist(user);
+                em.persist(user); // user was not managed, it becomes managed
             }
             else{ // user already exists, merge user
                 em.merge(user);
@@ -237,7 +226,7 @@ public class GroupServiceImpl implements GroupService{
 
     @Transactional
     public Group deleteGroup(int group_id){
-        Group group = getGroup(group_id);
+        Group group = getGroup(group_id);  // group becomes managed as well as users in the group
         if (group == null){
             return null;
         }
