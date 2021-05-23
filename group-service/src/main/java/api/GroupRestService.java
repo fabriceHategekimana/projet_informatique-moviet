@@ -16,7 +16,6 @@ import domain.model.User;
 // service
 import domain.service.GroupService;
 
-import java.util.Set;
 import java.util.HashSet;
 
 /*
@@ -83,13 +82,15 @@ public class GroupRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create, add a group to the existing groups")
-    public Response createGroup(Group group, final @Context UriInfo uriInfo){ // TODO: make it work with users (no auto increment id for users ?) and with the intermediate join table
+    public Response createGroup(Group group, final @Context UriInfo uriInfo){ // no auto increment id for users
         /*
         Create a group and returns HTTP status code and the location of the newly created object. It's possible to create multiple
         groups with same name. The unique identifier is its id that auto increments. We cannot input a group having an id !!
 
-        Example with curl:
+        Examples with curl:
         - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test"}'
+        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test", "admin_id": 1000}'
+        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test", "admin_id": 1000, "users": [{"id": 10}, {"id": 42}, {"id":3}, {"id":6}]}'
 
          Then you use GET to see the created object
         */
@@ -100,7 +101,7 @@ public class GroupRestService {
         }
 
         if (group.getUsers() == null){
-            group.setUsers(new HashSet<User>()); // empty set
+            group.setUsers(new HashSet<>()); // empty set
         }
 
         Group returnedGroup=groupService.createGroup(group); // can never have conflict if id are auto-incremented.
@@ -118,20 +119,17 @@ public class GroupRestService {
     @Path("/{group_id}/users/")  // TODO: maybe add another HTTP method for get {group_id}/users/{user_id}
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Adding a new user to an existing group")
-    public Response addUserToGroup(@PathParam("group_id") String str_id, User user){ // TODO: check if user already in group
+    @ApiOperation(value = "Adding an user to an existing group")
+    public Response addUserToGroup(@PathParam("group_id") String str_id, User user){
         /*
         Add an user to an existing group. Need to know the id of the group to update. Return modified object.
          */
 
         try {
-            log.info("Trying to add user " + user + "in a Group having id=" + str_id);
+            log.info("Trying to add user with user_id=" + user.getId() + "in a Group having id=" + str_id);
             int id = Integer.parseInt(str_id);
 
-            // only want initialized id and non null name, otherwise bad request
-            if (user.getId() == 0){
-                return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : all attributes need to be instantiated: " + user).build();
-            }
+            // user id can be 0..
 
             if (user.getGroups() == null){
                 user.setGroups(new HashSet<>()); // empty set
@@ -147,6 +145,35 @@ public class GroupRestService {
         }
         catch(NumberFormatException e){ // invalid id
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id, it should be numerical: id = " + str_id).build();
+        }
+
+    }
+
+    @DELETE
+    @Path("/{group_id}/users/")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Removing/kicking user from an existing group")
+    public Response removeUserFromGroup(@PathParam("group_id") String str_group_id, String str_user_id){
+        /*
+        Remove an user from an existing group. Need to know the id of the group and the id of the user to remove. Return modified object.
+         */
+        try {
+            log.info("Trying to remove user with user_id=" + str_user_id + "from a Group having group_id=" + str_group_id);
+            int group_id = Integer.parseInt(str_group_id);
+            int user_id = Integer.parseInt(str_user_id);
+
+            // user id can be 0
+            Group returnedGroup=groupService.removeUserFromGroup(group_id, user_id);
+            // will remove user if the Group if exists and if user exists, otherwise return null
+            if (returnedGroup == null){
+                // group does not exist already or user did not exist
+                return Response.status(Response.Status.NOT_FOUND).build(); // 404
+            }
+            return Response.ok(returnedGroup).build(); // 200
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id or user id, it should be numerical: group_id = " + str_group_id + ", user_id = " + str_user_id).build();
         }
 
     }
@@ -170,7 +197,7 @@ public class GroupRestService {
         }
 
         if (group.getUsers() == null){
-            group.setUsers(new HashSet<User>()); // empty set
+            group.setUsers(new HashSet<>()); // empty set
         }
 
         Group returnedGroup=groupService.updateGroup(group); // get all groups and check if group inside list of groups
