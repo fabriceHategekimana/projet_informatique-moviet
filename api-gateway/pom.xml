@@ -18,7 +18,6 @@
 		<jacoco.skip>true</jacoco.skip>
 		<microservice.port>5961</microservice.port> <!-- well not a microservice -->
 	</properties>
-
 	<build>
 		<plugins>
 			<plugin>

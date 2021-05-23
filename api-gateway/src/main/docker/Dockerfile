@@ -4,6 +4,11 @@ LABEL description="Centos 7 + Kong 0.14 + kong-oidc plugin"
 RUN yum install -y git unzip && yum clean all
 RUN yum install -y dos2unix
 
+RUN yum install -y git unzip && yum clean all
+RUN yum install -y openssl-devel -y
+RUN yum install -y gcc
+RUN luarocks install kong-oidc 1.0.1
+
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 RUN dos2unix /docker-entrypoint.sh
 RUN chmod 777 /docker-entrypoint.sh

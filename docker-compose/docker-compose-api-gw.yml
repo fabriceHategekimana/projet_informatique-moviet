@@ -52,7 +52,7 @@ services:
       KONG_PG_PASSWORD: kong
       KONG_PG_USER: kong
       KONG_PG_DATABASE: kongdb
-      KONG_PLUGINS: ""
+      KONG_PLUGINS: "bundled, oidc"
     volumes:      
       - ../web-ui/dist:/www/data:ro
 #    Assuming we want to put our own certificates, we should put them in /usr/local/kong/ssl/certs
