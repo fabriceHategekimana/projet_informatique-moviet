@@ -126,7 +126,7 @@ public class GroupRestService {
          */
 
         try {
-            log.info("Trying to add user " + user + "in a Group having id=" + str_id);
+            log.info("Trying to add user with user_id=" + user.getId() + "in a Group having id=" + str_id);
             int id = Integer.parseInt(str_id);
 
             // user id can be 0..
@@ -159,7 +159,7 @@ public class GroupRestService {
         Remove an user from an existing group. Need to know the id of the group and the id of the user to remove. Return modified object.
          */
         try {
-            log.info("Trying to remove user with id=" + str_user_id + "from a Group having id=" + str_group_id);
+            log.info("Trying to remove user with user_id=" + str_user_id + "from a Group having group_id=" + str_group_id);
             int group_id = Integer.parseInt(str_group_id);
             int user_id = Integer.parseInt(str_user_id);
 

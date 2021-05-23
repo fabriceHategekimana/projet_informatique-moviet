@@ -126,7 +126,10 @@ public class GroupServiceImpl implements GroupService{
 
         for (User user: group.getUsers()){
             // flushes implicitely each time, not really good in performance because doing tons of SQL queries
-            addUserToGroup(tmpgroup.getId(), user);
+            Group g = addUserToGroup(tmpgroup.getId(), user);
+            if (g == null){
+                return null;
+            }
         }
         em.merge(tmpgroup);
         return tmpgroup;
@@ -208,10 +211,23 @@ public class GroupServiceImpl implements GroupService{
         if (group.getUsers() == null){
             group.setUsers(new HashSet<>()); // empty set
         }
-        g.setUsers(new HashSet<>()); // remove all users !!!
+        Set<Integer> user_ids_already_in_group = new HashSet<>();
+
         for (User user: group.getUsers()){
-            // flushes implicitely each time, not really good in performance because doing tons of SQL queries
-            addUserToGroup(g.getId(), user);
+            if (user_ids_already_in_group.contains(user.getId())){  // if id already in group, we merge
+                em.merge(user);
+                em.merge(group);
+                continue;
+            }
+            if (getUser(user.getId()) == null){
+                // user did not exist, create user first
+                em.persist(user); // user was not managed, it becomes managed
+            }
+            else{ // user already exists, merge user
+                em.merge(user);
+            }
+            user.addGroup(group);
+            user_ids_already_in_group.add(user.getId());
         }
         // Group need to exist.
         em.merge(group);
