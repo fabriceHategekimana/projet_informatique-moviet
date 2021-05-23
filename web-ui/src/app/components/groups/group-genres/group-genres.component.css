@@ -3,14 +3,32 @@
     --input-height: 2em;
 } */
 /** --------------- */
+
+/* background */
+.background-box {
+    background-image: url("../../../../assets/background/background-groups.jpg");
+}
+
 .btn-container {
     display: flex;
     margin-left: 0.5em;
 }
 
 #preferences-container {
-    text-align: center;
+    margin: 0 auto;
+    padding: 5em;
+
+    border-radius: 1em;
+
+    -webkit-transform: translateY(5vh);
+    transform: translateY(5vh);
+    position: relative;
+    width: fit-content;
     justify-content: center;
+    text-align: center;
+    align-items: center;
+
+    background-color: white;
 }
 
 .genres-container {

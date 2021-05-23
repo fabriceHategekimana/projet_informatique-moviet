@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, OnChanges, Input } from '@angular/core'
 import { MovieService } from '../../../services/movie.service'
 import { Movie } from '../../interfaces/movie'
 
@@ -9,17 +9,24 @@ import { Movie } from '../../interfaces/movie'
 })
 export class DisplayMovieComponent implements OnInit {
 
+  @Input() movieId: number = 0; // movie ID is passed as an input to the component
+
   movie? : Movie;
 
   constructor(private movieService: MovieService) { }
 
   ngOnInit(): void {
-    this.getMovie();
+    this.getMovie(this.movieId);
   }
 
-  getMovie(): void {
+  ngOnChanges() { // "reload" the movie on change
+    this.getMovie(this.movieId);
+    console.log(this.movieId);
+  }
+
+  getMovie(movieId: number): void {
     // subscribe to get the movie: async fct
-    this.movieService.getMovie()
+    this.movieService.getMovie(movieId)
         .subscribe(movie => this.movie = movie);
   }
 }
