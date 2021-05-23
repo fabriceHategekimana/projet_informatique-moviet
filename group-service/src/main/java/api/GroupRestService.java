@@ -100,7 +100,7 @@ public class GroupRestService {
         }
 
         if (group.getUsers() == null){
-            group.setUsers(new HashSet<User>()); // empty set
+            group.setUsers(new HashSet<>()); // empty set
         }
 
         Group returnedGroup=groupService.createGroup(group); // can never have conflict if id are auto-incremented.
@@ -196,7 +196,7 @@ public class GroupRestService {
         }
 
         if (group.getUsers() == null){
-            group.setUsers(new HashSet<User>()); // empty set
+            group.setUsers(new HashSet<>()); // empty set
         }
 
         Group returnedGroup=groupService.updateGroup(group); // get all groups and check if group inside list of groups

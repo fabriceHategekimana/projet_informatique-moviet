@@ -63,6 +63,9 @@ public class GroupServiceImpl implements GroupService{
         if not in the Set return null, the Rest Service will take care of returning some HTTP code (404 not found here)
         https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html#find-java.lang.Class-java.lang.Object-
         */
+        if (group_id == 0){
+            return null;
+        }
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Group> criteria = builder.createQuery( Group.class );
 
@@ -71,7 +74,7 @@ public class GroupServiceImpl implements GroupService{
         criteria.select(root);
         criteria.where(builder.equal(root.get("id"), group_id));
         // https://www.initgrep.com/posts/java/jpa/select-values-in-criteria-queries
-        Group group = null;
+        Group group;
         try {
             group = em.createQuery(criteria).getSingleResult();
         }
@@ -83,6 +86,7 @@ public class GroupServiceImpl implements GroupService{
     }
 
     private User getUser(int user_id){
+        // user id can be 0
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<User> criteria = builder.createQuery( User.class );
 
@@ -91,7 +95,7 @@ public class GroupServiceImpl implements GroupService{
         criteria.select(root);
         criteria.where(builder.equal(root.get("id"), user_id));
         // https://www.initgrep.com/posts/java/jpa/select-values-in-criteria-queries
-        User user = null;
+        User user;
         try {
             user = em.createQuery(criteria).getSingleResult();
         }
@@ -138,32 +142,26 @@ public class GroupServiceImpl implements GroupService{
         if (group.getUsers() == null){
             group.setUsers(new HashSet<>()); // empty set
         }
-        boolean user_already_in_group = false;
         for (User usr: group.getUsers()){
 
             if (usr.getId() == user.getId()){
                 // user id already in group
-                user_already_in_group= true;
-                break;
-            }
-        }
-        if (!user_already_in_group){
-            if (getUser(user.getId()) == null){
-                // user did not exist, create user first
-                em.persist(user);
-            }
-            else{ // user already exists, merge user
                 em.merge(user);
+                em.merge(group);
+                return group;
             }
-
-            group.addUser(user);
-            // Group need to exist.
-            em.merge(group);
         }
-        else{
+        // user was not in the group
+        if (getUser(user.getId()) == null){
+            // user did not exist, create user first
+            em.persist(user);
+        }
+        else{ // user already exists, merge user
             em.merge(user);
-            em.merge(group);
         }
+        group.addUser(user);  // add user to the group
+        // Group need to exist.
+        em.merge(group);
         return group;
     }
 
@@ -189,22 +187,15 @@ public class GroupServiceImpl implements GroupService{
         }
 
         // Have to check if user in the group, is yes, can remove it, otherwise return null
-        boolean user_in_group = false;
         for (User usr: group.getUsers()){
             if (usr.getId() == user.getId()){
-                // user id in the group ! so we can remove later
-                user_in_group= true;
-                break;
+                // user id in the group ! so we can remove him
+                group.removeUser(user);  // user can still exist, just removed from the group
+                em.merge(group);
+                return group;
             }
         }
-        if (user_in_group){
-            group.removeUser(user);  // user can still exist, just removed from the group
-            em.merge(group);
-        }
-        else{
-            return null; // user not in group
-        }
-        return group;
+        return null; // user not in group
     }
 
     @Transactional
