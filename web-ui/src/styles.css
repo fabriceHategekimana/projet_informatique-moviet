@@ -37,8 +37,7 @@ html, body {
 }
 
 .page-container {
-    overflow: auto;
-    height: 100%;
+    /* height: 100%; */
     margin: 0;
     padding: 0;
     top: 0;
