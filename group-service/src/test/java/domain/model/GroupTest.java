@@ -5,7 +5,6 @@ package domain.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.infinispan.commons.hash.Hash;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;

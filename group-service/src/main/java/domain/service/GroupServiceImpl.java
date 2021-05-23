@@ -10,7 +10,6 @@ import domain.model.User;
 import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singleton
 import lombok.NonNull;
 import lombok.extern.java.Log;
-import org.hibernate.Session;
 
 // JPA
 import javax.persistence.EntityManager;
@@ -59,42 +58,45 @@ public class GroupServiceImpl implements GroupService{
 
     // find by ID, names are not unique
     @Transactional
-    public Group getGroup(int id){
+    public Group getGroup(int group_id){
         /* Need to find the group then return it, Id's are unique
         if not in the Set return null, the Rest Service will take care of returning some HTTP code (404 not found here)
         https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html#find-java.lang.Class-java.lang.Object-
         */
+        if (group_id == 0){
+            return null;
+        }
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Group> criteria = builder.createQuery( Group.class );
 
         Root<Group> root = criteria.from(Group.class);
         root.fetch("users", JoinType.LEFT);
         criteria.select(root);
-        criteria.where(builder.equal(root.get("id"), id));
+        criteria.where(builder.equal(root.get("id"), group_id));
         // https://www.initgrep.com/posts/java/jpa/select-values-in-criteria-queries
-        Group group = null;
+        Group group;
         try {
-            group = em.createQuery(criteria).getSingleResult();
+            group = em.createQuery(criteria).getSingleResult();  // group becomes managed
         }
         catch (NoResultException nre){
             group = null; // null if not found, 404
         }
-
         return group; // null if not found, 404
     }
 
-    private User getUser(int id){
+    private User getUser(int user_id){
+        // user id can be 0
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<User> criteria = builder.createQuery( User.class );
 
         Root<User> root = criteria.from(User.class);
         root.fetch("groups", JoinType.LEFT);
         criteria.select(root);
-        criteria.where(builder.equal(root.get("id"), id));
+        criteria.where(builder.equal(root.get("id"), user_id));
         // https://www.initgrep.com/posts/java/jpa/select-values-in-criteria-queries
-        User user = null;
+        User user;
         try {
-            user = em.createQuery(criteria).getSingleResult();
+            user = em.createQuery(criteria).getSingleResult();  // user becomes managed
         }
         catch (NoResultException nre){
             user = null; // null if not found, 404
@@ -106,7 +108,8 @@ public class GroupServiceImpl implements GroupService{
     @Transactional
     public Group createGroup(@NonNull Group group){
         /*
-        Can always create.. no restriction due to auto increment of unique identifier / primary key
+        Can always create but no id should be entered and need at least a name..
+        auto increment of unique identifier / primary key
          */
         if ((group.getId() != 0)|| (group.getName() == null)){ // if non initialized.
             // Actually if we do not check. SQL will throw an error because NOT NULL for the attribute in the table
@@ -116,122 +119,126 @@ public class GroupServiceImpl implements GroupService{
         if (group.getUsers() == null){
             group.setUsers(new HashSet<>()); // empty set, admin id 0 by default too
         }
+        // persist group without users then add users afterwards
+        Group tmpgroup = new Group(group.getName());
+        tmpgroup.setAdmin_id(group.getAdmin_id());
+        em.persist(tmpgroup);  // tmpgroup becomes managed
+
         for (User user: group.getUsers()){
-            if (getUser(user.getId()) == null){
-                // user did not exist, create user first
-                em.persist(user);
-            }
-            else{ // user already exists, merge user
-                em.merge(user);
+            // flushes implicitely each time, not really good in performance because doing tons of SQL queries
+            Group g = addUserToGroup(tmpgroup.getId(), user);
+            if (g == null){
+                return null;
             }
         }
-        em.persist(group);
-        return group;
+        em.merge(tmpgroup);
+        return tmpgroup;
     }
 
     @Transactional
-    public Group addUserToGroup(int id, @NonNull User user){
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Group> criteria = builder.createQuery( Group.class );
-
-        Root<Group> root = criteria.from(Group.class);
-        root.fetch("users", JoinType.LEFT);
-        criteria.select(root);
-        criteria.where(builder.equal(root.get("id"), id));
-
-        Group group = null;
-        try {
-            group = em.createQuery(criteria).getSingleResult();
-        }
-        catch (NoResultException nre){
-            return null; // error 404 not found in the group
+    public Group addUserToGroup(int group_id, @NonNull User user){
+        Group group = getGroup(group_id);  // group becomes managed
+        if (group == null){
+            return null; // not found group..
         }
         if (group.getUsers() == null){
             group.setUsers(new HashSet<>()); // empty set
         }
-        boolean user_already_in_group = false;
         for (User usr: group.getUsers()){
-
             if (usr.getId() == user.getId()){
                 // user id already in group
-                user_already_in_group= true;
-            }
-        }
-        if (!user_already_in_group){
-            if (getUser(user.getId()) == null){
-                // user did not exist, create user first
-                em.persist(user);
-            }
-            else{ // user already exists, merge user
                 em.merge(user);
+                em.merge(group);
+                return group;
             }
-
-            group.addUser(user);
-            // Group need to exist.
-            em.merge(group);
         }
-        else{
+        // user was not in the group
+        if (getUser(user.getId()) == null){
+            // user did not exist, create user first
+            em.persist(user);
+        }
+        else{ // user already exists, merge user
             em.merge(user);
-            em.merge(group);
         }
-        return group;
-    }
-
-    @Transactional
-    public Group updateGroup(@NonNull Group group){
-        /*
-        Update directly the whole group..
-         */
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Group> criteria = builder.createQuery( Group.class );
-
-        Root<Group> root = criteria.from(Group.class);
-        root.fetch("users", JoinType.LEFT);
-        criteria.select(root);
-        criteria.where(builder.equal(root.get("id"), group.getId()));
-
-        Group g = null;
-        try {
-            g = em.createQuery(criteria).getSingleResult();
-        }
-        catch (NoResultException nre){
-            return null; // error 404 not found in the group
-        }
-        if (group.getUsers() == null){
-            group.setUsers(new HashSet<>()); // empty set
-        }
-
-        for (User user: group.getUsers()){
-            if (getUser(user.getId()) == null){
-                // user did not exist, create user first
-                em.persist(user);
-            }
-            else{ // user already exists, merge user
-                em.merge(user);
-            }
-        }
-
+        group.addUser(user);  // add user to the group
         // Group need to exist.
         em.merge(group);
         return group;
     }
 
     @Transactional
-    public Group deleteGroup(int id){
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Group> criteria = builder.createQuery( Group.class );
-
-        Root<Group> root = criteria.from(Group.class);
-        root.fetch("users", JoinType.LEFT);
-        criteria.select(root);
-        criteria.where(builder.equal(root.get("id"), id));
-
-        Group group = null;
-        try {
-            group = em.createQuery(criteria).getSingleResult();
+    public Group removeUserFromGroup(int group_id, int user_id){
+        // Find group
+        Group group = getGroup(group_id); // group becomes managed
+        if (group == null){
+            return null; // not found group..
         }
-        catch (NoResultException nre){
-            return null; // group does not exist, return null -> will be HTTP status code 404 not found
+        if (group.getUsers() == null){
+            group.setUsers(new HashSet<>()); // empty set
+            return null; // cannot remove user if no users in the group
+        }
+        // Find user
+        User user = getUser(user_id); // user becomes managed
+        if (user == null){
+            return null; // not found user (if found user, need to verify if this user in the group)..
+        }
+        if (user.getGroups() == null){
+            user.setGroups(new HashSet<>()); // empty set
+            return null; // user not in a group.. so cannot remove user from the group
+        }
+
+        // Have to check if user in the group, is yes, can remove it, otherwise return null
+        for (User usr: group.getUsers()){
+            if (usr.getId() == user.getId()){
+                // user id in the group ! so we can remove him
+                group.removeUser(user);  // user can still exist, just removed from the group
+                em.merge(group);
+                return group;
+            }
+        }
+        return null; // user not in group
+    }
+
+    @Transactional
+    public Group updateGroup(@NonNull Group group){
+        /*
+        Update directly the whole group.. can even remove users !
+         */
+        Group g = getGroup(group.getId());  // g becomes managed as well as existing users in the group
+        if (g == null){
+            return null; // not found group..
+        }
+        if (group.getUsers() == null){
+            group.setUsers(new HashSet<>()); // empty set
+        }
+        Set<Integer> user_ids_already_in_group = new HashSet<>();
+
+        for (User user: group.getUsers()){
+            if (user_ids_already_in_group.contains(user.getId())){  // if id already in group, we merge
+                em.merge(user);
+                em.merge(group);
+                continue;
+            }
+            if (getUser(user.getId()) == null){
+                // user did not exist, create user first
+                em.persist(user); // user was not managed, it becomes managed
+            }
+            else{ // user already exists, merge user
+                em.merge(user);
+            }
+            user.addGroup(group);
+            user_ids_already_in_group.add(user.getId());
+        }
+        // Group need to exist.
+        em.merge(group);
+        return group;
+    }
+
+    @Transactional
+    public Group deleteGroup(int group_id){
+        Group group = getGroup(group_id);  // group becomes managed as well as users in the group
+        if (group == null){
+            return null;
         }
         // Group need to exist.
         Iterator<User> it = group.getUsers().iterator();
@@ -242,14 +249,7 @@ public class GroupServiceImpl implements GroupService{
             user.getGroups().remove(group);
             log.info("user id : " + user.getId() + " removed from users");
         }
-        log.info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         em.remove(group);
         return group;
-    }
-
-    private Set<User> getUsers(Group group){
-        Set<User> users = group.getUsers();
-        users.size();
-        return users;
     }
 }
