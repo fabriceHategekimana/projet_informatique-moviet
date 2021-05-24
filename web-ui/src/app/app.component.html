@@ -1,1 +1,7 @@
+<div class="container" *ngIf="auth.isLoading$ | async; else loaded">
+<!-- here loading page -->
+</div>
+
+<ng-template #loaded>
 <router-outlet></router-outlet>
+</ng-template>

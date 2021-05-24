@@ -1,31 +1,31 @@
 <div class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-      <a class="navbar-brand" routerLink="/">
-        <img src="../../../../assets/brand/logo.svg" alt="" width="30" class="d-inline-block align-text-top">
-        Moviet
-      </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" (click)="isTogglerShown=!isTogglerShown" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" [ngClass]="{ 'show': isTogglerShown }" id="navbarContent">
-        <!-- left aligned -->
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link" routerLinkActive="active" #currentLink="routerLinkActive" [attr.aria-current]="currentLink.isActive ? 'page' : ''" routerLink="/home">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLinkActive="active" #currentLink="routerLinkActive" [attr.aria-current]="currentLink.isActive ? 'page' : ''" routerLink="/groups">Groups</a>
-          </li>
-        </ul>
-        <!-- right aligned -->
-        <ul class="navbar-nav ml-auto mb-2">
-          <li class="nav-item">
-            <a class="nav-link" routerLinkActive="active" #currentLink="routerLinkActive" [attr.aria-current]="currentLink.isActive ? 'page' : ''" routerLink="/login">sign in</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLinkActive="active" #currentLink="routerLinkActive" [attr.aria-current]="currentLink.isActive ? 'page' : ''" routerLink="/register">sign up</a>
-          </li>
-        </ul>
-      </div>
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/">
+      <img src="../../../../assets/brand/logo.svg" alt="" width="30" class="d-inline-block align-text-top">
+      Moviet
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" (click)="isTogglerShown=!isTogglerShown"
+      data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" [ngClass]="{ 'show': isTogglerShown }" id="navbarContent">
+      <!-- left aligned -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" routerLinkActive="active" #currentLink="routerLinkActive"
+            [attr.aria-current]="currentLink.isActive ? 'page' : ''" routerLink="/home">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLinkActive="active" #currentLink="routerLinkActive"
+            [attr.aria-current]="currentLink.isActive ? 'page' : ''" routerLink="/groups">Groups</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav ml-auto mb-2">
+        <li *ngIf="(auth.isAuthenticated$ | async) === true">
+            <span class="nav-user-info" *ngIf="auth.user$ | async as user">{{ user.name }}</span>
+        </li>
+        <app-authentication-button></app-authentication-button>
+      </ul>
     </div>
   </div>
+</div>

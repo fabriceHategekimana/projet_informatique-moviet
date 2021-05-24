@@ -18,6 +18,13 @@ import { GroupInfoComponent } from './components/groups/group-info/group-info.co
 import { GroupFindMatchComponent } from './components/groups/group-find-match/group-find-match.component';
 import { GroupWaitPreferencesComponent } from './components/groups/group-wait-preferences/group-wait-preferences.component';
 
+import { AuthModule } from '@auth0/auth0-angular';
+import { environment as env } from '../environments/environment';
+import { LoginButtonComponent } from './shared/components/login-button/login-button.component';
+import { SignupButtonComponent } from './shared/components/signup-button/signup-button.component';
+import { LogoutButtonComponent } from './shared/components/logout-button/logout-button.component';
+import { AuthenticationButtonComponent } from './shared/components/authentication-button/authentication-button.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -33,12 +40,20 @@ import { GroupWaitPreferencesComponent } from './components/groups/group-wait-pr
     GroupJoinComponent,
     GroupInfoComponent,
     GroupFindMatchComponent,
-    GroupWaitPreferencesComponent
+    GroupWaitPreferencesComponent,
+    LoginButtonComponent,
+    SignupButtonComponent,
+    LogoutButtonComponent,
+    AuthenticationButtonComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    // Import the module into the application, with configuration
+    AuthModule.forRoot({
+      ...env.auth,
+    }),
   ],
   providers: [DisplayMovieComponent],
   bootstrap: [AppComponent]
