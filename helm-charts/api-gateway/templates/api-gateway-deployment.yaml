@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --file docker-compose-api-gw.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: api-gateway
+  name: api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: api-gateway
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --file docker-compose-api-gw.yml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/docker-compose_backend-network: "true"
+        io.kompose.network/helmcharts_frontend-network: "true"
+        io.kompose.network/helmcharts_gateway-network: "true"
+        io.kompose.service: api-gateway
+    spec:
+      containers:
+        - args:
+            - sh
+            - -c
+            - kong migrations bootstrap && kong migrations up && kong migrations finish && sh /docker-entrypoint.sh kong docker-start --v --nginx-conf /usr/local/kong/template/nginx-custom-static-sso.template
+          env:
+            - name: KONG_ADMIN_ACCESS_LOG
+              value: /dev/stdout
+            - name: KONG_ADMIN_ERROR_LOG
+              value: /dev/stderr
+            - name: KONG_ADMIN_LISTEN
+              value: 0.0.0.0:8001, 0.0.0.0:8444 ssl
+            - name: KONG_DATABASE
+              value: postgres
+            - name: KONG_LOG_LEVEL
+              value: debug
+            - name: KONG_PG_DATABASE
+              value: kongdb
+            - name: KONG_PG_HOST
+              value: kong-database
+            - name: KONG_PG_PASSWORD
+              value: kong
+            - name: KONG_PG_USER
+              value: kong
+            - name: KONG_PLUGINS
+            - name: KONG_PROXY_ACCESS_LOG
+              value: /dev/stdout
+            - name: KONG_PROXY_ERROR_LOG
+              value: /dev/stderr
+            - name: KONG_PROXY_LISTEN
+              value: 0.0.0.0:80, 0.0.0.0:443 ssl
+          image: unige/api-gateway
+          name: api-gateway
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+            - containerPort: 8001
+            - containerPort: 8444
+          resources: {}
+          volumeMounts:
+            - mountPath: /www/data
+              name: api-gateway-claim0
+              readOnly: true
+            - mountPath: /usr/local/kong/ssl/certs
+              name: api-gateway-claim1
+      hostname: api-gateway
+      restartPolicy: Always
+      volumes:
+        - name: api-gateway-claim0
+          persistentVolumeClaim:
+            claimName: api-gateway-claim0
+            readOnly: true
+        - name: api-gateway-claim1
+          persistentVolumeClaim:
+            claimName: api-gateway-claim1
+status: {}

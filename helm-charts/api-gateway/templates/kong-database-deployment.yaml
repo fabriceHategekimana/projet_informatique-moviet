@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --file docker-compose-api-gw.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: kong-database
+  name: kong-database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: kong-database
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --file docker-compose-api-gw.yml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/docker-compose_backend-network: "true"
+        io.kompose.service: kong-database
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DB
+              value: kongdb
+            - name: POSTGRES_PASSWORD
+              value: kong
+            - name: POSTGRES_USER
+              value: kong
+          image: postgres:10
+          name: kong-database
+          resources: {}
+          stdin: true
+          tty: true
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: pgdata-kong
+      hostname: kong-database
+      restartPolicy: Always
+      volumes:
+        - name: pgdata-kong
+          persistentVolumeClaim:
+            claimName: pgdata-kong
+status: {}

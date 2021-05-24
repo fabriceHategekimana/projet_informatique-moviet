@@ -11,6 +11,9 @@ sed -i '1iversion: "3"' docker-compose-microservices.yml
 #change restart to "always"
 sed -i '20s/on-failure/always/g' docker-compose-microservices.yml
 
+#health check
+#depends_on
+
 # create a kubernetes ymls
 kompose convert --file docker-compose-microservices.yml
 

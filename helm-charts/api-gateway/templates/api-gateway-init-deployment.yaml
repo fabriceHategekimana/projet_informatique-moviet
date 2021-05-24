@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --file docker-compose-api-gw.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: api-gateway-init
+  name: api-gateway-init
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: api-gateway-init
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --file docker-compose-api-gw.yml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/docker-compose_backend-network: "true"
+        io.kompose.network/helmcharts_gateway-network: "true"
+        io.kompose.service: api-gateway-init
+    spec:
+      containers:
+        - args:
+            - sh
+            - -c
+            - /tmp/config-kong.sh
+          image: unige/api-gateway
+          name: api-gateway-init
+          resources: {}
+      hostname: api-gateway-init
+      restartPolicy: Always
+status: {}
