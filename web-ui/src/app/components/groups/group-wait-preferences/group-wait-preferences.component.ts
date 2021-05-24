@@ -17,6 +17,7 @@ export class GroupWaitPreferencesComponent implements OnInit {
 
   currentGroup?: Group;
   users: User[] = [];
+  usersStatus : {[key: number] : boolean} = {}; // map user id and status
 
   constructor(private groupsComponent : GroupsComponent, private router: Router, private route: ActivatedRoute, private userService: UserService) { }
 
@@ -25,6 +26,8 @@ export class GroupWaitPreferencesComponent implements OnInit {
       this.currentGroup = this.groupsComponent.currentGroup; // save the current group
       // import all users:
       this.getAllUsers();
+      // import all user status:
+      this.getUsersStatus();
     };
 
     this.groupsComponent.getGroup(undefined, thenGroupimport);
@@ -35,6 +38,10 @@ export class GroupWaitPreferencesComponent implements OnInit {
 
   goToGenres() { // go to the genres selection page
     this.router.navigate(['genres'], {relativeTo: this.route, skipLocationChange: true });
+  }
+
+  goToFindMatch() { // go to the find-match page
+    this.router.navigate(['find-match'], {relativeTo: this.route.parent, skipLocationChange: true });
   }
 
   // get a single user:
@@ -65,4 +72,22 @@ export class GroupWaitPreferencesComponent implements OnInit {
     }
   }
 
+
+  getUsersStatus() { //!Mock
+    this.usersStatus = {
+      0: true,
+      1: false,
+      2: true,
+      3: false,
+      4: true,
+      5: false,
+    };
+  }
+
+  getUserStatus(userId: number): boolean { // get status of a single user
+    if (userId in this.usersStatus) { // if the id exists
+      return this.usersStatus[userId];
+    }
+    return true; // return true if user doesn't exists
+  }
 }

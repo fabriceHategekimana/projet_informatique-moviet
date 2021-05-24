@@ -76,7 +76,7 @@ export class GroupFindMatchComponent implements OnInit {
     document.getElementById('timerValue')!.innerHTML = this.timerValue;
     //TODO: send response to backend and get new movie to watch
     this.getMovieId();
-    this.startTimer(maxSec)
+    this.startTimer(maxSec);
   }
 
   onNo() {
@@ -85,7 +85,7 @@ export class GroupFindMatchComponent implements OnInit {
     document.getElementById('timerValue')!.innerHTML = this.timerValue;
     //TODO: send response to backend and get new movie to watch
     this.getMovieId();
-    this.startTimer(maxSec)
+    this.startTimer(maxSec);
   }
 
   onMaybe() {
@@ -94,7 +94,7 @@ export class GroupFindMatchComponent implements OnInit {
     document.getElementById('timerValue')!.innerHTML = this.timerValue;
     //TODO: send response to backend and get new movie to watch
     this.getMovieId();
-    this.startTimer(maxSec)
+    this.startTimer(maxSec);
   }
 
 }

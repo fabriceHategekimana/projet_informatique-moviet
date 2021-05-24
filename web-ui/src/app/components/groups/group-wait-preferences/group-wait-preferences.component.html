@@ -5,6 +5,9 @@
     <div id="info-container" *ngIf="currentGroup">
         <h2>Group ID: {{currentGroup.id}}</h2>
         <h2>Group name: {{currentGroup.name}}</h2>
+        <p class="body-card-text">
+            Waiting for all participants to be ready.
+        </p>
         <div id="user-list" class="card">
             <div class="card-header">
                 <h4>Users</h4>
@@ -14,16 +17,22 @@
                     <!-- <span>
                                     {{user.id}}
                                 </span> -->
-                    <span class="text-username">
-                        {{user.name}}
-                    </span>
-                    <ng-container *ngIf="user.id == currentGroup.admin_id">
-                        <span class="text-admin">admin</span>
-                    </ng-container>
+                    <div class="user-text-item">
+                        <span class="text-username">
+                            {{user.name}}
+                        </span>
+                        <ng-container *ngIf="user.id == currentGroup.admin_id">
+                            <span class="text-admin">admin</span>
+                        </ng-container>
+                    </div>
+                    <div class="user-status" [style.color]="getUserStatus(user.id) ? '#2FCC71' : 'red'">
+                        <div class="user-status-text">{{getUserStatus(user.id) ? "ready" : "waiting"}}</div>
+                        <img class="user-status-icon" width="18" [src]="getUserStatus(user.id) ? '../../../../assets/icons/checkbox-circle-fill.svg' : '../../../../assets/icons/Rolling-1s-200px.svg'" alt="">
+                    </div>
                 </li>
             </ul>
         </div>
-        <div type="button" class="btn btn-primary btn-lg btn-block mt-5" id="start" (click)="goToGenres()">Start
+        <div type="button" class="btn btn-primary btn-lg btn-block mt-5" id="start" (click)="goToFindMatch()">Start
         </div>
     </div>
 </div>

@@ -124,10 +124,13 @@ export class GroupGenresComponent implements OnInit {
     this.router.navigate(['find-match'], {relativeTo: this.route.parent, skipLocationChange: true });
   }
 
+  goToWaitPref() { // go to the wat-pref page
+    this.router.navigate(['wait-pref'], {relativeTo: this.route.parent, skipLocationChange: true });
+  }
   
   processPreferences() {
     // this function will send the preferences to the backend and then go to the find-match page
     // TODO: send preferences to the backend
-    this.goToFindMatch();
+    this.goToWaitPref();
   }
 }
