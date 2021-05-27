@@ -4,7 +4,6 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
   name: example
-    #  namespace: foo
 spec:
   rules:
     - host: www.example.com

@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata: 
+  name: minimal-ingress
+  annotations: 
+    nginx.ingress.kubernetes.io/auth-response-headers: Authorization
+    nginx.ingress.kubernetes.io/auth-signin: "https://moviet.eu.auth0.com/login"
+    nginx.ingress.kubernetes.io/auth-url: "https://moviet.eu.auth0.com/login"
+spec:
+  rules:
+  - host: moviet.com
+    http:
+      paths:
+      - path: /api/v1
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway
+            port:
+              number: 80
