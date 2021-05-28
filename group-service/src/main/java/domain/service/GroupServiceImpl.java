@@ -257,20 +257,16 @@ public class GroupServiceImpl implements GroupService{
     @Transactional // Integer of user id
     public Map<Integer,Status> getAllUserStatus(int group_id){
         Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
-        if ((group == null) || (group.getUsers() == null)){
-            return null; // not found group.. or no user meaning that we cannot get the status of an user..
+        if (group == null){
+            return null; // not found group..
         }
-        // we know that the group exists and that there are users up to this point
-        GroupUser groupUser = getGroupUser(group_id, user_id); // groupUser becomes managed
-        if (groupUser == null){
-            return null; // particular user not found
-        }
-        Map<Integer,Status> out = new HashMap<Integer,Status>();
+        // we know that the group exists and that there can be no users
+        Map<Integer,Status> out = new HashMap<>();
         for (User user : group.getUsers()) {
             GroupUser gU = getGroupUser(group_id, user.getId());
             out.put(user.getId(), gU.getUser_status());
         }
-        return out;
+        return out; // can be empty
     }
 
 
