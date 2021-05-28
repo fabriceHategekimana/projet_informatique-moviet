@@ -2,7 +2,7 @@ package domain.model;
 
 
 public enum Status {
-    CHOOSING("CHOOSING"), WAITING("WAITING"), VOTING("VOTING"), DONE("DONE");
+    CHOOSING("CHOOSING"), READY("READY"), VOTING("VOTING"), DONE("DONE");
     // what are in the parentheses are the codes
     private String code;
 

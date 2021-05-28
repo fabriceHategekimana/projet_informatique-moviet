@@ -6,9 +6,8 @@ import java.util.HashSet;
 // These three are from @Data but we add @Setter one by one and the constructor.
 import lombok.ToString;
 import lombok.Getter;
-
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 // https://projectlombok.org/features/all
