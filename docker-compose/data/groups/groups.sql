@@ -1,5 +1,6 @@
 DROP TABLE if exists T_groups CASCADE;
 -- need to be in one-line otherwise tons of errors..
+-- best website to test SQL online ! https://sqliteonline.com
 CREATE TABLE T_groups (
     group_id serial primary key,
     name varchar(255) not null,
@@ -35,7 +36,7 @@ CREATE TABLE T_groups_users (
     id serial primary key,
     group_id int REFERENCES T_groups(group_id),
     user_id int REFERENCES T_users(user_id),
-    user_status status_type NOT NULL
+    user_status status_type DEFAULT 'CHOOSING'
 );
 -- user_status is modified through the class User by using @SecondaryTable..
 -- https://www.baeldung.com/jpa-mapping-single-entity-to-multiple-tables

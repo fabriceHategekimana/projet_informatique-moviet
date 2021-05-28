@@ -25,7 +25,7 @@ DROP TYPE if exists status_type;
 CREATE TYPE status_type AS ENUM ('CHOOSING','READY', 'VOTING', 'DONE');  -- change of status changes in the same order
 -- cannot have users ready while others are voting..
 -- status status_type not null,
-CREATE TABLE T_groups_users (id serial primary key, group_id int REFERENCES T_groups(group_id), user_id int REFERENCES T_users(user_id), user_status status_type NOT NULL);
+CREATE TABLE T_groups_users (id serial primary key, group_id int REFERENCES T_groups(group_id), user_id int REFERENCES T_users(user_id), user_status status_type DEFAULT 'CHOOSING');
 -- user_status is modified through the class User by using @SecondaryTable..
 -- https://www.baeldung.com/jpa-mapping-single-entity-to-multiple-tables
 TRUNCATE TABLE T_groups_users;

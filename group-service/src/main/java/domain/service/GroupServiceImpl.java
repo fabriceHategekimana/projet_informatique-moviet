@@ -111,8 +111,7 @@ public class GroupServiceImpl implements GroupService{
 
         Root<GroupUser> root = criteria.from(GroupUser.class);
         criteria.select(root);
-        criteria.where(builder.equal(root.get("group_id"), group_id));
-        criteria.where(builder.equal(root.get("user_id"), user_id));
+        criteria.where(builder.and(builder.equal(root.get("group_id"), group_id), builder.equal(root.get("user_id"), user_id)));
         // https://www.initgrep.com/posts/java/jpa/select-values-in-criteria-queries
         GroupUser groupUser;
         try {
@@ -183,6 +182,11 @@ public class GroupServiceImpl implements GroupService{
         group.addUser(user);  // add user to the group
         // Group need to exist.
         em.merge(group);
+
+        // Also update status
+        GroupUser gU = getGroupUser(group_id, user.getId());
+        gU.setUser_status(Status.CHOOSING);
+        em.merge(gU);
         return group;
     }
 
@@ -248,6 +252,10 @@ public class GroupServiceImpl implements GroupService{
             }
             user.addGroup(group);
             user_ids_already_in_group.add(user.getId());
+            // Also update status
+            GroupUser gU = getGroupUser(group.getId(), user.getId());
+            gU.setUser_status(Status.CHOOSING);
+            em.merge(gU);
         }
         // Group need to exist.
         em.merge(group);
@@ -311,6 +319,7 @@ public class GroupServiceImpl implements GroupService{
                 if (status.equalsIgnoreCase("READY")) {
                     // check if everyone else in CHOOSING or READY, otherwise cannot update status !
                     if (!(gU.getUser_status().equals(Status.CHOOSING)) && !(gU.getUser_status().equals(Status.READY))) {
+                        log.severe(cannot_change_msg + "because other users have status VOTING OR DONE");
                         throw new IllegalArgumentException(cannot_change_msg + "because other users have status VOTING OR DONE");
                     }
                     if (!gU.getUser_status().equals(Status.READY)){
@@ -320,12 +329,14 @@ public class GroupServiceImpl implements GroupService{
                 else if (status.equalsIgnoreCase("VOTING")){
                     // check if everyone else in READY or VOTING, otherwise cannot update status !
                     if (!(gU.getUser_status().equals(Status.READY)) && !(gU.getUser_status().equals(Status.VOTING))){
+                        log.severe(cannot_change_msg + "because other users have status DONE or still CHOOSING");
                         throw new IllegalArgumentException(cannot_change_msg + "because other users have status DONE or still CHOOSING");
                     }
                 }
                 else if (status.equalsIgnoreCase("DONE")){
                     // check if everyone else in VOTING OR DONE, otherwise cannot update status !
                     if (!(gU.getUser_status().equals(Status.VOTING)) && !(gU.getUser_status().equals(Status.DONE))){
+                        log.severe(cannot_change_msg + "because other users have status still CHOOSING or READY");
                         throw new IllegalArgumentException(cannot_change_msg + "because other users have status still CHOOSING or READY");
                     }
                 }
@@ -352,8 +363,8 @@ public class GroupServiceImpl implements GroupService{
         Change all status of users in the group group_id to VOTING
          */
         Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
-        if ((group == null) || (group.getUsers() == null)){
-            return null; // not found group.. or no user meaning that we cannot update the status of an user..
+        if (group == null){
+            return null; // not found group..
         }
         // we know that the group exists and that there are users up to this point
         for (User user : group.getUsers()) {
