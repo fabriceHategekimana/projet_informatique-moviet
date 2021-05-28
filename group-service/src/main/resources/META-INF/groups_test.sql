@@ -20,11 +20,12 @@ INSERT INTO T_users (user_id) VALUES (3);
 INSERT INTO T_users (user_id) VALUES (4);
 
 DROP TABLE if exists T_groups_users CASCADE;
+DROP TYPE if exists status_type;
 -- choosing : for short term preferences, waiting: before vote
 CREATE TYPE status_type AS ENUM ('CHOOSING','WAITING', 'VOTING', 'DONE');  -- change of status changes in the same order
 -- cannot have users waiting while others are voting..
 -- status status_type not null,
-CREATE TABLE T_groups_users (group_id int REFERENCES T_groups(group_id) primary key, user_id int REFERENCES T_users(user_id) primary key, user_status status_type);
+CREATE TABLE T_groups_users (group_id int REFERENCES T_groups(group_id), user_id int REFERENCES T_users(user_id), user_status status_type NOT NULL);
 -- user_status is modified through the class User by using @SecondaryTable..
 -- https://www.baeldung.com/jpa-mapping-single-entity-to-multiple-tables
 TRUNCATE TABLE T_groups_users;
