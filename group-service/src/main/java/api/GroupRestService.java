@@ -286,6 +286,7 @@ public class GroupRestService {
     }
 
     @PUT
+    @Path("/{group_id}/users_status")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Changes all the status in the group to Voting")
     public Response changeToVotingAllUserStatus(String str_id){
