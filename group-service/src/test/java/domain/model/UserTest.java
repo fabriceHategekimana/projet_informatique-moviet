@@ -85,6 +85,6 @@ class UserTest {
 
     @Test
     void testToString(){
-        assertEquals("User(id=1, groups=[])", user.toString() );
+        assertEquals("User(id=1, groups=[], status=CHOOSING)", user.toString() );
     }
 }

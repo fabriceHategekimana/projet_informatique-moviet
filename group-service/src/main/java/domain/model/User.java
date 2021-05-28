@@ -11,15 +11,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 // https://projectlombok.org/features/all
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Column;
-
-import javax.persistence.ManyToMany;
 // https://youtu.be/FeZ5BC0PirQ
 
 @ToString
@@ -35,6 +30,20 @@ public class User {
     @Setter @JsonIgnore
     private Set<Group> groups = new HashSet<>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
     // https://thorben-janssen.com/6-hibernate-mappings-you-should-avoid-for-high-performance-applications/
+
+    @Setter @Enumerated(EnumType.ORDINAL)
+    private Status status = Status.CHOOSING;
+    /*
+    https://www.baeldung.com/jpa-mapping-single-entity-to-multiple-tables
+    https://www.baeldung.com/jpa-persisting-enums-in-jpa
+
+    "
+    A problem with this kind of mapping arises when we need to modify our enum.
+    If we add a new value in the middle or rearrange the enum's order, we'll break the existing data model.
+    Such issues might be hard to catch, as well as problematic to fix, as we would have to update all the database records.
+    "
+     */
+
     public User(int id){
         this.id=id;
     }
