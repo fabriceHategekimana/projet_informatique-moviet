@@ -296,12 +296,12 @@ public class GroupRestService {
         try {
             log.info("Trying to change all the status in the group to Voting using: id=" + str_id);
             int group_id = Integer.parseInt(str_id);
-            Group returnedGroup = groupService.changeToVotingAllUserStatus(group_id);
-            if (returnedGroup == null){
+            Map<Integer, Status> outMap = groupService.changeToVotingAllUserStatus(group_id);
+            if (outMap == null){
                 // group not found
                 return Response.status(Response.Status.NOT_FOUND).build(); // 404
             }
-            return Response.ok(returnedGroup).build(); // 200
+            return Response.ok(outMap).build(); // 200
         }
         catch(NumberFormatException e){ // invalid id
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id, it should be numerical: id = " + str_id).build();

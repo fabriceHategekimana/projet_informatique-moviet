@@ -361,7 +361,7 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Transactional
-    public Group changeToVotingAllUserStatus(int group_id){
+    public Map<Integer,Status> changeToVotingAllUserStatus(int group_id){
         /*
         Change all status of users in the group group_id to VOTING
          */
@@ -370,12 +370,14 @@ public class GroupServiceImpl implements GroupService{
             return null; // not found group..
         }
         // we know that the group exists and that there are users up to this point
+        Map<Integer,Status> out = new HashMap<>();
         for (User user : group.getUsers()) {
             GroupUser gU = getGroupUser(group_id, user.getId());
             gU.setUser_status(Status.VOTING);
             em.merge(gU);
+            out.put(user.getId(), gU.getUser_status());
         }
-        return group;
+        return out;
     }
 
     @Transactional
