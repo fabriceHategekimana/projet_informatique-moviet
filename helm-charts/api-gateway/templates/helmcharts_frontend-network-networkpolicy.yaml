@@ -2,13 +2,13 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   creationTimestamp: null
-  name: helmcharts_frontend-network
+  name: helmcharts-frontend-network
 spec:
   ingress:
     - from:
         - podSelector:
             matchLabels:
-              io.kompose.network/helmcharts_frontend-network: "true"
+              io.kompose.network/helmcharts-frontend-network: "true"
   podSelector:
     matchLabels:
-      io.kompose.network/helmcharts_frontend-network: "true"
+      io.kompose.network/helmcharts-frontend-network: "true"

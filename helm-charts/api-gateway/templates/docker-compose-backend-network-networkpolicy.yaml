@@ -2,13 +2,13 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   creationTimestamp: null
-  name: docker-compose_backend-network
+  name: docker-compose-backend-network
 spec:
   ingress:
     - from:
         - podSelector:
             matchLabels:
-              io.kompose.network/docker-compose_backend-network: "true"
+              io.kompose.network/docker-compose-backend-network: "true"
   podSelector:
     matchLabels:
-      io.kompose.network/docker-compose_backend-network: "true"
+      io.kompose.network/docker-compose-backend-network: "true"

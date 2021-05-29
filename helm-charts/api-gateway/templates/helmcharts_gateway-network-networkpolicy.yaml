@@ -2,13 +2,13 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   creationTimestamp: null
-  name: helmcharts_gateway-network
+  name: helmcharts-gateway-network
 spec:
   ingress:
     - from:
         - podSelector:
             matchLabels:
-              io.kompose.network/helmcharts_gateway-network: "true"
+              io.kompose.network/helmcharts-gateway-network: "true"
   podSelector:
     matchLabels:
-      io.kompose.network/helmcharts_gateway-network: "true"
+      io.kompose.network/helmcharts-gateway-network: "true"

@@ -22,9 +22,9 @@ spec:
         kompose.version: 1.22.0 (955b78124)
       creationTimestamp: null
       labels:
-        io.kompose.network/docker-compose_backend-network: "true"
-        io.kompose.network/helmcharts_frontend-network: "true"
-        io.kompose.network/helmcharts_gateway-network: "true"
+        io.kompose.network/docker-compose-backend-network: "true"
+        io.kompose.network/helmcharts-frontend-network: "true"
+        io.kompose.network/helmcharts-gateway-network: "true"
         io.kompose.service: api-gateway
     spec:
       containers:
