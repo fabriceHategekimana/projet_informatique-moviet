@@ -1,0 +1,63 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  name: ingress-web-ui
+spec:
+  rules:
+    - host: www.moviet.com
+      http:
+        paths:
+          - backend:
+              serviceName: web-ui-service
+              servicePort: 4200
+            path: /.*
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  name: ingress-group-service
+spec:
+  rules:
+    - host: www.moviet.com
+      http:
+        paths:
+          - backend:
+              serviceName: group-service
+              servicePort: 10080
+            path: /api/v1/groups/.*
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  name: ingress-user-service
+spec:
+  rules:
+    - host: www.moviet.com
+      http:
+        paths:
+          - backend:
+              serviceName: user-service
+              servicePort: 10082
+            path: /api/v1/users/.*
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  name: ingress-movie-service
+spec:
+  rules:
+    - host: www.moviet.com
+      http:
+        paths:
+          - backend:
+              serviceName: movie-service
+              servicePort: 10081
+            path: /api/v1/movies/.*
