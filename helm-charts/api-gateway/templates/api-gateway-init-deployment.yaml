@@ -31,6 +31,7 @@ spec:
             - -c
             - /tmp/config-kong.sh
           image: unige/api-gateway
+          imagePullPolicy: IfNotPresent
           name: api-gateway-init
           resources: {}
       hostname: api-gateway-init

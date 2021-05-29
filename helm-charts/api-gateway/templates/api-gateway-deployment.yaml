@@ -59,6 +59,7 @@ spec:
             - name: KONG_PROXY_LISTEN
               value: 0.0.0.0:80, 0.0.0.0:443 ssl
           image: unige/api-gateway
+          imagePullPolicy: IfNotPresent
           name: api-gateway
           ports:
             - containerPort: 80

@@ -11,7 +11,7 @@ spec:
       http:
         paths:
           - backend:
-              serviceName: exampleService
+              serviceName: exampleservice
               servicePort: 4200
             path: /
   # This section is only required if TLS is to be enabled for the Ingress
