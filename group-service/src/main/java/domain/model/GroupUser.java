@@ -5,6 +5,8 @@ import lombok.ToString;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -14,6 +16,10 @@ import javax.validation.constraints.NotNull;
 @ToString
 @Getter
 @NoArgsConstructor // need this otherwise can have some problems with PUT (create) requests
+@TypeDef( // https://vladmihalcea.com/the-best-way-to-map-an-enum-type-with-jpa-and-hibernate/
+        name = "status_db_enum",
+        typeClass = StatusDatabaseEnumType.class
+)
 @Entity @Table( name="T_groups_users")// JPA, mapping class - table
 public class GroupUser {
     @Id @GeneratedValue( strategy=GenerationType.IDENTITY ) // Generated Value, automatically generated following how the db was configured
@@ -24,10 +30,13 @@ public class GroupUser {
     @NotNull
     private int user_id;
 
-    @Setter
+    @Setter @Enumerated(EnumType.STRING) @Type( type = "status_db_enum" )
     private Status user_status = Status.CHOOSING;
     /*
-    We use the converter ! see links below and StatusConverter
+    We use this:
+    https://vladmihalcea.com/the-best-way-to-map-an-enum-type-with-jpa-and-hibernate/
+
+    We use do not use the converter.. see links below and StatusConverter
     https://www.baeldung.com/jpa-mapping-single-entity-to-multiple-tables
     https://www.baeldung.com/jpa-persisting-enums-in-jpa
      */

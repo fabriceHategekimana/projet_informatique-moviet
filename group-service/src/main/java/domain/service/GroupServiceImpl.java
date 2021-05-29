@@ -252,6 +252,7 @@ public class GroupServiceImpl implements GroupService{
             }
             user.addGroup(group);
             user_ids_already_in_group.add(user.getId());
+            em.merge(group);
             // Also update status
             GroupUser gU = getGroupUser(group.getId(), user.getId());
             gU.setUser_status(Status.CHOOSING);
@@ -306,7 +307,7 @@ public class GroupServiceImpl implements GroupService{
         if (groupUser == null){  // particular user not found..
             return null;
         }
-        String cannot_change_msg = "Cannot change status of user_id=" + user_id + "and group_id=" + group_id + "to status=" + status;
+        String cannot_change_msg = "Cannot change status of user_id=" + user_id + " and group_id=" + group_id + " to status=" + status;
 
         /* verify if request tries to bypass some status.. the most important are:
             - need everyone choosing or ready before changing status to ready
@@ -319,25 +320,27 @@ public class GroupServiceImpl implements GroupService{
                 if (status.equalsIgnoreCase("READY")) {
                     // check if everyone else in CHOOSING or READY, otherwise cannot update status !
                     if (!(gU.getUser_status().equals(Status.CHOOSING)) && !(gU.getUser_status().equals(Status.READY))) {
-                        log.severe(cannot_change_msg + "because other users have status VOTING OR DONE");
-                        throw new IllegalArgumentException(cannot_change_msg + "because other users have status VOTING OR DONE");
+                        log.severe(cannot_change_msg + " because other users have status VOTING OR DONE");
+                        throw new IllegalArgumentException(cannot_change_msg + " because other users have status VOTING OR DONE");
                     }
                     if (!gU.getUser_status().equals(Status.READY)){
                         all_ready=false;
                     }
                 }
                 else if (status.equalsIgnoreCase("VOTING")){
+                    all_ready=false;
                     // check if everyone else in READY or VOTING, otherwise cannot update status !
                     if (!(gU.getUser_status().equals(Status.READY)) && !(gU.getUser_status().equals(Status.VOTING))){
-                        log.severe(cannot_change_msg + "because other users have status DONE or still CHOOSING");
-                        throw new IllegalArgumentException(cannot_change_msg + "because other users have status DONE or still CHOOSING");
+                        log.severe(cannot_change_msg + " because other users have status DONE or still CHOOSING");
+                        throw new IllegalArgumentException(cannot_change_msg + " because other users have status DONE or still CHOOSING");
                     }
                 }
                 else if (status.equalsIgnoreCase("DONE")){
+                    all_ready=false;
                     // check if everyone else in VOTING OR DONE, otherwise cannot update status !
                     if (!(gU.getUser_status().equals(Status.VOTING)) && !(gU.getUser_status().equals(Status.DONE))){
-                        log.severe(cannot_change_msg + "because other users have status still CHOOSING or READY");
-                        throw new IllegalArgumentException(cannot_change_msg + "because other users have status still CHOOSING or READY");
+                        log.severe(cannot_change_msg + " because other users have status still CHOOSING or READY");
+                        throw new IllegalArgumentException(cannot_change_msg + " because other users have status still CHOOSING or READY");
                     }
                 }
             }
@@ -352,8 +355,10 @@ public class GroupServiceImpl implements GroupService{
                 }
             }
         }
-        groupUser.setUser_status(Status.valueOf(status.toUpperCase())); // https://www.tutorialspoint.com/how-to-convert-a-string-to-an-enum-in-java
-        em.merge(groupUser);
+        else{
+            groupUser.setUser_status(Status.valueOf(status.toUpperCase())); // https://www.tutorialspoint.com/how-to-convert-a-string-to-an-enum-in-java
+            em.merge(groupUser);
+        }
         return Status.valueOf(status);
     }
 
