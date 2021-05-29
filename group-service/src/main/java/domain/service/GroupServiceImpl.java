@@ -296,7 +296,7 @@ public class GroupServiceImpl implements GroupService{
     @Transactional
     public Status updateUserStatus(int group_id, int user_id, String status){
         /*
-        Update status of an user who is in a group
+        Update status of an user who is in a group, should also handle the case !
          */
         Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
         if ((group == null) || (group.getUsers() == null)){
@@ -348,18 +348,16 @@ public class GroupServiceImpl implements GroupService{
         if (all_ready){
             // set all to status VOTING if all users in the group were ready
             for (User user : group.getUsers()) {
-                if (user_id != user.getId()) {
-                    GroupUser gU = getGroupUser(group_id, user.getId());
-                    gU.setUser_status(Status.VOTING);
-                    em.merge(gU);
-                }
+                GroupUser gU = getGroupUser(group_id, user.getId());
+                gU.setUser_status(Status.VOTING);
+                em.merge(gU);
             }
         }
         else{
             groupUser.setUser_status(Status.valueOf(status.toUpperCase())); // https://www.tutorialspoint.com/how-to-convert-a-string-to-an-enum-in-java
             em.merge(groupUser);
         }
-        return Status.valueOf(status);
+        return Status.valueOf(status.toUpperCase());
     }
 
     @Transactional
