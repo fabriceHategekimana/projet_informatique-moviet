@@ -5,7 +5,6 @@ import com.uwetrottmann.tmdb2.entities.Genre;
 import com.uwetrottmann.tmdb2.entities.MovieResultsPage;
 import com.uwetrottmann.tmdb2.entities.TmdbDate;
 import com.uwetrottmann.tmdb2.enumerations.SortBy;
-import domain.helper.DiscoverFilterBuilder;
 import domain.helper.MovieConverter;
 import domain.model.DiscoverRequest;
 import domain.model.MovieDisplayInfo;
@@ -194,8 +193,8 @@ public class DiscoverRestService {
                     sortBy,
                     release_date_gte,
                     release_date_lte,
-                    DiscoverFilterBuilder.build(stringToSeparator(genres_operator), genres),
-                    DiscoverFilterBuilder.build(stringToSeparator(keywords_operator), keywords),
+                    new DiscoverFilter(stringToSeparator(genres_operator), genres),
+                    new DiscoverFilter(stringToSeparator(keywords_operator), keywords),
                     new DiscoverFilter(banned_genres),
                     new DiscoverFilter(banned_keywords));
         }
