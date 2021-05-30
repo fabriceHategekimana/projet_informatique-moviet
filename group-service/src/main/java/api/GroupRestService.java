@@ -11,12 +11,14 @@ import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singlet
 
 //  import classes of domain
 import domain.model.Group;
+import domain.model.Status;
 import domain.model.User;
 
 // service
 import domain.service.GroupService;
 
 import java.util.HashSet;
+import java.util.Map;
 
 /*
 https://thorntail.io/posts/wildfly-swarm-s-got-swagger/
@@ -116,7 +118,7 @@ public class GroupRestService {
     }
 
     @POST
-    @Path("/{group_id}/users/")  // TODO: maybe add another HTTP method for get {group_id}/users/{user_id}
+    @Path("/{group_id}/users/")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Adding an user to an existing group")
@@ -146,7 +148,6 @@ public class GroupRestService {
         catch(NumberFormatException e){ // invalid id
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id, it should be numerical: id = " + str_id).build();
         }
-
     }
 
     @DELETE
@@ -207,6 +208,104 @@ public class GroupRestService {
             return Response.status(Response.Status.NOT_FOUND).build(); // 404
         }
         return Response.ok(returnedGroup).build(); // 200
+    }
+
+    @GET
+    @Path("/{group_id}/users_status")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "GET list of user ids with their status")
+    public Response getAllUserStatus(@PathParam("group_id") String str_id){
+        /*
+        get list of user ids with their status
+         */
+        try {
+            log.info("Trying to get all the users status in a Group having id=" + str_id);
+            int group_id = Integer.parseInt(str_id);
+
+            Map<Integer, Status> outMap = groupService.getAllUserStatus(group_id);
+            if (outMap == null){
+                // group does not exist already
+                return Response.status(Response.Status.NOT_FOUND).build(); // 404
+            }
+            return Response.ok(outMap).build(); // 200
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id, it should be numerical: id = " + str_id).build();
+        }
+    }
+
+    @GET
+    @Path("/{group_id}/users/{user_id}/status") // TODO: remove /status to be more general ?, like for short term preferences
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "GET a particular user status")
+    public Response getUserStatus(@PathParam("group_id") String str_group_id, @PathParam("user_id") String str_user_id) {
+        try {
+            log.info("Trying get a user status of user with user_id=" + str_user_id + "from a Group having group_id=" + str_group_id);
+            int group_id = Integer.parseInt(str_group_id);
+            int user_id = Integer.parseInt(str_user_id);
+
+            // user id can be 0
+            Status status=groupService.getUserStatus(group_id, user_id);
+            if (status == null){
+                // group does not exist already or user did not exist
+                return Response.status(Response.Status.NOT_FOUND).build(); // 404
+            }
+            return Response.ok(status).build(); // 200
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id or user id, it should be numerical: group_id = " + str_group_id + ", user_id = " + str_user_id).build();
+        }
+    }
+
+    @PUT
+    @Path("/{group_id}/users/{user_id}/status") // TODO: remove /status to be more general ?, like for short term preferences
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "GET a particular user status")
+    public Response updateUserStatus(@PathParam("group_id") String str_group_id, @PathParam("user_id") String str_user_id, String status) {
+        try {
+            log.info("Trying get a user status of user with user_id=" + str_user_id + "from a Group having group_id=" + str_group_id);
+            int group_id = Integer.parseInt(str_group_id);
+            int user_id = Integer.parseInt(str_user_id);
+
+            // user id can be 0
+            try {
+                Status returnedStatus = groupService.updateUserStatus(group_id, user_id, status);
+                if (returnedStatus == null){
+                    // group does not exist already or user did not exist
+                    return Response.status(Response.Status.NOT_FOUND).build(); // 404
+                }
+                return Response.ok(returnedStatus).build(); // 200
+            }
+            catch (IllegalArgumentException e){
+                return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Bad user status requested: " + e).build();
+            }
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id or user id, it should be numerical: group_id = " + str_group_id + ", user_id = " + str_user_id).build();
+        }
+    }
+
+    @PUT
+    @Path("/{group_id}/users_status")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Changes all the status in the group to Voting")
+    public Response changeToVotingAllUserStatus(@PathParam("group_id") String str_id){
+        /*
+        Changes all the status in the group to Voting
+         */
+        try {
+            log.info("Trying to change all the status in the group to Voting using: id=" + str_id);
+            int group_id = Integer.parseInt(str_id);
+            Map<Integer, Status> outMap = groupService.changeToVotingAllUserStatus(group_id);
+            if (outMap == null){
+                // group not found
+                return Response.status(Response.Status.NOT_FOUND).build(); // 404
+            }
+            return Response.ok(outMap).build(); // 200
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id, it should be numerical: id = " + str_id).build();
+        }
     }
 
     @DELETE

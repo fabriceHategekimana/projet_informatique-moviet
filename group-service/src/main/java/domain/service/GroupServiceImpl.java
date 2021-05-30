@@ -1,11 +1,11 @@
 package domain.service;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 
 import domain.model.Group;
+import domain.model.GroupUser;
 import domain.model.User;
+import domain.model.Status;
 
 import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singleton
 import lombok.NonNull;
@@ -104,6 +104,25 @@ public class GroupServiceImpl implements GroupService{
         return user; // null if not found, 404
     }
 
+    private GroupUser getGroupUser(int group_id, int user_id){
+        // user id can be 0
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<GroupUser> criteria = builder.createQuery( GroupUser.class );
+
+        Root<GroupUser> root = criteria.from(GroupUser.class);
+        criteria.select(root);
+        criteria.where(builder.and(builder.equal(root.get("group_id"), group_id), builder.equal(root.get("user_id"), user_id)));
+        // https://www.initgrep.com/posts/java/jpa/select-values-in-criteria-queries
+        GroupUser groupUser;
+        try {
+            groupUser = em.createQuery(criteria).getSingleResult();  // user becomes managed
+        }
+        catch (NoResultException nre){
+            groupUser = null; // null if not found, 404
+        }
+        return groupUser; // null if not found, 404
+    }
+
     // create a group using only the name
     @Transactional
     public Group createGroup(@NonNull Group group){
@@ -163,6 +182,11 @@ public class GroupServiceImpl implements GroupService{
         group.addUser(user);  // add user to the group
         // Group need to exist.
         em.merge(group);
+
+        // Also update status
+        GroupUser gU = getGroupUser(group_id, user.getId());
+        gU.setUser_status(Status.CHOOSING);
+        em.merge(gU);
         return group;
     }
 
@@ -228,10 +252,132 @@ public class GroupServiceImpl implements GroupService{
             }
             user.addGroup(group);
             user_ids_already_in_group.add(user.getId());
+            em.merge(group);
+            // Also update status
+            GroupUser gU = getGroupUser(group.getId(), user.getId());
+            gU.setUser_status(Status.CHOOSING);
+            em.merge(gU);
         }
         // Group need to exist.
         em.merge(group);
         return group;
+    }
+
+    @Transactional // Integer of user id
+    public Map<Integer,Status> getAllUserStatus(int group_id){
+        Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
+        if (group == null){
+            return null; // not found group..
+        }
+        // we know that the group exists and that there can be no users
+        Map<Integer,Status> out = new HashMap<>();
+        for (User user : group.getUsers()) {
+            GroupUser gU = getGroupUser(group_id, user.getId());
+            out.put(user.getId(), gU.getUser_status());
+        }
+        return out; // can be empty
+    }
+
+
+    @Transactional
+    public Status getUserStatus(int group_id, int user_id){
+        Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
+        if ((group == null) || (group.getUsers() == null)){
+            return null; // not found group.. or no user meaning that we cannot get the status of an user..
+        }
+        // we know that the group exists and that there are users up to this point
+        GroupUser groupUser = getGroupUser(group_id, user_id); // groupUser becomes managed
+        if (groupUser == null){
+            return null; // particular user not found
+        }
+        return groupUser.getUser_status();
+    }
+
+    @Transactional
+    public Status updateUserStatus(int group_id, int user_id, String status){
+        /*
+        Update status of an user who is in a group, should also handle the case !
+         */
+        Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
+        if ((group == null) || (group.getUsers() == null)){
+            return null; // not found group.. or no user meaning that we cannot update the status of an user..
+        }
+        // we know that the group exists and that there are users up to this point
+        GroupUser groupUser = getGroupUser(group_id, user_id); // groupUser becomes managed so we can modify status directly !
+        if (groupUser == null){  // particular user not found..
+            return null;
+        }
+        String cannot_change_msg = "Cannot change status of user_id=" + user_id + " and group_id=" + group_id + " to status=" + status;
+
+        /* verify if request tries to bypass some status.. the most important are:
+            - need everyone choosing or ready before changing status to ready
+            - need everyone ready or voting before changing status to voting
+         */
+        boolean all_ready=true;
+        for (User user : group.getUsers()){
+            if (user_id != user.getId()){
+                GroupUser gU = getGroupUser(group_id, user.getId());
+                if (status.equalsIgnoreCase("READY")) {
+                    // check if everyone else in CHOOSING or READY, otherwise cannot update status !
+                    if (!(gU.getUser_status().equals(Status.CHOOSING)) && !(gU.getUser_status().equals(Status.READY))) {
+                        log.severe(cannot_change_msg + " because other users have status VOTING OR DONE");
+                        throw new IllegalArgumentException(cannot_change_msg + " because other users have status VOTING OR DONE");
+                    }
+                    if (!gU.getUser_status().equals(Status.READY)){
+                        all_ready=false;
+                    }
+                }
+                else if (status.equalsIgnoreCase("VOTING")){
+                    all_ready=false;
+                    // check if everyone else in READY or VOTING, otherwise cannot update status !
+                    if (!(gU.getUser_status().equals(Status.READY)) && !(gU.getUser_status().equals(Status.VOTING))){
+                        log.severe(cannot_change_msg + " because other users have status DONE or still CHOOSING");
+                        throw new IllegalArgumentException(cannot_change_msg + " because other users have status DONE or still CHOOSING");
+                    }
+                }
+                else if (status.equalsIgnoreCase("DONE")){
+                    all_ready=false;
+                    // check if everyone else in VOTING OR DONE, otherwise cannot update status !
+                    if (!(gU.getUser_status().equals(Status.VOTING)) && !(gU.getUser_status().equals(Status.DONE))){
+                        log.severe(cannot_change_msg + " because other users have status still CHOOSING or READY");
+                        throw new IllegalArgumentException(cannot_change_msg + " because other users have status still CHOOSING or READY");
+                    }
+                }
+            }
+        }
+        if (all_ready){
+            // set all to status VOTING if all users in the group were ready
+            for (User user : group.getUsers()) {
+                GroupUser gU = getGroupUser(group_id, user.getId());
+                gU.setUser_status(Status.VOTING);
+                em.merge(gU);
+            }
+        }
+        else{
+            groupUser.setUser_status(Status.valueOf(status.toUpperCase())); // https://www.tutorialspoint.com/how-to-convert-a-string-to-an-enum-in-java
+            em.merge(groupUser);
+        }
+        return Status.valueOf(status.toUpperCase());
+    }
+
+    @Transactional
+    public Map<Integer,Status> changeToVotingAllUserStatus(int group_id){
+        /*
+        Change all status of users in the group group_id to VOTING
+         */
+        Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
+        if (group == null){
+            return null; // not found group..
+        }
+        // we know that the group exists and that there are users up to this point
+        Map<Integer,Status> out = new HashMap<>();
+        for (User user : group.getUsers()) {
+            GroupUser gU = getGroupUser(group_id, user.getId());
+            gU.setUser_status(Status.VOTING);
+            em.merge(gU);
+            out.put(user.getId(), gU.getUser_status());
+        }
+        return out;
     }
 
     @Transactional

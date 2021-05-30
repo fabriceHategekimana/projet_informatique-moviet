@@ -3,23 +3,17 @@ package domain.model;
 import java.util.Set;
 import java.util.HashSet;
 
-// These three are from @Data but we add @Setter one by one and the constructor.
 import com.fasterxml.jackson.annotation.JsonIgnore;
+// These three are from @Data but we add @Setter one by one and the constructor.
 import lombok.ToString;
 import lombok.Getter;
-
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 // https://projectlombok.org/features/all
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Column;
-
-import javax.persistence.ManyToMany;
 // https://youtu.be/FeZ5BC0PirQ
 
 @ToString
@@ -33,7 +27,7 @@ public class User {
 
     @ManyToMany(mappedBy = "users")
     @Setter @JsonIgnore
-    private Set<Group> groups = new HashSet();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
+    private Set<Group> groups = new HashSet<>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
     // https://thorben-janssen.com/6-hibernate-mappings-you-should-avoid-for-high-performance-applications/
     public User(int id){
         this.id=id;

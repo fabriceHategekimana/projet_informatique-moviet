@@ -1,5 +1,6 @@
 DROP TABLE if exists T_groups CASCADE;
 -- need to be in one-line otherwise tons of errors..
+-- best website to test SQL online ! https://sqliteonline.com
 CREATE TABLE T_groups (
     group_id serial primary key,
     name varchar(255) not null,
@@ -26,16 +27,25 @@ INSERT INTO T_users (user_id) VALUES (3);
 INSERT INTO T_users (user_id) VALUES (4);
 
 DROP TABLE if exists T_groups_users CASCADE;
+DROP TYPE if exists status_type;
+-- choosing : for short term preferences, ready: before vote
+CREATE TYPE status_type AS ENUM ('CHOOSING','READY', 'VOTING', 'DONE');  -- change of status changes in the same order
+-- cannot have users ready while others are voting..
+-- status status_type not null,
 CREATE TABLE T_groups_users (
+    id serial primary key,
     group_id int REFERENCES T_groups(group_id),
-    user_id int REFERENCES T_users(user_id)
+    user_id int REFERENCES T_users(user_id),
+    user_status status_type DEFAULT 'CHOOSING'
 );
+-- user_status is modified through the class User by using @SecondaryTable..
+-- https://www.baeldung.com/jpa-mapping-single-entity-to-multiple-tables
 TRUNCATE TABLE T_groups_users;
-INSERT INTO T_groups_users (group_id, user_id) VALUES (1, 1);
-INSERT INTO T_groups_users (group_id, user_id) VALUES (1, 2);
-INSERT INTO T_groups_users (group_id, user_id) VALUES (2, 1);
-INSERT INTO T_groups_users (group_id, user_id) VALUES (2, 2);
-INSERT INTO T_groups_users (group_id, user_id) VALUES (2, 3);
-INSERT INTO T_groups_users (group_id, user_id) VALUES (2, 4);
+INSERT INTO T_groups_users (group_id, user_id, user_status) VALUES (1, 1, 'CHOOSING');
+INSERT INTO T_groups_users (group_id, user_id, user_status) VALUES (1, 2, 'READY');
+INSERT INTO T_groups_users (group_id, user_id, user_status) VALUES (2, 1, 'CHOOSING');
+INSERT INTO T_groups_users (group_id, user_id, user_status) VALUES (2, 2, 'CHOOSING');
+INSERT INTO T_groups_users (group_id, user_id, user_status) VALUES (2, 3, 'READY');
+INSERT INTO T_groups_users (group_id, user_id, user_status) VALUES (2, 4, 'READY');
 
 -- https://www.postgresql.org/docs/current/sql-droptable.html
