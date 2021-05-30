@@ -85,12 +85,50 @@ services:
       - backend-network
     # no database or not yet
 
+  poll-service-database:
+    image: postgres:13 # name of image to pull from docker hub
+    container_name: poll-service-database # name of container we'll see in docker ps
+    networks:
+      - backend-network
+    environment:
+      POSTGRES_USER: poll-service
+      POSTGRES_PASSWORD: poll-service
+      POSTGRES_DB: poll-service
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "poll-service", "-d", "poll-service" ] # user, db
+      interval: 30s # wait 30 seconds, try connecting
+      timeout: 30s # if cannot connect, wait timeout before retrying
+      retries: 3
+    volumes: # like mounting a folder from the host machine to the container, see docker volume inspect <volume_name>
+      - postgresql-db-poll-service:/var/lib/postgresql/data # careful, do not add a space in between
+      - ./data/polls/:/docker-entrypoint-initdb.d/
+    restart: on-failure
+    stdin_open: true
+    tty: true
+
+  poll-service:
+    image: unige/poll-service # use already built image that we've built from Maven
+    container_name: poll-service # name of container we'll see in docker ps
+    hostname: poll-service
+    ports:
+      - "10083:8080" # port mapping from host to container port
+    networks:
+      - backend-network
+    environment: # it will replace the H2 db that we use for IT.. when we run containers..
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_POLLDS_CONNECTION_DASH_URL: "jdbc:postgresql://poll-service-database:5432/poll-service" # it should be the name of the database ! 5432 is a port defined by pg
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_POLLDS_DRIVER_DASH_NAME: 'postgresql'
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_POLLDS_USER_DASH_NAME: 'poll-service'
+      THORNTAIL_DATASOURCES_DATA_DASH_SOURCES_POLLDS_PASSWORD: 'poll-service'
+    depends_on:
+      - poll-service-database
+
 networks: # networks isolates communication between some containers
   backend-network:
     driver: bridge
 
 volumes:
   postgresql-db-group-service:
+  postgresql-db-poll-service:
   postgresql-db-user-service:
 
 # to build/pull/use existing images and start containers, use:

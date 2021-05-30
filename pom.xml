@@ -16,6 +16,7 @@
         <module>movie-service</module>
         <module>api-gateway</module>
         <module>user-service</module>
+        <module>poll-service</module>
         <!-- Add here if need to add a module ! In the module, you have to define the parent -->
     </modules>
 
