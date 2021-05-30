@@ -3,6 +3,7 @@ import { Observable, of } from 'rxjs' // Observable => HTTP methods return Obser
 import { HttpClient, HttpHeaders } from '@angular/common/http' // http requests
 import { catchError, map, tap } from 'rxjs/operators' // error handling
 import { Group } from '../shared/interfaces/group'
+import { UsersStatus } from '../shared/interfaces/users-status'
 
 @Injectable({
   providedIn: 'root'
@@ -27,14 +28,19 @@ export class GroupService {
   
   constructor(private http: HttpClient) { }
 
-  getGroup(id : number): Observable<any> { // type any because get can return httpEvent or Observable<User>
+  getGroup(id : number): Observable<any> { // type any because get can return httpEvent or Observable<Group>
     return this.http.get<Group>(this.groupsUrl + "/" + id, this.httpOptionsGet)
                   .pipe(catchError(this.handleError<Group>('getGroup', undefined)));
   }
 
-  createGroup(): Observable<any> { // type any because get can return httpEvent or Observable<User>
+  createGroup(): Observable<any> {
     return this.http.post<Group>(this.groupsUrl, {name: 'newGroup'}, this.httpOptionsPost)
-                  .pipe(catchError(this.handleError<Group>('getGroup', undefined)));
+                  .pipe(catchError(this.handleError<Group>('createGroup', undefined)));
+  }
+
+  getUsersStatus(id : number): Observable<any> { // type any because get can return httpEvent or Observable<UsersStatus>
+    return this.http.get<UsersStatus>(this.groupsUrl + "/" + id + "/users_status", this.httpOptionsGet)
+                  .pipe(catchError(this.handleError<UsersStatus>('getUsersStatus', undefined)));
   }
 
   //** handle error function from https://angular.io/tutorial/toh-pt6

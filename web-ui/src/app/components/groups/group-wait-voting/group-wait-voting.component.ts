@@ -1,18 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { GroupsComponent } from '../groups.component'
 import { Group } from '../../../shared/interfaces/group';
-import { User } from '../../../shared/interfaces/user'
 import { UserService } from '../../../services/user.service';
 import { GroupService } from 'src/app/services/group.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
-
 @Component({
-  selector: 'app-group-wait-preferences',
-  templateUrl: './group-wait-preferences.component.html',
-  styleUrls: ['./group-wait-preferences.component.css']
+  selector: 'app-group-wait-voting',
+  templateUrl: './group-wait-voting.component.html',
+  styleUrls: ['./group-wait-voting.component.css']
 })
-export class GroupWaitPreferencesComponent implements OnInit {
+export class GroupWaitVotingComponent implements OnInit {
 
   currentGroup?: Group;
 
@@ -35,12 +33,5 @@ export class GroupWaitPreferencesComponent implements OnInit {
 
   goToFindMatch() { // go to the find-match page
     this.router.navigate(['find-match'], {relativeTo: this.route.parent, skipLocationChange: true });
-  }
-
-  goToFindMatchIfVoting(isVoting: any) { // go to the voting page if the users are voting
-    console.log(isVoting);
-    if(isVoting) {
-      this.goToFindMatch();
-    }
   }
 }

@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -17,6 +18,8 @@ import { GroupJoinComponent } from './components/groups/group-join/group-join.co
 import { GroupInfoComponent } from './components/groups/group-info/group-info.component';
 import { GroupFindMatchComponent } from './components/groups/group-find-match/group-find-match.component';
 import { GroupWaitPreferencesComponent } from './components/groups/group-wait-preferences/group-wait-preferences.component';
+import { GroupWaitVotingComponent } from './components/groups/group-wait-voting/group-wait-voting.component';
+import { DisplayUsersStatusComponent } from './shared/components/display-users-status/display-users-status.component';
 
 @NgModule({
   declarations: [
@@ -33,12 +36,15 @@ import { GroupWaitPreferencesComponent } from './components/groups/group-wait-pr
     GroupJoinComponent,
     GroupInfoComponent,
     GroupFindMatchComponent,
-    GroupWaitPreferencesComponent
+    GroupWaitPreferencesComponent,
+    GroupWaitVotingComponent,
+    DisplayUsersStatusComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    FormsModule,
   ],
   providers: [DisplayMovieComponent],
   bootstrap: [AppComponent]

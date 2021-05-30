@@ -8,7 +8,7 @@
         <p class="body-card-text">
             Waiting for all participants to be ready.
         </p>
-        <app-display-users-status [currentGroup]="currentGroup" (isVotingEvent)="goToFindMatchIfVoting($event)"></app-display-users-status>
+        <app-display-users-status [currentGroup]="currentGroup"></app-display-users-status>
         <div type="button" class="btn btn-primary btn-lg btn-block mt-5" id="start" (click)="goToFindMatch()">Start
         </div>
     </div>
