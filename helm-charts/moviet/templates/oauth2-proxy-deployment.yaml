@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: oauth2-proxy
+  name: oauth2-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: oauth2-proxy
+  template:
+    metadata:
+      labels:
+        k8s-app: oauth2-proxy
+    spec:
+      containers:
+      - args:
+        - --provider=oidc
+        - --upstream=https://moviet.graved.ch/
+        - --http-address=0.0.0.0:4180
+        - --cookie-secure=true
+        - --redirect-url=https://moviet.graved.ch/oauth2/callback 
+        - --pass-user-headers=true
+        - --set-xauthrequest=true
+        - --pass-access-token=true
+        - --skip-jwt-bearer-tokens=true
+        - --set-authorization-header=true
+        - --pass-authorization-header=true
+        - --cookie-secure=true
+        - --skip-auth-preflight=false
+        - --skip-oidc-discovery
+        - --oidc-issuer-url=https://moviet.eu.auth0.com/
+        - --login-url=https://moviet.eu.auth0.com/authorize
+        - --redeem-url=https://moviet.eu.auth0.com/oauth/token
+        - --oidc-jwks-url=https://moviet.eu.auth0.com/.well-known/jwks.json
+        - --email-domain=*
+        - --skip-auth-strip-headers=false
+        - --pass-basic-auth=false
+        env:
+        - name: OAUTH2_PROXY_CLIENT_ID
+          value: 
+        - name: OAUTH2_PROXY_CLIENT_SECRET
+          value: 
+        - name: OAUTH2_PROXY_COOKIE_SECRET
+          value: GjF6VW3G9rQUzoARFuySAg==
+        image: quay.io/oauth2-proxy/oauth2-proxy:latest
+        imagePullPolicy: Always
+        name: oauth2-proxy
+        ports:
+        - containerPort: 4180
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: oauth2-proxy
+  name: oauth2-proxy
+spec:
+  ports:
+  - name: http
+    port: 4180
+    protocol: TCP
+    targetPort: 4180
+  selector:
+    k8s-app: oauth2-proxy

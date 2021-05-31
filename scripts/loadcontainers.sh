@@ -1,5 +1,5 @@
 
-containers=$(echo unige/user-service unige/api-gateway unige/movie-service unige/group-service)
+containers=$(echo unige/user-service unige/api-gateway unige/movie-service unige/group-service unige/test-service)
 
 # trucs en plus
 #prefix=docker.io/

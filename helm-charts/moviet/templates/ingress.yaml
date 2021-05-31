@@ -2,54 +2,88 @@ apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: ingress-web-ui
+  annotations:  
+    nginx.ingress.kubernetes.io/auth-response-headers: Authorization
+    nginx.ingress.kubernetes.io/auth-url: "https://moviet.graved.ch/oauth2/auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://moviet.graved.ch/oauth2/start?rd=$escaped_request_uri"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+       auth_request_set $name_upstream_1 $upstream_cookie__oauth2_proxy_1;
+       access_by_lua_block {
+         if ngx.var.name_upstream_1 ~= "" then
+           ngx.header["Set-Cookie"] = "_oauth2_proxy_1=" .. ngx.var.name_upstream_1 .. ngx.var.auth_cookie:match("(; .*)")
+         end
+       }
 spec:
   rules:
-#    - host: www.moviet.com
-     - http:
+     - host: https://moviet.graved.ch/
+       http:
         paths:
           - backend:
               serviceName: web-ui-service
               servicePort: 4200
             path: /
+
 ---
+
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: ingress-group-service
 spec:
   rules:
-#      host: www.moviet.com
-     - http:
+     - host: https://moviet.graved.ch/
+       http:
         paths:
           - backend:
               serviceName: group-service
               servicePort: 10080
             path: /api/v1/groups/
+
 ---
+
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: ingress-user-service
 spec:
   rules:
-#     host: www.moviet.com
-    - http:
+    - host: https://moviet.graved.ch/
+      http:
         paths:
           - backend:
               serviceName: user-service
               servicePort: 10082
             path: /api/v1/users/
+
 ---
+
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: ingress-movie-service
 spec:
   rules:
-#     host: www.moviet.com
-    - http:
+    - host: https://moviet.graved.ch/
+      http:
         paths:
           - backend:
               serviceName: movie-service
               servicePort: 10081
             path: /api/v1/movies/
+
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-test-service
+spec:
+  rules:
+    - host: https://moviet.graved.ch/
+      http:
+        paths:
+          - backend:
+              serviceName: movie-service
+              servicePort: 10083
+            path: /api/v1/test/
+

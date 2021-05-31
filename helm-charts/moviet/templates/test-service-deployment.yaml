@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --file docker-compose-microservices.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: test-service
+  name: test-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: test-service
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --file docker-compose-microservices.yml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/backend-network: "true"
+        io.kompose.service: test-service
+    spec:
+      containers:
+        - image: unige/test-service
+          imagePullPolicy: IfNotPresent
+          name: test-service
+          ports:
+            - containerPort: 8080
+          resources: {}
+      hostname: test-service
+      restartPolicy: Always
+status: {}

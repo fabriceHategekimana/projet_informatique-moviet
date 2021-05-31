@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent> <!-- Added -->
+    <groupId>ch.unige</groupId>
+    <artifactId>moviet-microservices</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+  </parent>
+
+  <!-- <groupId>ch.unige</groupId> removed -->
+  <artifactId>test-service</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>war</packaging>
+
+  <name>test-service</name>
+
+  <properties> <!-- overrides super pom properties -->
+    <skip-docker-build>false</skip-docker-build> <!-- false -->
+    <microservice.port>10083</microservice.port> <!-- bind 8080 port of container to TCP port 10080 on localhost of the host machine-->
+    <slf4j.version>1.7.30</slf4j.version> <!-- http://www.slf4j.org/index.html. It removes one of the warnings..-->
+    <!-- https://stackoverflow.com/questions/7421612/slf4j-failed-to-load-class-org-slf4j-impl-staticloggerbinder -->
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.thorntail</groupId>
+      <artifactId>jaxrs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.thorntail</groupId>
+      <artifactId>jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.thorntail</groupId>
+      <artifactId>swagger</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.thorntail</groupId>
+      <artifactId>cdi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.thorntail</groupId>
+      <artifactId>transactions</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.enterprise</groupId>
+      <artifactId>cdi-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.spec.javax.ws.rs</groupId>
+      <artifactId>${jboss-jaxrs-api.artifactId}</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.thorntail</groupId>
+      <artifactId>datasources</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.thorntail</groupId>
+      <artifactId>logging</artifactId>
+    </dependency>
+    <!-- H2 in memory database used for tests-->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
+    <!-- http://www.slf4j.org/codes.html#StaticLoggerBinder -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax</groupId>
+      <artifactId>javaee-api</artifactId>
+      <version>${java-ee-api.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-entitymanager</artifactId>
+      <version>${hibernate-entitymanager.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.dadrus.jpa-unit</groupId>
+      <artifactId>jpa-unit5</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- "For all relational databases the jpa-unit-rdbms dependency needs to be added" https://github.com/dadrus/jpa-unit#rdbms-databases-->
+    <dependency>
+      <groupId>com.github.dadrus.jpa-unit</groupId>
+      <artifactId>jpa-unit-rdbms</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-all</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>${project.artifactId}</finalName>
+
+    <plugins>
+      <plugin>
+        <!-- Java Code Coverage -->
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unit-tests</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>pre-integration-test-prepare-agent</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+            <configuration>
+              <append>false</append>
+              <propertyName>jacoco.it.tests</propertyName>
+              <destFile>${project.build.directory}/jacoco-it.exec</destFile>
+              <address>localhost</address>
+              <output>tcpserver</output>
+              <port>10001</port>
+              <reset>false</reset>
+              <!--skip>${skip.dump}</skip-->
+              <skip>${skip-ITs}</skip>
+            </configuration>
+          </execution>
+          <execution>
+            <id>post-integration-test-prepare-agent</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>dump</goal>
+            </goals>
+            <configuration>
+              <append>false</append>
+              <propertyName>jacoco.it.tests</propertyName>
+              <destFile>${project.build.directory}/jacoco-it.exec</destFile>
+              <address>localhost</address>
+              <output>tcpserver</output>
+              <port>10001</port>
+              <reset>false</reset>
+              <!--skip>${skip.dump}</skip-->
+              <skip>${skip-ITs}</skip>
+            </configuration>
+          </execution>
+          <execution>
+            <id>merge-coverage</id>
+            <phase>install</phase>
+            <goals>
+              <goal>merge</goal>
+            </goals>
+            <configuration>
+              <destFile>${project.build.directory}/coverage-merged.exec</destFile>
+              <fileSets>
+                <fileSet>
+                  <directory>${project.build.directory}</directory>
+                  <includes>
+                    <include>*.exec</include>
+                  </includes>
+                </fileSet>
+              </fileSets>
+            </configuration>
+          </execution>
+          <execution>
+            <id>verify-report</id>
+            <phase>install</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <dataFile>${project.build.directory}/coverage-merged.exec</dataFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- For packaging, starting war and stopping war for IT -->
+      <plugin>
+        <groupId>io.thorntail</groupId>
+        <artifactId>thorntail-maven-plugin</artifactId>
+        <version>${version.thorntail}</version>
+        <configuration>
+          <jvmArguments>
+            <jvmArgument>${jacoco.it.tests}</jvmArgument>
+          </jvmArguments>
+          <!-- offset from 8080. Port inside container-->
+          <!--
+          <properties>
+            <thorntail.port.offset>20000</thorntail.port.offset>
+            <java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
+          </properties>-->
+          <properties>
+            <java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
+          </properties>
+        </configuration>
+        <executions>
+          <!-- For packaging -->
+          <execution>
+            <goals>
+              <goal>package</goal>
+            </goals>
+          </execution>
+          <!-- Starting the .war -->
+          <execution>
+            <id>pre-integration-test-start</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>start</goal>
+            </goals>
+            <configuration>
+              <jvmArguments>
+                <jvmArgument>${jacoco.it.tests}</jvmArgument>
+              </jvmArguments>
+            </configuration>
+          </execution>
+          <!-- After IT, stop .war-->
+          <execution>
+            <id>verify-stop</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>stop</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- setup temporary db for IT. Autocommit true -->
+    </plugins>
+  </build>
+</project>

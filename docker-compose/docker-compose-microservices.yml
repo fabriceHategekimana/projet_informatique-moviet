@@ -85,6 +85,15 @@ services:
       - backend-network
     # no database or not yet
 
+  test-service:
+    image: unige/test-service 
+    container_name: test-service 
+    hostname: test-service
+    ports:
+      - "10083:8080"
+    networks:
+      - backend-network
+
 networks: # networks isolates communication between some containers
   backend-network:
     driver: bridge

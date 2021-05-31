@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --file docker-compose-microservices.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: test-service
+  name: test-service
+spec:
+  ports:
+    - name: "10083"
+      port: 10083
+      targetPort: 8080
+  selector:
+    io.kompose.service: test-service
+status:
+  loadBalancer: {}
