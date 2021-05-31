@@ -343,6 +343,9 @@ public class GroupServiceImpl implements GroupService{
                         throw new IllegalArgumentException(cannot_change_msg + " because other users have status still CHOOSING or READY");
                     }
                 }
+                else if (status.equalsIgnoreCase("CHOOSING")){
+                    all_ready=false;
+                }
             }
         }
         if (all_ready){
