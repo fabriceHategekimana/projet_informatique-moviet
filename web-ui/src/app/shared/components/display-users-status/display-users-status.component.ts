@@ -25,21 +25,13 @@ export class DisplayUsersStatusComponent implements OnInit, OnChanges {
   constructor(private groupService: GroupService, private router: Router, private route: ActivatedRoute, private userService: UserService) { }
 
   ngOnInit(): void {
-      // import all users:
-      this.getAllUsers();
-      // import all user status:
-      this.getUsersStatus();
-
-      this.testIfVoting();
+      // import all users + import all user status + test if all users have voted
+      this.getAllUsers(() => {this.getUsersStatus(() => {this.testIfVoting();});});
   }
 
   ngOnChanges(): void { // when the input changes
-      // import all users:
-      this.getAllUsers();
-      // import all user status:
-      this.getUsersStatus();
-
-      this.testIfVoting();
+      // import all users + import all user status + test if all users have voted
+      this.getAllUsers(() => {this.getUsersStatus(() => {this.testIfVoting();});});
   }
 
   // get a single user:
@@ -60,18 +52,23 @@ export class DisplayUsersStatusComponent implements OnInit, OnChanges {
   }
 
   // get all the users:
-  getAllUsers() {
+  getAllUsers(then: () => any = () => void 0) {
     if (this.currentGroup) {
-      for (const groupUser of this.currentGroup.users) {
+      const nbUsers = this.currentGroup.users.length;
+      this.currentGroup.users.forEach((groupUser, i) => {
         const userId = groupUser.id;
-        this.getUser(userId);
+        if (i == nbUsers - 1) {
+          this.getUser(userId, then(), then());          
+        } else {
+          this.getUser(userId);
+        }
         // TODO: remove user if not in the list anymore
-      }
+      });
     }
   }
 
 
-  getUsersStatus() {
+  getUsersStatus(then: () => any = () => void 0) {
     // this.usersStatus = {  //!Mock
     //   0: UserStatusValue.READY,
     //   1: UserStatusValue.CHOOSING,
@@ -84,6 +81,7 @@ export class DisplayUsersStatusComponent implements OnInit, OnChanges {
       this.groupService.getUsersStatus(this.currentGroup.id)
       .subscribe(usersStatus => {
         this.usersStatus = usersStatus;
+        then();
       }); 
     }
   }
@@ -137,7 +135,7 @@ export class DisplayUsersStatusComponent implements OnInit, OnChanges {
     if (userId in this.usersStatus) { // if the id exists
       return this.usersStatus[userId];
     }
-    return UserStatusValue.READY; // return READY if user doesn't exists
+    return UserStatusValue.CHOOSING; // return CHOOSING as the default value
   }
 
   public get UserStatusValue(): typeof UserStatusValue { // we need to make the enum visible from the html
