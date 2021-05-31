@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DisplayMovieComponent } from '../../../shared/components/display-movie/display-movie.component'
+import { GroupService } from '../../../services/group.service'
 
 const maxSec = 22; // max number of seconds for the timer
 @Component({
@@ -16,7 +17,9 @@ export class GroupFindMatchComponent implements OnInit {
 
   movieId?: number;
 
-  constructor(private displayComponent: DisplayMovieComponent) { }
+  moviesSuggestions: number[] = []; // list of movies
+
+  constructor(private displayComponent: DisplayMovieComponent, private groupService: GroupService) { }
 
   ngOnInit(): void {
     document.getElementById('timerValue')!.innerHTML = this.timerValue;
@@ -69,6 +72,11 @@ export class GroupFindMatchComponent implements OnInit {
   getMovieId() { //! MOCK
     this.movieId = 0;
   }
+
+  //TODO: getMoviesSuggestions
+  // getMoviesSuggestions() {
+  //   this.groupService.getMoviesSuggestions()
+  // }
 
   onYes() {
     console.log("Yes");

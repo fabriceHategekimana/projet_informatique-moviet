@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http' // http requests
 import { catchError, map, tap } from 'rxjs/operators' // error handling
 import { Group } from '../shared/interfaces/group'
 import { UsersStatus } from '../shared/interfaces/users-status'
+import { MoviePreferences } from '../shared/interfaces/movie-preferences'
 
 @Injectable({
   providedIn: 'root'
@@ -57,4 +58,16 @@ export class GroupService {
       return of(result as T);
     };
   }
+
+  sendPreferences(groupId: number, moviePreferences: MoviePreferences): Observable<any> { // send the user preferences
+    //! MOCK
+    //TODO: send preferences
+    return of();
+  }
+
+  getMoviesSuggestions(): Observable<number[]> {
+    //! MOCK
+    return of([1, 2, 3, 4]);
+  }
+
 }

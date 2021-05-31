@@ -84,7 +84,7 @@
 .proposed-keywords-container {
     width: fit-content;
     margin-left: 0;
-    max-height: 7em;
+    max-height: 5em;
     overflow-y: scroll;
 }
 

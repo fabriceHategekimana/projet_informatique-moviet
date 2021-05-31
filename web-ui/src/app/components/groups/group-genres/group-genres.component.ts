@@ -6,6 +6,8 @@ import { Tag, Tags } from '../../../shared/interfaces/tags'
 import { Genre } from '../../../shared/interfaces/genre'
 import { Keyword, KeywordResults } from '../../../shared/interfaces/keyword' // import keyword interface
 import { MovieService } from '../../../services/movie.service'
+import { GroupService } from '../../../services/group.service'
+import { MoviePreferences } from '../../../shared/interfaces/movie-preferences'
 
 @Component({
   selector: 'app-group-genres',
@@ -29,7 +31,9 @@ export class GroupGenresComponent implements OnInit {
 
   keywordInput: string = ""; // input for the keywords
 
-  constructor(private movieService: MovieService, private groupsComponent : GroupsComponent, private router: Router, private route: ActivatedRoute) { }
+  isAdmin: boolean = false;
+
+  constructor(private movieService: MovieService, private groupService: GroupService, private groupsComponent : GroupsComponent, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.groupsComponent.getGroup( // get the group
@@ -44,6 +48,9 @@ export class GroupGenresComponent implements OnInit {
     this.getTags();
 
     this.getGenres();
+
+    // Test if admin:
+    this.testIfAdmin();
   }
 
   getTags(): void {
@@ -130,7 +137,30 @@ export class GroupGenresComponent implements OnInit {
   
   processPreferences() {
     // this function will send the preferences to the backend and then go to the find-match page
-    // TODO: send preferences to the backend
-    this.goToWaitPref();
+    // TODO: catch error
+    if (this.currentGroup != undefined) {
+      let test: number[] = this.selectedKeywords.map(k => k.id).filter(id => id != null) as number[];
+      let preferences: MoviePreferences = {
+        keywordsId: this.selectedKeywords.map(k => k.id).filter(id => id != null) as number[],
+        genresId: this.selectedGenres.map(k => k.id),
+        yearFrom: null,
+        yearTo: null,}
+      
+      if (this.yearFrom != undefined) {
+        preferences.yearFrom = this.yearFrom;
+      }
+
+      if (this.yearTo != undefined) {
+        preferences.yearTo = this.yearTo;
+      }
+
+      this.groupService.sendPreferences(this.currentGroup.id, preferences);
+      this.goToWaitPref();
+    }
+  }
+
+  testIfAdmin() { // test if the user is admin
+    //! MOCK
+    this.isAdmin = true;
   }
 }
