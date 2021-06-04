@@ -56,6 +56,16 @@ public class GroupServiceImpl implements GroupService{
         return new HashSet<>(em.createQuery(criteria).getResultList());
     }
 
+    @Transactional
+    public Status getGroupStatus(int group_id){
+        Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
+        if ((group == null) || (group.getUsers() == null)){
+            return null; // not found group.. or no user meaning that we cannot get the status of an user..
+        }
+        // we know that the group exists and that there are users up to this point
+        return group.getGroup_status();
+    }
+
     // find by ID, names are not unique
     @Transactional
     public Group getGroup(int group_id){
@@ -297,6 +307,8 @@ public class GroupServiceImpl implements GroupService{
     public Status updateUserStatus(int group_id, int user_id, String status){
         /*
         Update status of an user who is in a group, should also handle the case !
+
+        When one user status is changed to CHOOSING, everyone else changes to CHOOSING used for reset..
          */
         Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
         if ((group == null) || (group.getUsers() == null)){
@@ -314,10 +326,12 @@ public class GroupServiceImpl implements GroupService{
             - need everyone ready or voting before changing status to voting
          */
         boolean all_ready=true;
+        boolean all_done=true;
         for (User user : group.getUsers()){
             if (user_id != user.getId()){
                 GroupUser gU = getGroupUser(group_id, user.getId());
                 if (status.equalsIgnoreCase("READY")) {
+                    all_done=false;
                     // check if everyone else in CHOOSING or READY, otherwise cannot update status !
                     if (!(gU.getUser_status().equals(Status.CHOOSING)) && !(gU.getUser_status().equals(Status.READY))) {
                         log.severe(cannot_change_msg + " because other users have status VOTING OR DONE");
@@ -329,6 +343,7 @@ public class GroupServiceImpl implements GroupService{
                 }
                 else if (status.equalsIgnoreCase("VOTING")){
                     all_ready=false;
+                    all_done=false;
                     // check if everyone else in READY or VOTING, otherwise cannot update status !
                     if (!(gU.getUser_status().equals(Status.READY)) && !(gU.getUser_status().equals(Status.VOTING))){
                         log.severe(cannot_change_msg + " because other users have status DONE or still CHOOSING");
@@ -342,9 +357,26 @@ public class GroupServiceImpl implements GroupService{
                         log.severe(cannot_change_msg + " because other users have status still CHOOSING or READY");
                         throw new IllegalArgumentException(cannot_change_msg + " because other users have status still CHOOSING or READY");
                     }
+                    if (!gU.getUser_status().equals(Status.DONE)){
+                        all_done=false;
+                    }
                 }
                 else if (status.equalsIgnoreCase("CHOOSING")){
-                    all_ready=false;
+                    // TODO, to remove this part and add reset method hm, and use all_ready and all_done false here again
+                    Group groupTmp = getGroup(group_id);  // group becomes managed as well as existing users in the group
+
+                    // set all to status CHOOSING if all users in the group were ready
+                    for (User userTmp : groupTmp.getUsers()) {
+                        GroupUser gU2 = getGroupUser(group_id, userTmp.getId());
+                        gU2.setUser_status(Status.CHOOSING);
+                        em.merge(gU2);
+                    }
+
+                    // set group status to CHOOSING directly..
+                    groupTmp = getGroup(group_id);  // group becomes managed as well as existing users in the group
+                    groupTmp.setGroup_status(Status.CHOOSING);
+                    em.merge(groupTmp);
+                    return Status.CHOOSING;
                 }
             }
         }
@@ -354,23 +386,29 @@ public class GroupServiceImpl implements GroupService{
                 GroupUser gU = getGroupUser(group_id, user.getId());
                 gU.setUser_status(Status.VOTING);
                 em.merge(gU);
-
-                group = getGroup(group_id);  // group becomes managed as well as existing users in the group
-                group.setGroup_status(Status.VOTING);
-                em.merge(group);
             }
+            // set group status to VOTING, the group status can never be READY actually.
+            group = getGroup(group_id);  // group becomes managed as well as existing users in the group
+            group.setGroup_status(Status.VOTING);
+            em.merge(group);
+        }
+        else if (all_done){
+            groupUser.setUser_status(Status.valueOf(status.toUpperCase())); // https://www.tutorialspoint.com/how-to-convert-a-string-to-an-enum-in-java
+            em.merge(groupUser);
+            // set group status to DONE
+            group = getGroup(group_id);  // group becomes managed as well as existing users in the group
+            group.setGroup_status(Status.DONE);
+            em.merge(group);
         }
         else{
             groupUser.setUser_status(Status.valueOf(status.toUpperCase())); // https://www.tutorialspoint.com/how-to-convert-a-string-to-an-enum-in-java
             em.merge(groupUser);
-
-            // TODO: modify group status in general
         }
         return Status.valueOf(status.toUpperCase());
     }
 
     @Transactional
-    public Map<Integer,Status> skipAllUserStatus(int group_id){
+    public Status skipAllUserStatus(int group_id){
         /*
         Change all status of users in the group group_id to VOTING if user status were CHOOSING or READY or to DONE if user status were VOTING or DONE.
 
@@ -397,18 +435,16 @@ public class GroupServiceImpl implements GroupService{
         }
 
         // we know that the group exists and that there are users up to this point
-        Map<Integer,Status> out = new HashMap<>();
         for (User user : group.getUsers()) {
             GroupUser gU = getGroupUser(group_id, user.getId());
             gU.setUser_status(newStatus);
             em.merge(gU);
-            out.put(user.getId(), gU.getUser_status());
         }
 
         group = getGroup(group_id);  // group becomes managed as well as existing users in the group
         group.setGroup_status(newStatus);
-
-        return out;
+        em.merge(group);
+        return newStatus;
     }
 
     @Transactional
