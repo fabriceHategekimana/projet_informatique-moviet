@@ -289,14 +289,14 @@ public class GroupRestService {
     @Path("/{group_id}/users_status")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Changes all the status in the group to Voting")
-    public Response changeToVotingAllUserStatus(@PathParam("group_id") String str_id){
+    public Response skipAllUserStatus(@PathParam("group_id") String str_id){
         /*
-        Changes all the status in the group to Voting
+        Changes all the status in the group to Voting or to Done
          */
         try {
             log.info("Trying to change all the status in the group to Voting using: id=" + str_id);
             int group_id = Integer.parseInt(str_id);
-            Map<Integer, Status> outMap = groupService.changeToVotingAllUserStatus(group_id);
+            Map<Integer, Status> outMap = groupService.skipAllUserStatus(group_id);
             if (outMap == null){
                 // group not found
                 return Response.status(Response.Status.NOT_FOUND).build(); // 404

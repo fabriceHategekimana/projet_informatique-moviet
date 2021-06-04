@@ -354,32 +354,60 @@ public class GroupServiceImpl implements GroupService{
                 GroupUser gU = getGroupUser(group_id, user.getId());
                 gU.setUser_status(Status.VOTING);
                 em.merge(gU);
+
+                group = getGroup(group_id);  // group becomes managed as well as existing users in the group
+                group.setGroup_status(Status.VOTING);
+                em.merge(group);
             }
         }
         else{
             groupUser.setUser_status(Status.valueOf(status.toUpperCase())); // https://www.tutorialspoint.com/how-to-convert-a-string-to-an-enum-in-java
             em.merge(groupUser);
+
+            // TODO: modify group status in general
         }
         return Status.valueOf(status.toUpperCase());
     }
 
     @Transactional
-    public Map<Integer,Status> changeToVotingAllUserStatus(int group_id){
+    public Map<Integer,Status> skipAllUserStatus(int group_id){
         /*
-        Change all status of users in the group group_id to VOTING
+        Change all status of users in the group group_id to VOTING if user status were CHOOSING or READY or to DONE if user status were VOTING or DONE.
+
+        Also changes the group status !
          */
         Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
         if (group == null){
             return null; // not found group..
         }
+        // we suppose all user status are modified by updateUserStatus
+        boolean skipToDone = false; // will skip all to VOTING
+        for (User user : group.getUsers()) {
+            GroupUser gU = getGroupUser(group_id, user.getId());
+            if ((gU.getUser_status() == Status.VOTING) || (gU.getUser_status() == Status.DONE)){
+                skipToDone = true;
+            }
+        }
+        Status newStatus;
+        if (!skipToDone){
+            newStatus = Status.VOTING;
+        }
+        else{
+            newStatus = Status.DONE;
+        }
+
         // we know that the group exists and that there are users up to this point
         Map<Integer,Status> out = new HashMap<>();
         for (User user : group.getUsers()) {
             GroupUser gU = getGroupUser(group_id, user.getId());
-            gU.setUser_status(Status.VOTING);
+            gU.setUser_status(newStatus);
             em.merge(gU);
             out.put(user.getId(), gU.getUser_status());
         }
+
+        group = getGroup(group_id);  // group becomes managed as well as existing users in the group
+        group.setGroup_status(newStatus);
+
         return out;
     }
 
