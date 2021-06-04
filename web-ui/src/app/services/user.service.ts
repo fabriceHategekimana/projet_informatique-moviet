@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core'
 import { Observable, of } from 'rxjs' // Observable => HTTP methods return Observable objects
 import { HttpClient, HttpHeaders } from '@angular/common/http' // http requests
 import { catchError, map, tap } from 'rxjs/operators' // error handling
-import { Group } from '../shared/interfaces/group'
+import { User } from '../shared/interfaces/user'
 
 @Injectable({
   providedIn: 'root'
 })
-export class GroupService {
+export class UserService {
   // http options for the request
   private httpOptionsGet = {
     headers: new HttpHeaders({
@@ -22,19 +22,13 @@ export class GroupService {
     observe: 'response' as 'response'
   };
 
-  private groupsUrl : string = "http://localhost/api/v1/groups"; // url using api
-  //private groupsUrl : string = "http://localhost:10080/groups";
+  private usersUrl : string = "http://localhost/api/v1/users"; // url using api
   
   constructor(private http: HttpClient) { }
 
-  getGroup(id : number): Observable<any> { // type any because get can return httpEvent or Observable<User>
-    return this.http.get<Group>(this.groupsUrl + "/" + id, this.httpOptionsGet)
-                  .pipe(catchError(this.handleError<Group>('getGroup', undefined)));
-  }
-
-  createGroup(): Observable<any> { // type any because get can return httpEvent or Observable<User>
-    return this.http.post<Group>(this.groupsUrl, {name: 'newGroup'}, this.httpOptionsPost)
-                  .pipe(catchError(this.handleError<Group>('getGroup', undefined)));
+  getUser(id : number): Observable<any> { // type any because get can return httpEvent or Observable<User>
+    return this.http.get<User>(this.usersUrl + "/" + id, this.httpOptionsGet)
+                  .pipe(catchError(this.handleError<User>('getUser', undefined)));
   }
 
   //** handle error function from https://angular.io/tutorial/toh-pt6

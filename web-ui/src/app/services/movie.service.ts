@@ -19,15 +19,15 @@ export class MovieService {
     })};
 
 
-  private movieUrl : string = "http://localhost/api/v1/movie-service/Mock_movies/0"; //! MOCK
+  private movieUrl : string = "http://localhost/api/v1/movie-service/Mock_movies"; //! MOCK
   private genresUrl : string = "http://localhost/api/v1/movie-service/Mock_movies/genres"; //! MOCK
   private keywordUrl : string = "http://localhost/api/v1/movie-service/Mock_search/keyword"; //! MOCK
 
   constructor(private http: HttpClient) { }
 
-  getMovie(): Observable<any> { // type any because get can return httpEvent or Observable<Movie>
+  getMovie(movieId: number): Observable<any> { // type any because get can return httpEvent or Observable<Movie>
     // console.log(this.http.get<Movie>(movieUrl, httpOptions));
-    return this.http.get<Movie>(this.movieUrl, this.httpOptions)
+    return this.http.get<Movie>(this.movieUrl + '/' + movieId, this.httpOptions)
                   .pipe(catchError(this.handleError<Movie>('getMovie', undefined)));
     // return mock
     // return of({

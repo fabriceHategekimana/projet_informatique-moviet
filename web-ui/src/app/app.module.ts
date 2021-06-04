@@ -16,6 +16,7 @@ import { GroupGenresComponent } from './components/groups/group-genres/group-gen
 import { GroupJoinComponent } from './components/groups/group-join/group-join.component';
 import { GroupInfoComponent } from './components/groups/group-info/group-info.component';
 import { GroupFindMatchComponent } from './components/groups/group-find-match/group-find-match.component';
+import { GroupWaitPreferencesComponent } from './components/groups/group-wait-preferences/group-wait-preferences.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { GroupFindMatchComponent } from './components/groups/group-find-match/gr
     GroupGenresComponent,
     GroupJoinComponent,
     GroupInfoComponent,
-    GroupFindMatchComponent
+    GroupFindMatchComponent,
+    GroupWaitPreferencesComponent
   ],
   imports: [
     BrowserModule,

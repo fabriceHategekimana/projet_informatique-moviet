@@ -5,13 +5,15 @@ import { User } from '../../../shared/interfaces/user'
 import { UserService } from '../../../services/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { fromEventPattern } from 'rxjs';
+import { info } from 'node:console';
+
 
 @Component({
-  selector: 'app-group-info',
-  templateUrl: './group-info.component.html',
-  styleUrls: ['./group-info.component.css']
+  selector: 'app-group-wait-preferences',
+  templateUrl: './group-wait-preferences.component.html',
+  styleUrls: ['./group-wait-preferences.component.css']
 })
-export class GroupInfoComponent implements OnInit {
+export class GroupWaitPreferencesComponent implements OnInit {
 
   currentGroup?: Group;
   users: User[] = [];
