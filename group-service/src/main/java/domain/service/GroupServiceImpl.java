@@ -2,10 +2,7 @@ package domain.service;
 
 import java.util.*;
 
-import domain.model.Group;
-import domain.model.GroupUser;
-import domain.model.User;
-import domain.model.Status;
+import domain.model.*;
 
 import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singleton
 import lombok.NonNull;
@@ -445,6 +442,27 @@ public class GroupServiceImpl implements GroupService{
         group.setGroup_status(newStatus);
         em.merge(group);
         return newStatus;
+    }
+
+
+    @Transactional
+    public boolean updateMoviePreferences(int group_id, int user_id, MoviePreferences movie_preferences){
+        Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
+        if ((group == null) || (group.getUsers() == null)){
+            return false; // not found group.. or no user meaning that we cannot get the status of an user..
+        }
+        // we know that the group exists and that there are users up to this point
+        GroupUser groupUser = getGroupUser(group_id, user_id); // groupUser becomes managed
+        if (groupUser == null){
+            return false; // particular user not found
+        }
+        log.info("Trying to update movies preferences to " + movie_preferences);
+        groupUser.getYear_range().setYear_from(movie_preferences.getYear_from());
+        groupUser.getYear_range().setYear_to(movie_preferences.getYear_to());
+        groupUser.setKeywords_id(movie_preferences.getKeywords_id());
+        groupUser.setGenres_id(movie_preferences.getGenres_id());
+        em.merge(groupUser);
+        return true;
     }
 
     @Transactional

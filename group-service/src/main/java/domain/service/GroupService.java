@@ -3,6 +3,7 @@ package domain.service;
 import java.util.Map;
 import java.util.Set;
 import domain.model.Group;
+import domain.model.MoviePreferences;
 import domain.model.User;
 import domain.model.Status;
 
@@ -18,5 +19,6 @@ public interface GroupService{
     Status updateUserStatus(int group_id, int user_id, String status); // called by PUT request
     Status skipAllUserStatus(int group_id); // called by PUT request
     Status getGroupStatus(int group_id); // called by GET request
+    boolean updateMoviePreferences(int group_id, int user_id, MoviePreferences movie_preferences); // called by PUT request
     Group deleteGroup(int id); // called by DELETE request
 }
