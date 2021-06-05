@@ -32,6 +32,7 @@ public class GroupUser {
 
     @Setter @Enumerated(EnumType.STRING) @Type( type = "status_db_enum" )
     private Status user_status = Status.CHOOSING;
+
     /*
     We use this:
     https://vladmihalcea.com/the-best-way-to-map-an-enum-type-with-jpa-and-hibernate/
@@ -40,5 +41,8 @@ public class GroupUser {
     https://www.baeldung.com/jpa-mapping-single-entity-to-multiple-tables
     https://www.baeldung.com/jpa-persisting-enums-in-jpa
      */
+
+    @Setter @Embedded
+    private MoviePreferences movie_preferences = new MoviePreferences();
 
 }
