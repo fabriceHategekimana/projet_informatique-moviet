@@ -457,8 +457,11 @@ public class GroupServiceImpl implements GroupService{
             return false; // particular user not found
         }
         log.info("Trying to update movies preferences to " + movie_preferences);
+        groupUser.setYear_range(new YearRange(movie_preferences.getYear_from(), movie_preferences.getYear_to()));
+        /*
         groupUser.getYear_range().setYear_from(movie_preferences.getYear_from());
         groupUser.getYear_range().setYear_to(movie_preferences.getYear_to());
+        */
         groupUser.setKeywords_id(movie_preferences.getKeywords_id());
         groupUser.setGenres_id(movie_preferences.getGenres_id());
         em.merge(groupUser);

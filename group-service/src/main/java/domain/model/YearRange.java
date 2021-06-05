@@ -15,4 +15,13 @@ public class YearRange {
     private Integer year_from = null;
     private Integer year_to = null;
 
+    public YearRange(Integer year_from, Integer year_to){
+        this.year_from = year_from;
+        this.year_to = year_to;
+    }
+
+    public YearRange(int year_from, int year_to){
+        this.year_from = year_from;
+        this.year_to = year_to;
+    }
 }
