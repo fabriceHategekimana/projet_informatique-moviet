@@ -11,6 +11,7 @@ import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singlet
 
 //  import classes of domain
 import domain.model.Group;
+import domain.model.MoviePreferences;
 import domain.model.Status;
 import domain.model.User;
 
@@ -257,7 +258,7 @@ public class GroupRestService {
 
 
     @GET
-    @Path("/{group_id}/users/{user_id}/status") // TODO: remove /status to be more general ?, like for short term preferences
+    @Path("/{group_id}/users/{user_id}/status")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "GET a particular user status")
     public Response getUserStatus(@PathParam("group_id") String str_group_id, @PathParam("user_id") String str_user_id) {
@@ -280,9 +281,9 @@ public class GroupRestService {
     }
 
     @PUT
-    @Path("/{group_id}/users/{user_id}/status") // TODO: remove /status to be more general ?, like for short term preferences
+    @Path("/{group_id}/users/{user_id}/status")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "GET a particular user status")
+    @ApiOperation(value = "Update a particular user status")
     public Response updateUserStatus(@PathParam("group_id") String str_group_id, @PathParam("user_id") String str_user_id, String status) {
         try {
             log.info("Trying update a user status of user with user_id=" + str_user_id + "from a Group having group_id=" + str_group_id);
@@ -306,6 +307,35 @@ public class GroupRestService {
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id or user id, it should be numerical: group_id = " + str_group_id + ", user_id = " + str_user_id).build();
         }
     }
+    /*
+    @PUT
+    @Path("/{group_id}/users/{user_id}/movie_preferences")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Update a particular user Movie Preferences (short term preferences composed of genres, keywords, year from, year to)")
+    public Response updateUserStatus(@PathParam("group_id") String str_group_id, @PathParam("user_id") String str_user_id, MoviePreferences movie_preferences) {
+        try {
+            log.info("Trying update movie preferences of user with user_id=" + str_user_id + "from a Group having group_id=" + str_group_id);
+            int group_id = Integer.parseInt(str_group_id);
+            int user_id = Integer.parseInt(str_user_id);
+
+            // user id can be 0
+            try {
+                Status returnedStatus = groupService.updateMoviePreferences(group_id, user_id, movie_preferences);
+                if (returnedStatus == null){
+                    // group does not exist already or user did not exist
+                    return Response.status(Response.Status.NOT_FOUND).build(); // 404
+                }
+                return Response.ok(returnedStatus).build(); // 200
+            }
+            catch (IllegalArgumentException e){
+                return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Bad user status requested: " + e).build();
+            }
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id or user id, it should be numerical: group_id = " + str_group_id + ", user_id = " + str_user_id).build();
+        }
+    }
+    */
 
     @PUT
     @Path("/{group_id}/users_status")

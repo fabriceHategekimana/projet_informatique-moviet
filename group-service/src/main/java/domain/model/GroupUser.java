@@ -10,6 +10,8 @@ import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
 // https://projectlombok.org/features/all
 
 
@@ -42,7 +44,33 @@ public class GroupUser {
     https://www.baeldung.com/jpa-persisting-enums-in-jpa
      */
 
+    // In another tables !
+    /* https://www.callicoder.com/hibernate-spring-boot-jpa-element-collection-demo/
+    https://javabydeveloper.com/mapping-collection-of-embeddablecomposite-types-jpa-with-hibernate/
+    https://javabydeveloper.com/hibernate-entity-types-vs-value-types/
+
+    @JoinColumns(
+    {
+            @JoinColumn(name = "group_id", referencedColumnName = "group_id"),
+            @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    })
+     */
+    @Setter
+    @ElementCollection
+    @CollectionTable(name = "T_groups_users_keywords", joinColumns={@JoinColumn(name = "group_id", referencedColumnName = "group_id"), @JoinColumn(name = "user_id", referencedColumnName = "user_id")}) // https://docs.oracle.com/javaee/6/api/javax/persistence/CollectionTable.html#joinColumns()
+    @Column(name = "keyword_id")
+    private Set<Integer> keywords_id = new HashSet<>();
+    // primary key is weirdly the group_id and user_id, not id ?! (probably because of intermediate table, the actual primary key in the db is id..)
+
+    @Setter
+    @ElementCollection
+    @CollectionTable(name = "T_groups_users_genres", joinColumns={@JoinColumn(name = "group_id", referencedColumnName = "group_id"), @JoinColumn(name = "user_id", referencedColumnName = "user_id")})
+    @Column(name = "genre_id")
+    private Set<Integer> genres_id = new HashSet<>();
+
+    // In T_groups_users table
     @Setter @Embedded
-    private MoviePreferences movie_preferences = new MoviePreferences();
+    private YearRange year_range = new YearRange();
+
 
 }

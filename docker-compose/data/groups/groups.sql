@@ -40,7 +40,9 @@ CREATE TABLE T_groups_users (
     id serial primary key,
     group_id int REFERENCES T_groups(group_id),
     user_id int REFERENCES T_users(user_id),
-    user_status status_type DEFAULT 'CHOOSING'
+    user_status status_type NOT NULL DEFAULT 'CHOOSING',
+    year_from int,
+    year_to int
 );
 -- user_status is modified through the class User by using @SecondaryTable..
 -- https://www.baeldung.com/jpa-mapping-single-entity-to-multiple-tables
@@ -53,3 +55,33 @@ INSERT INTO T_groups_users (group_id, user_id, user_status) VALUES (2, 3, 'READY
 INSERT INTO T_groups_users (group_id, user_id, user_status) VALUES (2, 4, 'READY');
 
 -- https://www.postgresql.org/docs/current/sql-droptable.html
+
+-- --------------------------------------------------------------------------------
+-- TABLES FOR ELEMENT COLLECTION IN JPA
+-- no reference key
+-- https://javabydeveloper.com/mapping-collection-of-basic-value-types-jpa-with-hibernate/
+DROP TABLE if exists T_groups_users_keywords CASCADE;
+CREATE TABLE T_groups_users_keywords (
+    group_id int NOT NULL,
+    user_id int NOT NULL,
+    keyword_id int NOT NULL,
+    primary key (group_id, user_id, keyword_id)
+);
+TRUNCATE TABLE T_groups_users_keywords;
+
+INSERT INTO T_groups_users_keywords (group_id, user_id, keyword_id) VALUES (1, 1, 9715);
+INSERT INTO T_groups_users_keywords (group_id, user_id, keyword_id) VALUES (1, 1, 265894);
+INSERT INTO T_groups_users_keywords (group_id, user_id, keyword_id) VALUES (2, 1, 265894);
+
+DROP TABLE if exists T_groups_users_genres CASCADE;
+CREATE TABLE T_groups_users_genres (
+    group_id int NOT NULL,
+    user_id int NOT NULL,
+    genre_id int NOT NULL,
+    primary key (group_id, user_id, genre_id)
+);
+TRUNCATE TABLE T_groups_users_genres;
+
+INSERT INTO T_groups_users_genres (group_id, user_id, genre_id) VALUES (1, 1, 878);
+INSERT INTO T_groups_users_genres (group_id, user_id, genre_id) VALUES (1, 1, 18);
+INSERT INTO T_groups_users_genres (group_id, user_id, genre_id) VALUES (2, 1, 878);
