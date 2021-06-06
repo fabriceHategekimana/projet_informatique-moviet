@@ -18,9 +18,10 @@ RUN npm install
 RUN npm install -g @angular/cli@7.3.9
 
 # add app
-COPY . /app
+COPY dist/web-ui /app
 
 # start app
-CMD ng serve --host 0.0.0.0
+CMD sudo ng build --prod
+# CMD ng serve --host 0.0.0.0
 
 #docker build -t site:dev .
