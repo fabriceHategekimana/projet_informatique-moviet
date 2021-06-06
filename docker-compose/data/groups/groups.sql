@@ -58,12 +58,11 @@ INSERT INTO T_groups_users (group_id, user_id, user_status) VALUES (2, 4, 'READY
 
 -- --------------------------------------------------------------------------------
 -- TABLES FOR ELEMENT COLLECTION IN JPA
--- no reference key
 -- https://javabydeveloper.com/mapping-collection-of-basic-value-types-jpa-with-hibernate/
 DROP TABLE if exists T_groups_users_keywords CASCADE;
 CREATE TABLE T_groups_users_keywords (
-    group_id int NOT NULL,
-    user_id int NOT NULL,
+    group_id int NOT NULL REFERENCES T_groups(group_id),
+    user_id int NOT NULL REFERENCES T_users(user_id),
     keyword_id int NOT NULL,
     primary key (group_id, user_id, keyword_id)
 );
@@ -75,8 +74,8 @@ INSERT INTO T_groups_users_keywords (group_id, user_id, keyword_id) VALUES (2, 1
 
 DROP TABLE if exists T_groups_users_genres CASCADE;
 CREATE TABLE T_groups_users_genres (
-    group_id int NOT NULL,
-    user_id int NOT NULL,
+    group_id int NOT NULL REFERENCES T_groups(group_id),
+    user_id int NOT NULL REFERENCES T_users(user_id),
     genre_id int NOT NULL,
     primary key (group_id, user_id, genre_id)
 );

@@ -217,11 +217,16 @@ public class GroupServiceImpl implements GroupService{
             user.setGroups(new HashSet<>()); // empty set
             return null; // user not in a group.. so cannot remove user from the group
         }
-
+        GroupUser gU;
         // Have to check if user in the group, is yes, can remove it, otherwise return null
         for (User usr: group.getUsers()){
             if (usr.getId() == user.getId()){
                 // user id in the group ! so we can remove him
+                // remove keywords and genres
+                gU = getGroupUser(group_id, user.getId());
+                gU.setKeywords_id(null);
+                gU.setGenres_id(null);
+
                 group.removeUser(user);  // user can still exist, just removed from the group
                 em.merge(group);
                 return group;
@@ -476,10 +481,16 @@ public class GroupServiceImpl implements GroupService{
             return null;
         }
         // Group need to exist.
+        GroupUser gU;
         Iterator<User> it = group.getUsers().iterator();
         while (it.hasNext()){
             User user = it.next();
             log.info("user id : " + user.getId() + " is being removed from users");
+            // remove keywords and genres
+            gU = getGroupUser(group_id, user.getId());
+            gU.setKeywords_id(null);
+            gU.setGenres_id(null);
+
             it.remove();
             user.getGroups().remove(group);
             log.info("user id : " + user.getId() + " removed from users");
