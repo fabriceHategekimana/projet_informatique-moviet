@@ -2,10 +2,7 @@ package domain.service;
 
 import java.util.*;
 
-import domain.model.Group;
-import domain.model.GroupUser;
-import domain.model.User;
-import domain.model.Status;
+import domain.model.*;
 
 import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singleton
 import lombok.NonNull;
@@ -220,11 +217,16 @@ public class GroupServiceImpl implements GroupService{
             user.setGroups(new HashSet<>()); // empty set
             return null; // user not in a group.. so cannot remove user from the group
         }
-
+        GroupUser gU;
         // Have to check if user in the group, is yes, can remove it, otherwise return null
         for (User usr: group.getUsers()){
             if (usr.getId() == user.getId()){
                 // user id in the group ! so we can remove him
+                // remove keywords and genres
+                gU = getGroupUser(group_id, user.getId());
+                gU.setKeywords_id(null);
+                gU.setGenres_id(null);
+
                 group.removeUser(user);  // user can still exist, just removed from the group
                 em.merge(group);
                 return group;
@@ -391,6 +393,7 @@ public class GroupServiceImpl implements GroupService{
             group = getGroup(group_id);  // group becomes managed as well as existing users in the group
             group.setGroup_status(Status.VOTING);
             em.merge(group);
+            status = "voting";
         }
         else if (all_done){
             groupUser.setUser_status(Status.valueOf(status.toUpperCase())); // https://www.tutorialspoint.com/how-to-convert-a-string-to-an-enum-in-java
@@ -448,16 +451,45 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Transactional
+    public boolean updateMoviePreferences(int group_id, int user_id, MoviePreferences movie_preferences){
+        Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
+        if ((group == null) || (group.getUsers() == null)){
+            return false; // not found group.. or no user meaning that we cannot get the status of an user..
+        }
+        // we know that the group exists and that there are users up to this point
+        GroupUser groupUser = getGroupUser(group_id, user_id); // groupUser becomes managed
+        if (groupUser == null){
+            return false; // particular user not found
+        }
+        log.info("Trying to update movies preferences to " + movie_preferences);
+        groupUser.setYear_range(new YearRange(movie_preferences.getYear_from(), movie_preferences.getYear_to()));
+        /*
+        groupUser.getYear_range().setYear_from(movie_preferences.getYear_from());
+        groupUser.getYear_range().setYear_to(movie_preferences.getYear_to());
+        */
+        groupUser.setKeywords_id(movie_preferences.getKeywords_id());
+        groupUser.setGenres_id(movie_preferences.getGenres_id());
+        em.merge(groupUser);
+        return true;
+    }
+
+    @Transactional
     public Group deleteGroup(int group_id){
         Group group = getGroup(group_id);  // group becomes managed as well as users in the group
         if (group == null){
             return null;
         }
         // Group need to exist.
+        GroupUser gU;
         Iterator<User> it = group.getUsers().iterator();
         while (it.hasNext()){
             User user = it.next();
             log.info("user id : " + user.getId() + " is being removed from users");
+            // remove keywords and genres
+            gU = getGroupUser(group_id, user.getId());
+            gU.setKeywords_id(null);
+            gU.setGenres_id(null);
+
             it.remove();
             user.getGroups().remove(group);
             log.info("user id : " + user.getId() + " removed from users");
