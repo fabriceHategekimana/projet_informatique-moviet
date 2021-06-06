@@ -235,6 +235,28 @@ public class GroupRestService {
     }
 
     @GET
+    @Path("/{group_id}/group_status")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "GET a particular group status")
+    public Response getGroupStatus(@PathParam("group_id") String str_group_id) {
+        try {
+            log.info("Trying get a group status of a Group having group_id=" + str_group_id);
+            int group_id = Integer.parseInt(str_group_id);
+
+            Status status=groupService.getGroupStatus(group_id);
+            if (status == null){
+                // group does not exist already
+                return Response.status(Response.Status.NOT_FOUND).build(); // 404
+            }
+            return Response.ok(status).build(); // 200
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id, it should be numerical: group_id = " + str_group_id).build();
+        }
+    }
+
+
+    @GET
     @Path("/{group_id}/users/{user_id}/status") // TODO: remove /status to be more general ?, like for short term preferences
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "GET a particular user status")
@@ -263,7 +285,7 @@ public class GroupRestService {
     @ApiOperation(value = "GET a particular user status")
     public Response updateUserStatus(@PathParam("group_id") String str_group_id, @PathParam("user_id") String str_user_id, String status) {
         try {
-            log.info("Trying get a user status of user with user_id=" + str_user_id + "from a Group having group_id=" + str_group_id);
+            log.info("Trying update a user status of user with user_id=" + str_user_id + "from a Group having group_id=" + str_group_id);
             int group_id = Integer.parseInt(str_group_id);
             int user_id = Integer.parseInt(str_user_id);
 
@@ -289,19 +311,19 @@ public class GroupRestService {
     @Path("/{group_id}/users_status")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Changes all the status in the group to Voting")
-    public Response changeToVotingAllUserStatus(@PathParam("group_id") String str_id){
+    public Response skipAllUserStatus(@PathParam("group_id") String str_id){
         /*
-        Changes all the status in the group to Voting
+        Skip group status ! Changes all the status in the group to Voting or to Done
          */
         try {
             log.info("Trying to change all the status in the group to Voting using: id=" + str_id);
             int group_id = Integer.parseInt(str_id);
-            Map<Integer, Status> outMap = groupService.changeToVotingAllUserStatus(group_id);
-            if (outMap == null){
+            Status status = groupService.skipAllUserStatus(group_id);
+            if (status == null){
                 // group not found
                 return Response.status(Response.Status.NOT_FOUND).build(); // 404
             }
-            return Response.ok(outMap).build(); // 200
+            return Response.ok(status).build(); // 200
         }
         catch(NumberFormatException e){ // invalid id
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id, it should be numerical: id = " + str_id).build();
