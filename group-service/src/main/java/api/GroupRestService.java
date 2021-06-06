@@ -312,7 +312,7 @@ public class GroupRestService {
     @Path("/{group_id}/users/{user_id}/movie_preferences")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update a particular user Movie Preferences (short term preferences composed of genres, keywords, year from, year to)")
-    public Response updateUserStatus(@PathParam("group_id") String str_group_id, @PathParam("user_id") String str_user_id, MoviePreferences movie_preferences) {
+    public Response updateMoviePreferences(@PathParam("group_id") String str_group_id, @PathParam("user_id") String str_user_id, MoviePreferences movie_preferences) {
         try {
             log.info("Trying to update movie preferences of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
             int group_id = Integer.parseInt(str_group_id);
