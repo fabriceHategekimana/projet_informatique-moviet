@@ -34,7 +34,7 @@ export class GroupJoinComponent implements OnInit {
       () => { // then
         this.currentGroup = this.groupsComponent.currentGroup; // save the current group
         // join the group:
-        this.router.navigate([id], { relativeTo: this.route });
+        this.router.navigate([id], { relativeTo: this.route, skipLocationChange: false});
       },
       () => { // if error
         console.log("Error: the group doesn't exist");
@@ -49,7 +49,7 @@ export class GroupJoinComponent implements OnInit {
         this.currentGroup = this.groupsComponent.currentGroup; // save the current group
         // join the group:
         console.log(this.groupsComponent.currentGroup);
-        this.router.navigate([this.currentGroup!.id], { relativeTo: this.route });
+        this.router.navigate([this.currentGroup!.id], { relativeTo: this.route, skipLocationChange: false });
       },
       () => { // if error
         console.log("Error creating group: the group doesn't exist");

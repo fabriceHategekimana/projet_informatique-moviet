@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,6 +17,11 @@ import { GroupGenresComponent } from './components/groups/group-genres/group-gen
 import { GroupJoinComponent } from './components/groups/group-join/group-join.component';
 import { GroupInfoComponent } from './components/groups/group-info/group-info.component';
 import { GroupFindMatchComponent } from './components/groups/group-find-match/group-find-match.component';
+import { GroupWaitPreferencesComponent } from './components/groups/group-wait-preferences/group-wait-preferences.component';
+import { GroupWaitVotingComponent } from './components/groups/group-wait-voting/group-wait-voting.component';
+import { DisplayUsersStatusComponent } from './shared/components/display-users-status/display-users-status.component';
+import { GroupShowResultComponent } from './components/groups/group-show-result/group-show-result.component';
+import { GroupWaitResultComponent } from './components/groups/group-wait-result/group-wait-result.component';
 
 @NgModule({
   declarations: [
@@ -31,12 +37,18 @@ import { GroupFindMatchComponent } from './components/groups/group-find-match/gr
     GroupGenresComponent,
     GroupJoinComponent,
     GroupInfoComponent,
-    GroupFindMatchComponent
+    GroupFindMatchComponent,
+    GroupWaitPreferencesComponent,
+    GroupWaitVotingComponent,
+    DisplayUsersStatusComponent,
+    GroupShowResultComponent,
+    GroupWaitResultComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    FormsModule,
   ],
   providers: [DisplayMovieComponent],
   bootstrap: [AppComponent]
