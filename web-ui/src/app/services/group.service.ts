@@ -6,6 +6,7 @@ import { Group } from '../shared/interfaces/group'
 import { UsersStatus } from '../shared/interfaces/users-status'
 import { UserStatusValue } from '../shared/interfaces/users-status'
 import { MoviePreferences } from '../shared/interfaces/movie-preferences'
+import { group } from 'node:console'
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +30,6 @@ export class GroupService {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
     }),
-    observe: 'response' as 'response'
   };
 
   private groupsUrl : string = "http://localhost/api/v1/groups"; // url using api
@@ -83,8 +83,25 @@ export class GroupService {
     return of(123);
   }
 
+  getUserStatus(groupId: number, userId: number): Observable<any> {
+    // console.log(this.groupsUrl + "/" + groupId + "/" + "users/" + userId + "/status");
+    return this.http.get<UserStatusValue>(this.groupsUrl + "/" + groupId + "/" + "users/" + userId + "/status", this.httpOptionsGet)
+                  .pipe(catchError(this.handleError<any>('getUserStatus', undefined)));
+  }
+
   setUserStatus(groupId: number, userId: number, status: UserStatusValue): Observable<any> {
+    // console.log(this.groupsUrl + "/" + groupId + "/" + "users/" + userId + "/status");
     return this.http.put<UserStatusValue>(this.groupsUrl + "/" + groupId + "/" + "users/" + userId + "/status", status, this.httpOptionsPut)
                   .pipe(catchError(this.handleError<any>('setUserStatus', undefined)));
+  }
+
+  setGroupStatus(groupId: number, status: UserStatusValue): Observable<any> {
+    return this.http.put<UserStatusValue>(this.groupsUrl + "/" + groupId + "/users_status", status, this.httpOptionsPut)
+                  .pipe(catchError(this.handleError<any>('setGroupStatus', undefined)));
+  }
+
+  getGroupStatus(id : number): Observable<any> { // type any because get can return httpEvent or Observable<UserStatusValue>
+    return this.http.get<UserStatusValue>(this.groupsUrl + "/" + id + "/group_status", this.httpOptionsGet)
+                  .pipe(catchError(this.handleError<UserStatusValue>('getGroupStatus', undefined)));
   }
 }

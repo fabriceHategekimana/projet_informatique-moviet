@@ -20,6 +20,13 @@
     background-color: white;
 }
 
+#match-text-container {
+    background-color: white;
+    z-index: 1;
+    margin-bottom: 3em;
+    text-align: center;
+}
+
 .inline-container {
     width: 100%;
     display: flex;

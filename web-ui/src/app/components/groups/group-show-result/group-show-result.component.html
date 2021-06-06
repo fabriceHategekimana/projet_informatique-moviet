@@ -3,6 +3,9 @@
         <div class="blur-box"></div>
     </div>
     <div id="match-container">
+        <div id="match-text-container">
+            <h2 id="match-text">It's a match!</h2>
+        </div>
         <div class="inline-container">
             <ng-container *ngIf="movieId != undefined">
                 <app-display-movie [movieId]="movieId"></app-display-movie>

@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core'
 import { GroupsComponent } from '../groups.component'
 import { Group } from '../../../shared/interfaces/group'
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router'
 import { Tag, Tags } from '../../../shared/interfaces/tags'
 import { Genre } from '../../../shared/interfaces/genre'
 import { Keyword, KeywordResults } from '../../../shared/interfaces/keyword' // import keyword interface
 import { MovieService } from '../../../services/movie.service'
-import { GroupService } from '../../../services/group.service'
+import { UserStatusValue } from '../../../shared/interfaces/users-status'
+import { UserService } from '../../../services/user.service'
+import { GroupService } from 'src/app/services/group.service'
 import { MoviePreferences } from '../../../shared/interfaces/movie-preferences'
 
 @Component({
@@ -155,8 +157,45 @@ export class GroupGenresComponent implements OnInit {
       }
 
       this.groupService.sendPreferences(this.currentGroup.id, preferences);
-      this.goToWaitPref();
+      this.setUserStatus(() => {this.goToWaitPref();});
     }
+  }
+
+  setUserStatus(then: () => any = () => void 0, onError?: () => any) {
+    this.groupsComponent.getGroup(undefined, () => {
+        let groupId = this.groupsComponent.currentGroup!.id;
+        this.groupService.getGroupStatus(groupId)
+          .subscribe((groupStatus) => {
+            if (groupStatus == UserStatusValue.CHOOSING) {
+              this.groupService.setUserStatus(groupId, this.getMyUserId(), UserStatusValue.READY) // change status to READY
+                .subscribe(()=> {
+                  then();
+                }, () => {
+                  if (onError == undefined) {
+                    then();
+                  } else {
+                    onError();
+                  }
+                }); 
+            } else {
+              if (onError == undefined) {
+                then();
+              } else {
+                onError();
+              }
+            }
+          }, () => {
+            if (onError == undefined) {
+              then();
+            } else {
+              onError();
+            }
+          });
+    });
+  }
+
+  getMyUserId(): number { //! Temporary
+    return 1;
   }
 
   testIfAdmin() { // test if the user is admin

@@ -46,10 +46,11 @@ export class GroupShowResultComponent implements OnInit {
     //TODO: check if admin
     //TODO: reset group status
     if (this.currentGroup != undefined) {
-      this.groupService.setUserStatus(this.currentGroup.id, this.getMyUserId(), UserStatusValue.CHOOSING); // reset to choosing
+      this.groupService.setUserStatus(this.currentGroup.id, this.getMyUserId(), UserStatusValue.CHOOSING)
+        .subscribe(()=>{
+          this.goToGroupInfo(); // go to the parent component page = group
+        }); // reset to choosing
     }
-    // setUserStatus(groupId: number, userId: number, status: UserStatusValue)
-    this.goToGroupInfo(); // go to the parent component page = group
   }
 
   goToGroupInfo(): void {

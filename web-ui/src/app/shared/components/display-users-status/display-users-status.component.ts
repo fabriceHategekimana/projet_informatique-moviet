@@ -5,8 +5,8 @@ import { User } from '../../../shared/interfaces/user'
 import { UserService } from '../../../services/user.service';
 import { GroupService } from '../../../../app/services/group.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UsersStatus } from '../../../shared/interfaces/users-status'
-import { UserStatusValue } from '../../../shared/interfaces/users-status'
+import { UsersStatus } from '../../../shared/interfaces/users-status';
+import { UserStatusValue } from '../../../shared/interfaces/users-status';
 
 @Component({
   selector: 'app-display-users-status',
@@ -17,21 +17,22 @@ export class DisplayUsersStatusComponent implements OnInit, OnChanges {
 
   @Input() currentGroup?: Group; // currentGroup as an input parameter of the child
 
-  @Output() isVotingEvent = new EventEmitter<boolean>(); // indicate that we need to switch to the voting page if we are on the waiting page for preferencies
+  @Output() groupStatusEvent = new EventEmitter<UserStatusValue>(); // indicate that status of the group
 
   users: User[] = [];
   usersStatus : UsersStatus = {}; // map user id and status
+  groupStatus? : UserStatusValue;
 
   constructor(private groupService: GroupService, private router: Router, private route: ActivatedRoute, private userService: UserService) { }
 
   ngOnInit(): void {
       // import all users + import all user status + test if all users have voted
-      this.getAllUsers(() => {this.getUsersStatus(() => {this.testIfVoting();});});
+      this.getAllUsers(() => {this.getUsersStatus(); this.getGroupStatus();});
   }
 
   ngOnChanges(): void { // when the input changes
       // import all users + import all user status + test if all users have voted
-      this.getAllUsers(() => {this.getUsersStatus(() => {this.testIfVoting();});});
+      this.getAllUsers(() => {this.getUsersStatus(); this.getGroupStatus();});
   }
 
   // get a single user:
@@ -142,18 +143,19 @@ export class DisplayUsersStatusComponent implements OnInit, OnChanges {
     return UserStatusValue; 
   }
 
-  testIfVoting(): void { // test if the users are voting (or everybody done)
-    if (this.users.length == 0) { // if no users
-      this.isVotingEvent.emit(false);
-      return;
+  getGroupStatus(then: () => any = () => {this.emitGroupStatus();}): void {
+    if (this.currentGroup != undefined) {
+      this.groupService.getGroupStatus(this.currentGroup.id)
+      .subscribe((status) => {
+        this.groupStatus = status;
+        then();
+      });
     }
-    for (const user of this.users) {
-      const userStatus = this.getUserStatus(user.id);
-      if (userStatus == UserStatusValue.VOTING || userStatus == UserStatusValue.DONE) {
-        this.isVotingEvent.emit(true); // users are voting or done
-        return;
-      }
+  }
+
+  emitGroupStatus(): void { // send the group status
+    if (this.groupStatus != undefined) {
+      this.groupStatusEvent.emit(this.groupStatus);
     }
-    this.isVotingEvent.emit(false);
   }
 }

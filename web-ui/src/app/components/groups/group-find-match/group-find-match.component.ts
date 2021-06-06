@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { DisplayMovieComponent } from '../../../shared/components/display-movie/display-movie.component'
+import { Component, OnInit } from '@angular/core'
 import { GroupService } from '../../../services/group.service'
-import { ActivatedRoute, Router } from '@angular/router';
+import { GroupsComponent } from '../groups.component'
+import { UserStatusValue } from '../../../shared/interfaces/users-status'
+import { ActivatedRoute, Router } from '@angular/router'
 
 const maxSec = 22; // max number of seconds for the timer
 @Component({
@@ -22,7 +23,7 @@ export class GroupFindMatchComponent implements OnInit {
 
   movieIndex: number = 0;
 
-  constructor(private displayComponent: DisplayMovieComponent, private groupService: GroupService, private router: Router, private route: ActivatedRoute) { }
+  constructor(private groupsComponent : GroupsComponent, private groupService: GroupService, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     document.getElementById('timerValue')!.innerHTML = this.timerValue;
@@ -101,8 +102,11 @@ export class GroupFindMatchComponent implements OnInit {
   getNextMovie() {
     if (this.movieId != undefined) {
       if (++this.movieIndex >= this.moviesSuggestions.length) { // test the lenght of the suggestion
-        // go to the next page:
-        this.goToWaitVoting();
+        // set user status:
+        this.setUserStatus(() => {
+          // go to the next page:
+          this.goToWaitVoting();
+        });
       } else { // select next movie
         this.getMovieId();
       }
@@ -140,4 +144,40 @@ export class GroupFindMatchComponent implements OnInit {
     this.startTimer(maxSec);
   }
 
+  getMyUserId(): number { //! Temporary
+    return 1;
+  }
+
+  setUserStatus(then: () => any = () => void 0, onError?: () => any) {
+    this.groupsComponent.getGroup(undefined, () => {
+        let groupId = this.groupsComponent.currentGroup!.id;
+        this.groupService.getGroupStatus(groupId)
+          .subscribe((groupStatus) => {
+            if (groupStatus == UserStatusValue.VOTING) {
+              this.groupService.setUserStatus(groupId, this.getMyUserId(), UserStatusValue.DONE) // change status to DONE
+                .subscribe(()=> {
+                  then();
+                }, () => {
+                  if (onError == undefined) {
+                    then();
+                  } else {
+                    onError();
+                  }
+                }); 
+            } else {
+              if (onError == undefined) {
+                then();
+              } else {
+                onError();
+              }
+            }
+          }, () => {
+            if (onError == undefined) {
+              then();
+            } else {
+              onError();
+            }
+          });
+    });
+  }
 }

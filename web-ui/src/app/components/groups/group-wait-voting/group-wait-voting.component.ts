@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { GroupsComponent } from '../groups.component'
 import { Group } from '../../../shared/interfaces/group';
+import { UsersStatus } from '../../../shared/interfaces/users-status';
+import { UserStatusValue } from '../../../shared/interfaces/users-status';
 import { UserService } from '../../../services/user.service';
 import { GroupService } from 'src/app/services/group.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -23,22 +25,70 @@ export class GroupWaitVotingComponent implements OnInit {
       this.currentGroup = this.groupsComponent.currentGroup; // save the current group
     };
 
-    this.groupsComponent.getGroup(undefined, thenGroupimport);
+    this.groupsComponent.getGroup(undefined, () => {thenGroupimport(); this.setUserStatus();});
 
     // refresh group info every x micro-seconds:
     this.timerRefreshResult = setInterval(() => {this.groupsComponent.getGroup(undefined, thenGroupimport);}, 1000);
   }
 
-  goToWaitResult() { // go to the show-result page
+  goToWaitResult() { // go to the wait-result page
     if (this.timerRefreshResult != undefined) {
       this.clearTimer();
     }
-    this.router.navigate(['wait-result'], {relativeTo: this.route.parent, skipLocationChange: true}); // pass the movieId to show-result
+    this.router.navigate(['wait-result'], {relativeTo: this.route.parent, skipLocationChange: true});
   }
 
   endVoting() {
     //TODO: test if admin:
-    this.goToWaitResult();
+    this.skipPref();
+  }
+
+  skipPref() {
+    // TODO: only the admin should skip
+    if (this.currentGroup != undefined) {
+      // change the group status
+      this.groupService.setGroupStatus(this.currentGroup.id, UserStatusValue.DONE) // change the group status to DONE
+        .subscribe(()=>{
+          this.goToWaitResult(); // go to wait result
+        });
+    }
+  }
+
+  getMyUserId(): number { //! Temporary
+    return 1;
+  }
+
+  setUserStatus(then: () => any = () => void 0, onError?: () => any) {
+    this.groupsComponent.getGroup(undefined, () => {
+        let groupId = this.groupsComponent.currentGroup!.id;
+        this.groupService.getGroupStatus(groupId)
+          .subscribe((groupStatus) => {
+            if (groupStatus == UserStatusValue.VOTING) {
+              this.groupService.setUserStatus(groupId, this.getMyUserId(), UserStatusValue.DONE) // change status to DONE
+                .subscribe(()=> {
+                  then();
+                }, () => {
+                  if (onError == undefined) {
+                    then();
+                  } else {
+                    onError();
+                  }
+                }); 
+            } else {
+              if (onError == undefined) {
+                then();
+              } else {
+                onError();
+              }
+            }
+          }, () => {
+            if (onError == undefined) {
+              then();
+            } else {
+              onError();
+            }
+          });
+    });
   }
 
   clearTimer() {

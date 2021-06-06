@@ -27,8 +27,8 @@ const routes: Routes = [
   }, 
   {path: 'groups/:groupId', component: GroupsComponent, // with parameters
     children: [
-      {path: '', redirectTo: 'group-info', pathMatch: 'full'},
-      {path: 'group-info' , component: GroupInfoComponent},
+      {path: '', component: GroupInfoComponent},
+      {path: 'group-info' , redirectTo: '', pathMatch: 'full'},
       {path: 'genres' , component: GroupGenresComponent},
       {path: 'wait-pref', component: GroupWaitPreferencesComponent},
       {path: 'wait-voting', component:GroupWaitVotingComponent},
