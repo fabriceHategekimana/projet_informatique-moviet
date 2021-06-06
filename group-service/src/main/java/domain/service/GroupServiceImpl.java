@@ -388,6 +388,7 @@ public class GroupServiceImpl implements GroupService{
             group = getGroup(group_id);  // group becomes managed as well as existing users in the group
             group.setGroup_status(Status.VOTING);
             em.merge(group);
+            status = "voting";
         }
         else if (all_done){
             groupUser.setUser_status(Status.valueOf(status.toUpperCase())); // https://www.tutorialspoint.com/how-to-convert-a-string-to-an-enum-in-java

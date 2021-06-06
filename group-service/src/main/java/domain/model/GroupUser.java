@@ -10,6 +10,7 @@ import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 // https://projectlombok.org/features/all
@@ -23,7 +24,9 @@ import java.util.Set;
         typeClass = StatusDatabaseEnumType.class
 )
 @Entity @Table( name="T_groups_users")// JPA, mapping class - table
-public class GroupUser {
+public class GroupUser implements Serializable {
+    // serializable : serialize into JSO, XML or a representation different than from memory. Used to send in network
+
     @Id @GeneratedValue( strategy=GenerationType.IDENTITY ) // Generated Value, automatically generated following how the db was configured
     private int id;
     // No setters for group_id and user_id, we do not use this class to change it directly
