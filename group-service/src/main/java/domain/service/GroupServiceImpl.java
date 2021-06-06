@@ -450,7 +450,6 @@ public class GroupServiceImpl implements GroupService{
         return newStatus;
     }
 
-
     @Transactional
     public boolean updateMoviePreferences(int group_id, int user_id, MoviePreferences movie_preferences){
         Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
