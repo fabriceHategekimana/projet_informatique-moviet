@@ -3,6 +3,7 @@ import { Observable, of } from 'rxjs' // Observable => HTTP methods return Obser
 import { HttpClient, HttpHeaders } from '@angular/common/http' // http requests
 import { catchError, map, tap } from 'rxjs/operators' // error handling
 import { User } from '../shared/interfaces/user'
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,7 @@ export class UserService {
     observe: 'response' as 'response'
   };
 
-  private usersUrl : string = "http://localhost/api/v1/users"; // url using api
+  private usersUrl : string = environment.API_URL + "users"; // url using api
   
   constructor(private http: HttpClient) { }
 

@@ -7,6 +7,7 @@ import { UsersStatus } from '../shared/interfaces/users-status'
 import { UserStatusValue } from '../shared/interfaces/users-status'
 import { MoviePreferences } from '../shared/interfaces/movie-preferences'
 import { group } from 'node:console'
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +33,7 @@ export class GroupService {
     }),
   };
 
-  private groupsUrl : string = "http://localhost/api/v1/groups"; // url using api
+  private groupsUrl : string = environment.API_URL +  "groups"; // url using api
   //private groupsUrl : string = "http://localhost:10080/groups";
   
   constructor(private http: HttpClient) { }

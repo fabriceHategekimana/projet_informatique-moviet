@@ -6,6 +6,7 @@ import { Tag, Tags } from '../shared/interfaces/tags'
 import { Observable, of } from 'rxjs'; // Observable => HTTP methods return Observable objects
 import { HttpClient, HttpHeaders } from '@angular/common/http' // http requests
 import { catchError, map, tap } from 'rxjs/operators' // error handling
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -19,9 +20,9 @@ export class MovieService {
     })};
 
 
-  private movieUrl : string = "http://localhost/api/v1/movie-service/Mock_movies"; //! MOCK
-  private genresUrl : string = "http://localhost/api/v1/movie-service/Mock_movies/genres"; //! MOCK
-  private keywordUrl : string = "http://localhost/api/v1/movie-service/Mock_search/keyword"; //! MOCK
+  private movieUrl : string = environment.API_URL + "movie-service/Mock_movies"; //! MOCK
+  private genresUrl : string = environment.API_URL + "movie-service/Mock_movies/genres"; //! MOCK
+  private keywordUrl : string = environment.API_URL + "movie-service/Mock_search/keyword"; //! MOCK
 
   constructor(private http: HttpClient) { }
 
