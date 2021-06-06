@@ -32,7 +32,7 @@ export class GroupInfoComponent implements OnInit {
   }
 
   goToGenres() { // go to the genres selection page
-    this.router.navigate(['genres'], {relativeTo: this.route, skipLocationChange: true });
+    this.router.navigate(['genres'], {relativeTo: this.route.parent, skipLocationChange: true });
   }
 
   // get a single user:

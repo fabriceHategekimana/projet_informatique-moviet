@@ -16,6 +16,8 @@ export class GroupWaitPreferencesComponent implements OnInit {
 
   currentGroup?: Group;
 
+  private timerRefreshResult? :NodeJS.Timeout;
+
   constructor(private groupsComponent : GroupsComponent, private groupService: GroupService, private router: Router, private route: ActivatedRoute, private userService: UserService) { }
 
   ngOnInit(): void {
@@ -26,21 +28,28 @@ export class GroupWaitPreferencesComponent implements OnInit {
     this.groupsComponent.getGroup(undefined, thenGroupimport);
 
     // refresh group info every x micro-seconds:
-    setInterval(() => {this.groupsComponent.getGroup(undefined, thenGroupimport);}, 1000);
+    this.timerRefreshResult = setInterval(() => {this.groupsComponent.getGroup(undefined, thenGroupimport);}, 1000);
   }
 
   goToGenres() { // go to the genres selection page
+    this.clearTimer();    
     this.router.navigate(['genres'], {relativeTo: this.route, skipLocationChange: true });
   }
 
   goToFindMatch() { // go to the find-match page
+    this.clearTimer();
     this.router.navigate(['find-match'], {relativeTo: this.route.parent, skipLocationChange: true });
   }
 
   goToFindMatchIfVoting(isVoting: any) { // go to the voting page if the users are voting
-    console.log(isVoting);
+    // console.log(isVoting);
+    this.clearTimer();
     if(isVoting) {
       this.goToFindMatch();
     }
+  }
+
+  clearTimer() {
+    if(this.timerRefreshResult!=undefined) clearInterval(this.timerRefreshResult);
   }
 }

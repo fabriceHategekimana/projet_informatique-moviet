@@ -70,4 +70,9 @@ export class GroupService {
     return of([1, 2, 3, 4]);
   }
 
+  getMovieResult(groupId: number): Observable<number> {
+    //! MOCK
+    return of(123);
+  }
+
 }
