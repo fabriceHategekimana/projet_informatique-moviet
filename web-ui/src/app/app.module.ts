@@ -20,6 +20,8 @@ import { GroupFindMatchComponent } from './components/groups/group-find-match/gr
 import { GroupWaitPreferencesComponent } from './components/groups/group-wait-preferences/group-wait-preferences.component';
 import { GroupWaitVotingComponent } from './components/groups/group-wait-voting/group-wait-voting.component';
 import { DisplayUsersStatusComponent } from './shared/components/display-users-status/display-users-status.component';
+import { GroupShowResultComponent } from './components/groups/group-show-result/group-show-result.component';
+import { GroupWaitResultComponent } from './components/groups/group-wait-result/group-wait-result.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +40,9 @@ import { DisplayUsersStatusComponent } from './shared/components/display-users-s
     GroupFindMatchComponent,
     GroupWaitPreferencesComponent,
     GroupWaitVotingComponent,
-    DisplayUsersStatusComponent
+    DisplayUsersStatusComponent,
+    GroupShowResultComponent,
+    GroupWaitResultComponent
   ],
   imports: [
     BrowserModule,

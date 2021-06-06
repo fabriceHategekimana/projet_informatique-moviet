@@ -1,11 +1,15 @@
 import { Component, OnInit } from '@angular/core'
 import { GroupsComponent } from '../groups.component'
 import { Group } from '../../../shared/interfaces/group'
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router'
 import { Tag, Tags } from '../../../shared/interfaces/tags'
 import { Genre } from '../../../shared/interfaces/genre'
 import { Keyword, KeywordResults } from '../../../shared/interfaces/keyword' // import keyword interface
 import { MovieService } from '../../../services/movie.service'
+import { UserStatusValue } from '../../../shared/interfaces/users-status'
+import { UserService } from '../../../services/user.service'
+import { GroupService } from 'src/app/services/group.service'
+import { MoviePreferences } from '../../../shared/interfaces/movie-preferences'
 
 @Component({
   selector: 'app-group-genres',
@@ -29,7 +33,9 @@ export class GroupGenresComponent implements OnInit {
 
   keywordInput: string = ""; // input for the keywords
 
-  constructor(private movieService: MovieService, private groupsComponent : GroupsComponent, private router: Router, private route: ActivatedRoute) { }
+  isAdmin: boolean = false;
+
+  constructor(private movieService: MovieService, private groupService: GroupService, private groupsComponent : GroupsComponent, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.groupsComponent.getGroup( // get the group
@@ -44,6 +50,9 @@ export class GroupGenresComponent implements OnInit {
     this.getTags();
 
     this.getGenres();
+
+    // Test if admin:
+    this.testIfAdmin();
   }
 
   getTags(): void {
@@ -130,7 +139,67 @@ export class GroupGenresComponent implements OnInit {
   
   processPreferences() {
     // this function will send the preferences to the backend and then go to the find-match page
-    // TODO: send preferences to the backend
-    this.goToWaitPref();
+    // TODO: catch error
+    if (this.currentGroup != undefined) {
+      let test: number[] = this.selectedKeywords.map(k => k.id).filter(id => id != null) as number[];
+      let preferences: MoviePreferences = {
+        keywordsId: this.selectedKeywords.map(k => k.id).filter(id => id != null) as number[],
+        genresId: this.selectedGenres.map(k => k.id),
+        yearFrom: null,
+        yearTo: null,}
+      
+      if (this.yearFrom != undefined) {
+        preferences.yearFrom = this.yearFrom;
+      }
+
+      if (this.yearTo != undefined) {
+        preferences.yearTo = this.yearTo;
+      }
+
+      this.groupService.sendPreferences(this.currentGroup.id, preferences);
+      this.setUserStatus(() => {this.goToWaitPref();});
+    }
+  }
+
+  setUserStatus(then: () => any = () => void 0, onError?: () => any) {
+    this.groupsComponent.getGroup(undefined, () => {
+        let groupId = this.groupsComponent.currentGroup!.id;
+        this.groupService.getGroupStatus(groupId)
+          .subscribe((groupStatus) => {
+            if (groupStatus == UserStatusValue.CHOOSING) {
+              this.groupService.setUserStatus(groupId, this.getMyUserId(), UserStatusValue.READY) // change status to READY
+                .subscribe(()=> {
+                  then();
+                }, () => {
+                  if (onError == undefined) {
+                    then();
+                  } else {
+                    onError();
+                  }
+                }); 
+            } else {
+              if (onError == undefined) {
+                then();
+              } else {
+                onError();
+              }
+            }
+          }, () => {
+            if (onError == undefined) {
+              then();
+            } else {
+              onError();
+            }
+          });
+    });
+  }
+
+  getMyUserId(): number { //! Temporary
+    return 1;
+  }
+
+  testIfAdmin() { // test if the user is admin
+    //! MOCK
+    this.isAdmin = true;
   }
 }

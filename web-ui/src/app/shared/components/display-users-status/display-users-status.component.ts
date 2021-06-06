@@ -5,8 +5,8 @@ import { User } from '../../../shared/interfaces/user'
 import { UserService } from '../../../services/user.service';
 import { GroupService } from '../../../../app/services/group.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UsersStatus } from '../../../shared/interfaces/users-status'
-import { UserStatusValue } from '../../../shared/interfaces/users-status'
+import { UsersStatus } from '../../../shared/interfaces/users-status';
+import { UserStatusValue } from '../../../shared/interfaces/users-status';
 
 @Component({
   selector: 'app-display-users-status',
@@ -17,29 +17,22 @@ export class DisplayUsersStatusComponent implements OnInit, OnChanges {
 
   @Input() currentGroup?: Group; // currentGroup as an input parameter of the child
 
-  @Output() isVotingEvent = new EventEmitter<boolean>(); // indicate that we need to switch to the voting page if we are on the waiting page for preferencies
+  @Output() groupStatusEvent = new EventEmitter<UserStatusValue>(); // indicate that status of the group
 
   users: User[] = [];
   usersStatus : UsersStatus = {}; // map user id and status
+  groupStatus? : UserStatusValue;
 
   constructor(private groupService: GroupService, private router: Router, private route: ActivatedRoute, private userService: UserService) { }
 
   ngOnInit(): void {
-      // import all users:
-      this.getAllUsers();
-      // import all user status:
-      this.getUsersStatus();
-
-      this.testIfVoting();
+      // import all users + import all user status + test if all users have voted
+      this.getAllUsers(() => {this.getUsersStatus(); this.getGroupStatus();});
   }
 
   ngOnChanges(): void { // when the input changes
-      // import all users:
-      this.getAllUsers();
-      // import all user status:
-      this.getUsersStatus();
-
-      this.testIfVoting();
+      // import all users + import all user status + test if all users have voted
+      this.getAllUsers(() => {this.getUsersStatus(); this.getGroupStatus();});
   }
 
   // get a single user:
@@ -60,18 +53,23 @@ export class DisplayUsersStatusComponent implements OnInit, OnChanges {
   }
 
   // get all the users:
-  getAllUsers() {
+  getAllUsers(then: () => any = () => void 0) {
     if (this.currentGroup) {
-      for (const groupUser of this.currentGroup.users) {
+      const nbUsers = this.currentGroup.users.length;
+      this.currentGroup.users.forEach((groupUser, i) => {
         const userId = groupUser.id;
-        this.getUser(userId);
+        if (i == nbUsers - 1) {
+          this.getUser(userId, then(), then());          
+        } else {
+          this.getUser(userId);
+        }
         // TODO: remove user if not in the list anymore
-      }
+      });
     }
   }
 
 
-  getUsersStatus() {
+  getUsersStatus(then: () => any = () => void 0) {
     // this.usersStatus = {  //!Mock
     //   0: UserStatusValue.READY,
     //   1: UserStatusValue.CHOOSING,
@@ -84,6 +82,7 @@ export class DisplayUsersStatusComponent implements OnInit, OnChanges {
       this.groupService.getUsersStatus(this.currentGroup.id)
       .subscribe(usersStatus => {
         this.usersStatus = usersStatus;
+        then();
       }); 
     }
   }
@@ -137,25 +136,26 @@ export class DisplayUsersStatusComponent implements OnInit, OnChanges {
     if (userId in this.usersStatus) { // if the id exists
       return this.usersStatus[userId];
     }
-    return UserStatusValue.READY; // return READY if user doesn't exists
+    return UserStatusValue.CHOOSING; // return CHOOSING as the default value
   }
 
   public get UserStatusValue(): typeof UserStatusValue { // we need to make the enum visible from the html
     return UserStatusValue; 
   }
 
-  testIfVoting(): void { // test if the users are voting (or everybody done)
-    if (this.users.length == 0) { // if no users
-      this.isVotingEvent.emit(false);
-      return;
+  getGroupStatus(then: () => any = () => {this.emitGroupStatus();}): void {
+    if (this.currentGroup != undefined) {
+      this.groupService.getGroupStatus(this.currentGroup.id)
+      .subscribe((status) => {
+        this.groupStatus = status;
+        then();
+      });
     }
-    for (const user of this.users) {
-      const userStatus = this.getUserStatus(user.id);
-      if (userStatus == UserStatusValue.VOTING || userStatus == UserStatusValue.DONE) {
-        this.isVotingEvent.emit(true); // users are voting or done
-        return;
-      }
+  }
+
+  emitGroupStatus(): void { // send the group status
+    if (this.groupStatus != undefined) {
+      this.groupStatusEvent.emit(this.groupStatus);
     }
-    this.isVotingEvent.emit(false);
   }
 }

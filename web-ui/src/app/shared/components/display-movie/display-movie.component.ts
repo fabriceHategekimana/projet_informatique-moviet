@@ -21,7 +21,7 @@ export class DisplayMovieComponent implements OnInit {
 
   ngOnChanges() { // "reload" the movie on change
     this.getMovie(this.movieId);
-    console.log(this.movieId);
+    // console.log(this.movieId);
   }
 
   getMovie(movieId: number): void {
