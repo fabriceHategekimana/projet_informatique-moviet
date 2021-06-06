@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http' // http requests
 import { catchError, map, tap } from 'rxjs/operators' // error handling
 import { Group } from '../shared/interfaces/group'
 import { UsersStatus } from '../shared/interfaces/users-status'
+import { UserStatusValue } from '../shared/interfaces/users-status'
 import { MoviePreferences } from '../shared/interfaces/movie-preferences'
 
 @Injectable({
@@ -18,6 +19,13 @@ export class GroupService {
   };
 
   private httpOptionsPost = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json',
+    }),
+    observe: 'response' as 'response'
+  };
+
+  private httpOptionsPut = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
     }),
@@ -75,4 +83,8 @@ export class GroupService {
     return of(123);
   }
 
+  setUserStatus(groupId: number, userId: number, status: UserStatusValue): Observable<any> {
+    return this.http.put<UserStatusValue>(this.groupsUrl + "/" + groupId + "/" + "users/" + userId + "/status", status, this.httpOptionsPut)
+                  .pipe(catchError(this.handleError<any>('setUserStatus', undefined)));
+  }
 }

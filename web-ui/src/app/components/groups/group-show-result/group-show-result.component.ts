@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ɵINTERNAL_BROWSER_DYNAMIC_PLATFORM_PROVIDERS } from '@angular/platform-browser-dynamic';
+import { Group } from '../../../shared/interfaces/group';
+import { GroupService } from 'src/app/services/group.service';
+import { GroupsComponent } from '../groups.component'
+import { UsersStatus } from '../../../shared/interfaces/users-status'
+import { UserStatusValue } from '../../../shared/interfaces/users-status'
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -11,9 +15,15 @@ export class GroupShowResultComponent implements OnInit {
 
   movieId?: number;
 
-  constructor(private router: Router, private route: ActivatedRoute) { }
+  currentGroup?: Group;
+
+  constructor(private groupsComponent : GroupsComponent, private groupService: GroupService, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
+    let thenGroupimport = () => { // method to call after group import
+      this.currentGroup = this.groupsComponent.currentGroup; // save the current group
+    };
+    this.groupsComponent.getGroup(undefined, thenGroupimport);
     this.getMovieId();
     if (this.movieId == undefined) {
       this.goToWaitResult(); // return to the waiting page if the movie does not exist
@@ -33,12 +43,21 @@ export class GroupShowResultComponent implements OnInit {
   }
 
   restart(): void {
+    //TODO: check if admin
     //TODO: reset group status
-    this.goToParent(); // go to the parent component page = group
+    if (this.currentGroup != undefined) {
+      this.groupService.setUserStatus(this.currentGroup.id, this.getMyUserId(), UserStatusValue.CHOOSING); // reset to choosing
+    }
+    // setUserStatus(groupId: number, userId: number, status: UserStatusValue)
+    this.goToGroupInfo(); // go to the parent component page = group
   }
 
-  goToParent(): void {
+  goToGroupInfo(): void {
+    // history.pushState()
     this.router.navigate(['group-info'], { relativeTo: this.route.parent, skipLocationChange: true});
   }
 
+  getMyUserId(): number { //! Temporary
+    return 1;
+  }
 }
