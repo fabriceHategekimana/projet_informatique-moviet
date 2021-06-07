@@ -1,4 +1,8 @@
+DROP TABLE if exists T_groups_users_keywords CASCADE;
+DROP TABLE if exists T_groups_users_genres CASCADE;
+DROP TABLE if exists T_groups_users CASCADE;
 DROP TABLE if exists T_groups CASCADE;
+DROP TABLE if exists T_users CASCADE;
 DROP TYPE if exists status_type;
 -- choosing : for short term preferences, ready: before vote
 CREATE TYPE status_type AS ENUM ('CHOOSING','READY', 'VOTING', 'DONE');
@@ -20,7 +24,6 @@ INSERT INTO T_groups (name, admin_id) VALUES ('ethan', 1);
 INSERT INTO T_groups (name, admin_id) VALUES ('raphael', 1);
 
 -- no auto id incremented
-DROP TABLE if exists T_users CASCADE;
 CREATE TABLE T_users (
     user_id int primary key
 );
@@ -30,7 +33,6 @@ INSERT INTO T_users (user_id) VALUES (2);
 INSERT INTO T_users (user_id) VALUES (3);
 INSERT INTO T_users (user_id) VALUES (4);
 
-DROP TABLE if exists T_groups_users CASCADE;
 -- DROP TYPE if exists status_type;
 -- choosing : for short term preferences, ready: before vote
 -- CREATE TYPE status_type AS ENUM ('CHOOSING','READY', 'VOTING', 'DONE');  -- change of status changes in the same order
@@ -59,7 +61,6 @@ INSERT INTO T_groups_users (group_id, user_id, user_status) VALUES (2, 4, 'READY
 -- --------------------------------------------------------------------------------
 -- TABLES FOR ELEMENT COLLECTION IN JPA
 -- https://javabydeveloper.com/mapping-collection-of-basic-value-types-jpa-with-hibernate/
-DROP TABLE if exists T_groups_users_keywords CASCADE;
 CREATE TABLE T_groups_users_keywords (
     group_id int NOT NULL REFERENCES T_groups(group_id),
     user_id int NOT NULL REFERENCES T_users(user_id),
@@ -72,7 +73,6 @@ INSERT INTO T_groups_users_keywords (group_id, user_id, keyword_id) VALUES (1, 1
 INSERT INTO T_groups_users_keywords (group_id, user_id, keyword_id) VALUES (1, 1, 265894);
 INSERT INTO T_groups_users_keywords (group_id, user_id, keyword_id) VALUES (2, 1, 265894);
 
-DROP TABLE if exists T_groups_users_genres CASCADE;
 CREATE TABLE T_groups_users_genres (
     group_id int NOT NULL REFERENCES T_groups(group_id),
     user_id int NOT NULL REFERENCES T_users(user_id),
