@@ -1,8 +1,14 @@
 package domain.model;
 
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @ToString
@@ -31,5 +37,28 @@ public class Count {
         this.nb_yes = nb_yes;
         this.nb_no = nb_no;
         this.nb_maybe = nb_maybe;
+    }
+
+    public Count(
+            @NotNull int group_id, @NotNull int movie_id) {
+        this(group_id, movie_id, 0, 0, 0);
+    }
+
+    public void checkValidity() {
+        if (group_id <= 0) {
+            throw new IllegalArgumentException(String.format("group_id should be a strictly positive integer, given %d", group_id));
+        }
+        if (movie_id <= 0) {
+            throw new IllegalArgumentException(String.format("movie_id should be a strictly positive integer, given %d", movie_id));
+        }
+        if (nb_yes < 0) {
+            throw new IllegalArgumentException(String.format("nb_yes should be a positive integer, given %d", nb_yes));
+        }
+        if (nb_no < 0) {
+            throw new IllegalArgumentException(String.format("nb_no should be a positive integer, given %d", nb_no));
+        }
+        if (nb_maybe < 0) {
+            throw new IllegalArgumentException(String.format("nb_maybe should be a positive integer, given %d", nb_maybe));
+        }
     }
 }
