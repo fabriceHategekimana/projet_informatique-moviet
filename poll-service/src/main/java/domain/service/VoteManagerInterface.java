@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public interface VoteManagerInterface {
-    Count createPoll(@NotNull int group_id, @NotNull int movie_id);
+    Count createPoll(@NotNull Count count);
 
     Count incrementYes(@NotNull int group_id, @NotNull int movie_id);
     Count incrementNo(@NotNull int group_id, @NotNull int movie_id);

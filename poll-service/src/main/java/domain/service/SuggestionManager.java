@@ -127,7 +127,7 @@ public class SuggestionManager implements SuggestionManagerInterface {
 
     @Override
     public Proposition computeProposition(@NotNull SuggestionWithCriteria suggestionWithCriteria) {
-        return null;
+        return Proposition.fromSuggestionWithCriteria(suggestionWithCriteria);
     }
 
     @Override

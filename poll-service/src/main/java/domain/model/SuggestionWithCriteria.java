@@ -1,8 +1,14 @@
 package domain.model;
 
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @ToString
@@ -20,20 +26,24 @@ public class SuggestionWithCriteria {
     private float popularity;
     @Setter @NotNull
     private int n_sat_w_genre;
-    @Setter @NotNull
+    @Setter
+    @NotNull
     private int n_sat_b_genre;
-    @Setter @NotNull
-    private int n_sat_w_keyword;
-    @Setter @NotNull
-    private int n_sat_b_keyword;
-    @Setter @NotNull
+    @Setter
+    @NotNull
+    private int n_match_w_keyword;
+    @Setter
+    @NotNull
+    private int n_match_b_keyword;
+    @Setter
+    @NotNull
     private int n_sat_date;
 
     public SuggestionWithCriteria(
             @NotNull int group_id, @NotNull int movie_id,
             @NotNull float popularity,
             @NotNull int n_sat_w_genre, @NotNull int n_sat_b_genre,
-            @NotNull int n_sat_w_keyword, @NotNull int n_sat_b_keyword,
+            @NotNull int n_match_w_keyword, @NotNull int n_match_b_keyword,
             @NotNull int n_sat_date) {
 
         this.group_id = group_id;
@@ -41,8 +51,8 @@ public class SuggestionWithCriteria {
         this.popularity = popularity;
         this.n_sat_w_genre = n_sat_w_genre;
         this.n_sat_b_genre = n_sat_b_genre;
-        this.n_sat_w_keyword = n_sat_w_keyword;
-        this.n_sat_b_keyword = n_sat_b_keyword;
+        this.n_match_w_keyword = n_match_w_keyword;
+        this.n_match_b_keyword = n_match_b_keyword;
         this.n_sat_date = n_sat_date;
     }
 
@@ -50,22 +60,22 @@ public class SuggestionWithCriteria {
         if (group_id <= 0){
             throw new IllegalArgumentException(String.format("group_id should be a strictly positive integer, given '%d'", group_id));
         }
-        if (movie_id <= 0){
+        if (movie_id <= 0) {
             throw new IllegalArgumentException(String.format("movie_id should be a strictly positive integer, given '%d'", movie_id));
         }
-        if (n_sat_w_genre < 0){
+        if (n_sat_w_genre < 0) {
             throw new IllegalArgumentException(String.format("n_sat_w_genre should be a positive integer, given '%d'", n_sat_w_genre));
         }
-        if (n_sat_b_genre < 0){
+        if (n_sat_b_genre < 0) {
             throw new IllegalArgumentException(String.format("n_sat_b_genre should be a positive integer, given '%d'", n_sat_b_genre));
         }
-        if (n_sat_w_keyword < 0){
-            throw new IllegalArgumentException(String.format("n_sat_w_keyword should be a positive integer, given '%d'", n_sat_w_keyword));
+        if (n_match_w_keyword < 0) {
+            throw new IllegalArgumentException(String.format("n_sat_w_keyword should be a positive integer, given '%d'", n_match_w_keyword));
         }
-        if (n_sat_b_keyword < 0){
-            throw new IllegalArgumentException(String.format("n_sat_b_keyword should be a positive integer, given '%d'", n_sat_b_keyword));
+        if (n_match_b_keyword < 0) {
+            throw new IllegalArgumentException(String.format("n_sat_b_keyword should be a positive integer, given '%d'", n_match_b_keyword));
         }
-        if (n_sat_date < 0){
+        if (n_sat_date < 0) {
             throw new IllegalArgumentException(String.format("n_sat_date should be a positive integer, given '%d'", n_sat_date));
         }
     }
