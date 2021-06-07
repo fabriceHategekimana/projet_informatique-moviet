@@ -2,13 +2,9 @@ package api;
 
 // Integration Testing
 import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
 import static org.hamcrest.Matchers.*;
 
 import io.restassured.http.ContentType;
-
-import domain.model.User;
-import domain.model.Group;
 
 /*
 https://github.com/rest-assured/rest-assured/wiki/Usage#static-imports
@@ -23,7 +19,6 @@ import io.restassured.RestAssured;
 
 // Unit/Component testing using JUnit 5
 // https://junit.org/junit5/docs/current/user-guide/#writing-tests
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.BeforeAll;

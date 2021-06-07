@@ -56,8 +56,8 @@ class GroupTest {
     @Test
     void testSetUsers(){
         Group tmpgroup = new Group("hello world");
-        User usr1 = new User(1);
-        User usr2 = new User(2);
+        User usr1 = new User("1");
+        User usr2 = new User("2");
         Set<User> users = new HashSet<>();
         users.add(usr1);
         users.add(usr2);
@@ -70,8 +70,8 @@ class GroupTest {
     @Test
     void testAddUsers(){
         Group tmpgroup = new Group("hello world");
-        User usr1 = new User(1);
-        User usr2 = new User(2);
+        User usr1 = new User("1");
+        User usr2 = new User("2");
         Set<User> users = new HashSet<>();
         users.add(usr1);
         users.add(usr2);
@@ -85,8 +85,8 @@ class GroupTest {
     @Test
     void testRemoveUsers(){
         Group tmpgroup = new Group("hello world");
-        User usr1 = new User(1);
-        User usr2 = new User(2);
+        User usr1 = new User("1");
+        User usr2 = new User("2");
         Set<User> users = new HashSet<>();
         users.add(usr1);
         users.add(usr2);

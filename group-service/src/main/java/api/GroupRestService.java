@@ -163,10 +163,9 @@ public class GroupRestService {
         try {
             log.info("Trying to remove user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
             int group_id = Integer.parseInt(str_group_id);
-            int user_id = Integer.parseInt(str_user_id);
 
             // user id can be 0
-            Group returnedGroup=groupService.removeUserFromGroup(group_id, user_id);
+            Group returnedGroup=groupService.removeUserFromGroup(group_id, str_user_id);
             // will remove user if the Group if exists and if user exists, otherwise return null
             if (returnedGroup == null){
                 // group does not exist already or user did not exist
@@ -223,7 +222,7 @@ public class GroupRestService {
             log.info("Trying to get all the users status in a Group having id=" + str_id);
             int group_id = Integer.parseInt(str_id);
 
-            Map<Integer, Status> outMap = groupService.getAllUserStatus(group_id);
+            Map<String, Status> outMap = groupService.getAllUserStatus(group_id);
             if (outMap == null){
                 // group does not exist already
                 return Response.status(Response.Status.NOT_FOUND).build(); // 404
@@ -265,10 +264,9 @@ public class GroupRestService {
         try {
             log.info("Trying to get a user status of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
             int group_id = Integer.parseInt(str_group_id);
-            int user_id = Integer.parseInt(str_user_id);
 
             // user id can be 0
-            Status status=groupService.getUserStatus(group_id, user_id);
+            Status status=groupService.getUserStatus(group_id, str_user_id);
             if (status == null){
                 // group does not exist already or user did not exist
                 return Response.status(Response.Status.NOT_FOUND).build(); // 404
@@ -288,11 +286,10 @@ public class GroupRestService {
         try {
             log.info("Trying to update a user status of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
             int group_id = Integer.parseInt(str_group_id);
-            int user_id = Integer.parseInt(str_user_id);
 
             // user id can be 0
             try {
-                Status returnedStatus = groupService.updateUserStatus(group_id, user_id, status);
+                Status returnedStatus = groupService.updateUserStatus(group_id, str_user_id, status);
                 if (returnedStatus == null){
                     // group does not exist already or user did not exist
                     return Response.status(Response.Status.NOT_FOUND).build(); // 404
@@ -316,11 +313,10 @@ public class GroupRestService {
         try {
             log.info("Trying to update movie preferences of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
             int group_id = Integer.parseInt(str_group_id);
-            int user_id = Integer.parseInt(str_user_id);
 
             // user id can be 0
             try {
-                boolean returnedBoolean = groupService.updateMoviePreferences(group_id, user_id, movie_preferences);
+                boolean returnedBoolean = groupService.updateMoviePreferences(group_id, str_user_id, movie_preferences);
                 if (!returnedBoolean){
                     // group does not exist already or user did not exist
                     return Response.status(Response.Status.NOT_FOUND).build(); // 404
@@ -344,11 +340,10 @@ public class GroupRestService {
         try {
             log.info("Trying to get movie preferences of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
             int group_id = Integer.parseInt(str_group_id);
-            int user_id = Integer.parseInt(str_user_id);
 
             // user id can be 0
             try {
-                MoviePreferences returned_movie_preferences = groupService.getMoviePreferences(group_id, user_id);
+                MoviePreferences returned_movie_preferences = groupService.getMoviePreferences(group_id, str_user_id);
                 if (returned_movie_preferences == null){
                     // group does not exist already or user did not exist
                     return Response.status(Response.Status.NOT_FOUND).build(); // 404
