@@ -5,7 +5,6 @@ import com.uwetrottmann.tmdb2.entities.MovieResultsPage;
 import com.uwetrottmann.tmdb2.entities.TmdbDate;
 import com.uwetrottmann.tmdb2.enumerations.SortBy;
 import com.uwetrottmann.tmdb2.services.DiscoverService;
-import domain.helper.DiscoverFilterBuilder;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -88,7 +87,7 @@ public class DiscoverExample {
 //                    .with_crew()                      // ~
 //                    .with_companies()                 // ~
                     .with_genres(new DiscoverFilter(28, 12))                    // !
-                    .with_keywords(DiscoverFilterBuilder.build(DiscoverFilter.Separator.OR, 9663, 177912, 12988))                  // !
+                    .with_keywords(new DiscoverFilter(DiscoverFilter.Separator.OR, 9663, 177912, 12988))                  // !
 //                    .with_people()                    // ~
 //                    .year()                           // ~
 //                    .without_genres()                 // !
