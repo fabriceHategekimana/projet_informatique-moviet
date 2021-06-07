@@ -15,6 +15,6 @@ COPY ./ /app/
 # RUN npm run build -- --output-path=./dist/web-ui --configuration $configuration
 RUN ng build --prod
 
-CMD ng serve --host 0.0.0.0 --port 80 --disable-host-check --prod
+CMD ng serve --host 0.0.0.0 --port 4200 --disable-host-check --prod
 
 #docker build -t site:dev .
