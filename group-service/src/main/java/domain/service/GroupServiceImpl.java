@@ -484,7 +484,7 @@ public class GroupServiceImpl implements GroupService{
         if (groupUser == null){
             return null; // particular user not found
         }
-        return new MoviePreferences(groupUser.getKeywords_id(), groupUser.getGenres_id(), groupUser.getYear_range().getYear_from(), groupUser.getYear_range().getYear_from());
+        return new MoviePreferences(groupUser.getKeywords_id(), groupUser.getGenres_id(), groupUser.getYear_range().getYear_from(), groupUser.getYear_range().getYear_to());
     }
 
     @Transactional

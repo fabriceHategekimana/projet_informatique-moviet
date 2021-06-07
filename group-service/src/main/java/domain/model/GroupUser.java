@@ -59,14 +59,14 @@ public class GroupUser implements Serializable {
     })
      */
     @Setter
-    @ElementCollection
+    @ElementCollection(fetch= FetchType.EAGER) // ugliest solution
     @CollectionTable(name = "T_groups_users_keywords", joinColumns={@JoinColumn(name = "group_id", referencedColumnName = "group_id"), @JoinColumn(name = "user_id", referencedColumnName = "user_id")}) // https://docs.oracle.com/javaee/6/api/javax/persistence/CollectionTable.html#joinColumns()
     @Column(name = "keyword_id")
     private Set<Integer> keywords_id = new HashSet<>();
     // primary key is weirdly the group_id and user_id, not id ?! (probably because of intermediate table, the actual primary key in the db is id..)
 
     @Setter
-    @ElementCollection
+    @ElementCollection(fetch= FetchType.EAGER) // ugliest solution
     @CollectionTable(name = "T_groups_users_genres", joinColumns={@JoinColumn(name = "group_id", referencedColumnName = "group_id"), @JoinColumn(name = "user_id", referencedColumnName = "user_id")})
     @Column(name = "genre_id")
     private Set<Integer> genres_id = new HashSet<>();

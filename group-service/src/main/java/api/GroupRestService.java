@@ -364,7 +364,6 @@ public class GroupRestService {
         }
     }
 
-
     @PUT
     @Path("/{group_id}/users_status")
     @Produces(MediaType.APPLICATION_JSON)
@@ -386,6 +385,15 @@ public class GroupRestService {
         catch(NumberFormatException e){ // invalid id
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id, it should be numerical: id = " + str_id).build();
         }
+    }
+
+    @GET
+    @Path("/testing_header_parsing")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "testing header parsing")
+    public Response getHeader(@Context HttpHeaders headers){
+        MultivaluedMap<String, String> my_headers = headers.getRequestHeaders();
+        return Response.ok(my_headers).build();    //building the server response
     }
 
     @DELETE
