@@ -19,4 +19,10 @@ public class MoviePreferences {
     private Integer year_from = null;
     private Integer year_to = null;
 
+    public MoviePreferences(Set<Integer> keywords_id, Set<Integer> genres_id, Integer year_from, Integer year_to) {
+        this.keywords_id = keywords_id;
+        this.genres_id = genres_id;
+        this.year_from = year_from;
+        this.year_to = year_to;
+    }
 }

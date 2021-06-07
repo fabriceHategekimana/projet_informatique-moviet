@@ -336,6 +336,34 @@ public class GroupRestService {
         }
     }
 
+    @GET
+    @Path("/{group_id}/users/{user_id}/movie_preferences")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "GET a particular user Movie Preferences (short term preferences composed of genres, keywords, year from, year to)")
+    public Response getMoviePreferences(@PathParam("group_id") String str_group_id, @PathParam("user_id") String str_user_id) {
+        try {
+            log.info("Trying to get movie preferences of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
+            int group_id = Integer.parseInt(str_group_id);
+            int user_id = Integer.parseInt(str_user_id);
+
+            // user id can be 0
+            try {
+                MoviePreferences returned_movie_preferences = groupService.getMoviePreferences(group_id, user_id);
+                if (returned_movie_preferences == null){
+                    // group does not exist already or user did not exist
+                    return Response.status(Response.Status.NOT_FOUND).build(); // 404
+                }
+                return Response.ok(returned_movie_preferences).build(); // 200
+            }
+            catch (IllegalArgumentException e){
+                return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Bad movie preferences requested: " + e).build();
+            }
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id or user id, it should be numerical: group_id = " + str_group_id + ", user_id = " + str_user_id).build();
+        }
+    }
+
 
     @PUT
     @Path("/{group_id}/users_status")
