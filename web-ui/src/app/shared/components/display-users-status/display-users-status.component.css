@@ -1,0 +1,47 @@
+
+
+#user-list {
+    margin: 2em auto;
+    width: 25em;
+    text-align: left;
+    
+}
+
+.text-admin {
+    text-align: right;
+    float: right;
+    color: lightslategray;
+}
+
+.text-username {
+    display: inline-block;
+    max-width: 7em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+}
+
+.body-card-text {
+    padding: 1em;
+}
+
+.user-text-item {
+    display: inline-block;
+    width: 15em;
+}
+
+.user-status {
+    /* display: inline-block; */
+    float: right;
+}
+
+.user-status {
+    font-weight: 500;
+}
+
+.user-status-text {
+    display: inline-block;
+    min-width: 4em;
+    width: fit-content;
+}

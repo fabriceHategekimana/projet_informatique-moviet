@@ -11,9 +11,15 @@ import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singlet
 
 //  import classes of domain
 import domain.model.Group;
+import domain.model.MoviePreferences;
+import domain.model.Status;
+import domain.model.User;
 
 // service
 import domain.service.GroupService;
+
+import java.util.HashSet;
+import java.util.Map;
 
 /*
 https://thorntail.io/posts/wildfly-swarm-s-got-swagger/
@@ -79,13 +85,15 @@ public class GroupRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create, add a group to the existing groups")
-    public Response createGroup(Group group, final @Context UriInfo uriInfo){
+    public Response createGroup(Group group, final @Context UriInfo uriInfo){ // no auto increment id for users
         /*
         Create a group and returns HTTP status code and the location of the newly created object. It's possible to create multiple
         groups with same name. The unique identifier is its id that auto increments. We cannot input a group having an id !!
 
-        Example with curl:
+        Examples with curl:
         - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test"}'
+        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test", "admin_id": 1000}'
+        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test", "admin_id": 1000, "users": [{"id": 10}, {"id": 42}, {"id":3}, {"id":6}]}'
 
          Then you use GET to see the created object
         */
@@ -95,11 +103,81 @@ public class GroupRestService {
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : only other attributes than id are (must be) initialized: " + group).build();
         }
 
+        if (group.getUsers() == null){
+            group.setUsers(new HashSet<>()); // empty set
+        }
+
         Group returnedGroup=groupService.createGroup(group); // can never have conflict if id are auto-incremented.
+        if (returnedGroup == null){
+            log.severe("Tried to create Group: id=" + group.getId() + " name=" +group.getId()+ " admin_id="+group.getAdmin_id() + " with some users but either id was non zero or group had null name or some of the users had user id was 1");
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Tried to create Group: id=" + group.getId() + " name=" +group.getId()+ " admin_id="+group.getAdmin_id() + " with some users but either id was non zero or group had null name or some of the users had user id was 1").build();
+        }
         // returnedGroup can be null in general but we tested the input before so it's not null.. otherwise bad request..
         UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder(); // https://www.logicbig.com/tutorials/java-ee-tutorial/jax-rs/uri-info.html
         uriBuilder.path(Integer.toString(returnedGroup.getId()));
         return Response.created(uriBuilder.build()).entity(returnedGroup).build(); // 201
+    }
+
+    @POST
+    @Path("/{group_id}/users/")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Adding an user to an existing group")
+    public Response addUserToGroup(@PathParam("group_id") String str_id, User user){
+        /*
+        Add an user to an existing group. Need to know the id of the group to update. Return modified object.
+         */
+
+        try {
+            log.info("Trying to add user with user_id=" + user.getId() + " in a Group having id=" + str_id);
+            int id = Integer.parseInt(str_id);
+
+            // user id can be 0..
+
+            if (user.getGroups() == null){
+                user.setGroups(new HashSet<>()); // empty set
+            }
+
+            Group returnedGroup=groupService.addUserToGroup(id, user);
+            // will add user if the Group if exists, otherwise return null
+            if (returnedGroup == null){
+                // group does not exist already
+                return Response.status(Response.Status.NOT_FOUND).build(); // 404
+            }
+            return Response.ok(returnedGroup).build(); // 200
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id, it should be numerical: id = " + str_id).build();
+        }
+    }
+
+    @DELETE
+    @Path("/{group_id}/users/")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Removing/kicking user from an existing group")
+    public Response removeUserFromGroup(@PathParam("group_id") String str_group_id, String str_user_id){
+        /*
+        Remove an user from an existing group. Need to know the id of the group and the id of the user to remove. Return modified object.
+         */
+        try {
+            log.info("Trying to remove user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
+            int group_id = Integer.parseInt(str_group_id);
+            int user_id = Integer.parseInt(str_user_id);
+
+            // user id can be 0
+            Group returnedGroup=groupService.removeUserFromGroup(group_id, user_id);
+            // will remove user if the Group if exists and if user exists, otherwise return null
+            if (returnedGroup == null){
+                // group does not exist already or user did not exist
+                return Response.status(Response.Status.NOT_FOUND).build(); // 404
+            }
+            return Response.ok(returnedGroup).build(); // 200
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id or user id, it should be numerical: group_id = " + str_group_id + ", user_id = " + str_user_id).build();
+        }
+
     }
 
     @PUT
@@ -110,14 +188,20 @@ public class GroupRestService {
         /*
         Update existing group. Need to know the id to update. Return modified object.
 
-        Example:
+        Examples:
         - curl --verbose -H "Content-Type: application/json" -X PUT http://localhost:10080/groups -d '{"id":3,"name":"fabrice"}'
+        - curl --verbose -H "Content-Type: application/json" -X PUT http://localhost:10080/groups -d '{"id":3,"name":"fabrice", "users": [{"name": "hello"}]}'
          */
         log.info("Trying to update using Group: " + group);
         // only want initialized id and non null name, otherwise bad request
         if ((group.getId() == 0) || (group.getName() == null)){
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : all attributes need to be instantiated: " + group).build();
         }
+
+        if (group.getUsers() == null){
+            group.setUsers(new HashSet<>()); // empty set
+        }
+
         Group returnedGroup=groupService.updateGroup(group); // get all groups and check if group inside list of groups
         // will update the Group if exists, otherwise return null
         if (returnedGroup == null){
@@ -125,6 +209,155 @@ public class GroupRestService {
             return Response.status(Response.Status.NOT_FOUND).build(); // 404
         }
         return Response.ok(returnedGroup).build(); // 200
+    }
+
+    @GET
+    @Path("/{group_id}/users_status")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "GET list of user ids with their status")
+    public Response getAllUserStatus(@PathParam("group_id") String str_id){
+        /*
+        get list of user ids with their status
+         */
+        try {
+            log.info("Trying to get all the users status in a Group having id=" + str_id);
+            int group_id = Integer.parseInt(str_id);
+
+            Map<Integer, Status> outMap = groupService.getAllUserStatus(group_id);
+            if (outMap == null){
+                // group does not exist already
+                return Response.status(Response.Status.NOT_FOUND).build(); // 404
+            }
+            return Response.ok(outMap).build(); // 200
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id, it should be numerical: id = " + str_id).build();
+        }
+    }
+
+    @GET
+    @Path("/{group_id}/group_status")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "GET a particular group status")
+    public Response getGroupStatus(@PathParam("group_id") String str_group_id) {
+        try {
+            log.info("Trying to get a group status of a Group having group_id=" + str_group_id);
+            int group_id = Integer.parseInt(str_group_id);
+
+            Status status=groupService.getGroupStatus(group_id);
+            if (status == null){
+                // group does not exist already
+                return Response.status(Response.Status.NOT_FOUND).build(); // 404
+            }
+            return Response.ok(status).build(); // 200
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id, it should be numerical: group_id = " + str_group_id).build();
+        }
+    }
+
+
+    @GET
+    @Path("/{group_id}/users/{user_id}/status")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "GET a particular user status")
+    public Response getUserStatus(@PathParam("group_id") String str_group_id, @PathParam("user_id") String str_user_id) {
+        try {
+            log.info("Trying to get a user status of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
+            int group_id = Integer.parseInt(str_group_id);
+            int user_id = Integer.parseInt(str_user_id);
+
+            // user id can be 0
+            Status status=groupService.getUserStatus(group_id, user_id);
+            if (status == null){
+                // group does not exist already or user did not exist
+                return Response.status(Response.Status.NOT_FOUND).build(); // 404
+            }
+            return Response.ok(status).build(); // 200
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id or user id, it should be numerical: group_id = " + str_group_id + ", user_id = " + str_user_id).build();
+        }
+    }
+
+    @PUT
+    @Path("/{group_id}/users/{user_id}/status")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Update a particular user status")
+    public Response updateUserStatus(@PathParam("group_id") String str_group_id, @PathParam("user_id") String str_user_id, String status) {
+        try {
+            log.info("Trying to update a user status of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
+            int group_id = Integer.parseInt(str_group_id);
+            int user_id = Integer.parseInt(str_user_id);
+
+            // user id can be 0
+            try {
+                Status returnedStatus = groupService.updateUserStatus(group_id, user_id, status);
+                if (returnedStatus == null){
+                    // group does not exist already or user did not exist
+                    return Response.status(Response.Status.NOT_FOUND).build(); // 404
+                }
+                return Response.ok(returnedStatus).build(); // 200
+            }
+            catch (IllegalArgumentException e){
+                return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Bad user status requested: " + e).build();
+            }
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id or user id, it should be numerical: group_id = " + str_group_id + ", user_id = " + str_user_id).build();
+        }
+    }
+
+    @PUT
+    @Path("/{group_id}/users/{user_id}/movie_preferences")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Update a particular user Movie Preferences (short term preferences composed of genres, keywords, year from, year to)")
+    public Response updateMoviePreferences(@PathParam("group_id") String str_group_id, @PathParam("user_id") String str_user_id, MoviePreferences movie_preferences) {
+        try {
+            log.info("Trying to update movie preferences of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
+            int group_id = Integer.parseInt(str_group_id);
+            int user_id = Integer.parseInt(str_user_id);
+
+            // user id can be 0
+            try {
+                boolean returnedBoolean = groupService.updateMoviePreferences(group_id, user_id, movie_preferences);
+                if (!returnedBoolean){
+                    // group does not exist already or user did not exist
+                    return Response.status(Response.Status.NOT_FOUND).build(); // 404
+                }
+                return Response.ok(returnedBoolean).build(); // 200
+            }
+            catch (IllegalArgumentException e){
+                return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Bad movie preferences requested: " + e).build();
+            }
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id or user id, it should be numerical: group_id = " + str_group_id + ", user_id = " + str_user_id).build();
+        }
+    }
+
+
+    @PUT
+    @Path("/{group_id}/users_status")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Changes all the status in the group to Voting")
+    public Response skipAllUserStatus(@PathParam("group_id") String str_id){
+        /*
+        Skip group status ! Changes all the status in the group to Voting or to Done
+         */
+        try {
+            log.info("Trying to change all the status in the group to Voting using: id=" + str_id);
+            int group_id = Integer.parseInt(str_id);
+            Status status = groupService.skipAllUserStatus(group_id);
+            if (status == null){
+                // group not found
+                return Response.status(Response.Status.NOT_FOUND).build(); // 404
+            }
+            return Response.ok(status).build(); // 200
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id, it should be numerical: id = " + str_id).build();
+        }
     }
 
     @DELETE
@@ -151,7 +384,7 @@ public class GroupRestService {
             return Response.ok(returnedGroup).build(); // 200
         }
         catch(NumberFormatException e){ // invalid id
-            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid id, it should be numerical: id = " + str_id).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id, it should be numerical: id = " + str_id).build();
         }
     }
 }

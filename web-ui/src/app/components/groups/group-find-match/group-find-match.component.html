@@ -1,9 +1,18 @@
-<div id="match-container">
-    <div class="inline-container">
-        <div class="btn btn-success btn-lg" id="btn-yes">YES</div>
-        <app-display-movie></app-display-movie>
-        <div class="btn btn-danger btn-lg" id="btn-no">NO</div>
+<div class="page-container">
+    <div class="background-box">
+        <div class="blur-box"></div>
     </div>
-    <div class="btn btn-secondary btn-lg" id="btn-maybe">Maybe</div>
-    <div id="timer" class="mt-5"><h2>{{timerValue}}</h2></div>
+    <div id="match-container">
+        <div class="inline-container">
+            <ng-container *ngIf="movieId != undefined">
+                <app-display-movie [movieId]="movieId"></app-display-movie>
+            </ng-container>
+        </div>
+        <div class="inline-container button-container">
+            <img class="btn btn-lg btn-danger" id="btn-no" src="../../../../assets/buttons/1F922.svg" alt="" width="100" (click)="onNo()">
+            <img class="btn btn-lg btn-secondary" id="btn-maybe" src="../../../../assets/buttons/1F610.svg" alt="" width="100" (click)="onMaybe()">
+            <img class="btn btn-lg btn-success" id="btn-yes" src="../../../../assets/buttons/1F60D.svg" alt="" width="100" (click)="onYes()">
+        </div>
+        <div id="timer" class="mt-2"><h3><span id="timerValue">00:00</span></h3></div>
+    </div>
 </div>

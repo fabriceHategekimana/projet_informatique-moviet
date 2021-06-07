@@ -2,6 +2,7 @@ package domain.service;
 
 import domain.service.GroupServiceImpl;
 import domain.model.Group;
+import domain.model.User;
 
 // Unit/Component testing using JUnit 5
 // https://junit.org/junit5/docs/current/user-guide/#writing-tests
@@ -15,6 +16,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import eu.drus.jpa.unit.api.JpaUnit;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -54,13 +57,16 @@ class GroupServiceImplTest {
     @Test
     void testGetGroup() {
         initDataStore();  // create new groups
-        List<Group> groups = groupServiceImpl.getAllGroups(); // get list of groups through the business service
-        int random_choice = (int) (Math.random() * groups.size());
-        int id = groups.get(random_choice).getId(); // get the id through Java object ! (list of groups)
+        // order not preserved
+        Set<Group> groups = groupServiceImpl.getAllGroups(); // get set of groups through the business service
+        List<Group> list_groups = new ArrayList<>(groups); // shallow copy
 
-        Group grp= groupServiceImpl.getGroup(id); // get the specific group through the business service
-        assertEquals(groups.get(random_choice).getId(), grp.getId()); // check the ids
-        assertEquals(groups.get(random_choice).getName(), grp.getName());
+        int id = list_groups.get(0).getId(); // get the id through Java object ! (set of groups)
+
+        Group grp = groupServiceImpl.getGroup(id); // get the specific group through the business service
+
+        assertEquals(list_groups.get(0).getId(), grp.getId()); // check the ids
+        assertEquals(list_groups.get(0).getName(), grp.getName());
     }
 
     @Test
@@ -92,9 +98,10 @@ class GroupServiceImplTest {
     @Test
     void testCreateWithIdGroup() {
         initDataStore();  // create new groups
-        List<Group> groups = groupServiceImpl.getAllGroups(); // get list of groups through the business service
-        int random_choice = (int) (Math.random() * groups.size());
-        Group group = groups.get(random_choice);
+        Set<Group> groups = groupServiceImpl.getAllGroups(); // get set of groups through the business service
+        List<Group> list_groups = new ArrayList<>(groups); // shallow copy
+
+        Group group = list_groups.get(0);
         assertNull(groupServiceImpl.createGroup(group)); // check if null because trying to create group with an id
     }
 
@@ -103,8 +110,8 @@ class GroupServiceImplTest {
     void testUpdateGroup() { // TODO: test Group input entered in updateGroup in Impl
         // create a group and modify its name
         groupServiceImpl.createGroup(getRandomGroup());
-        List<Group> groups = groupServiceImpl.getAllGroups(); // get list of groups through the business service
-        Group group = groups.get(groups.size() - 1);  // get last group
+        Set<Group> groups = groupServiceImpl.getAllGroups(); // get set of groups through the business service
+        Group group = groupServiceImpl.getGroup(groups.size());  // get last group
 
         assertNotNull(group);
         int id = group.getId();
@@ -117,9 +124,9 @@ class GroupServiceImplTest {
     @Test
     void testUpdateNonExistantGroup() {
         initDataStore();  // create new groups
-        List<Group> groups = groupServiceImpl.getAllGroups(); // get list of groups through the business service
+        Set<Group> groups = groupServiceImpl.getAllGroups(); // get set of groups through the business service
         // delete the last one
-        Group old_group = groups.get(groups.size() - 1);  // get last group
+        Group old_group = groupServiceImpl.getGroup(groups.size());  // get last group
         assertNotNull(old_group);
         int id = old_group.getId();
         groupServiceImpl.deleteGroup(id);
@@ -140,8 +147,8 @@ class GroupServiceImplTest {
     void testDeleteGroup() {
         // create a group and then delete one of the groups
         groupServiceImpl.createGroup(getRandomGroup());
-        List<Group> groups = groupServiceImpl.getAllGroups(); // get list of groups through the business service
-        Group group = groups.get(groups.size() - 1);  // get last group
+        Set<Group> groups = groupServiceImpl.getAllGroups(); // get set of groups through the business service
+        Group group = groupServiceImpl.getGroup(groups.size());  // get last group
 
         assertNotNull(group);
         int id = group.getId();
@@ -156,8 +163,8 @@ class GroupServiceImplTest {
     }
 
 
-    private List<Group> getGroups() {
-        List<Group> groups = new ArrayList<>();
+    private Set<Group> getGroups() {
+        Set<Group> groups = new HashSet<>();
         long numberOfNewGrp = Math.round((Math.random() * 10)) + 5;
         for (int i = 0; i < numberOfNewGrp; i++) {
             groups.add(getRandomGroup());
@@ -167,7 +174,7 @@ class GroupServiceImplTest {
 
     private int initDataStore() {
         int size = groupServiceImpl.getAllGroups().size();
-        List<Group> newGroups = getGroups();
+        Set<Group> newGroups = getGroups();
         for (Group g : newGroups) {
             em.persist(g);
         }
