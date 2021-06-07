@@ -46,6 +46,9 @@ yarn-error.log
 testem.log
 /typings
 
+# For personal scripts
+scripts/local_my_run.sh
+
 # System Files
 .DS_Store
 Thumbs.db
