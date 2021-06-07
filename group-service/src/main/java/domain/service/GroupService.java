@@ -20,5 +20,6 @@ public interface GroupService{
     Status skipAllUserStatus(int group_id); // called by PUT request
     Status getGroupStatus(int group_id); // called by GET request
     boolean updateMoviePreferences(int group_id, int user_id, MoviePreferences movie_preferences); // called by PUT request
+    MoviePreferences getMoviePreferences(int group_id, int user_id); // called by GET request
     Group deleteGroup(int id); // called by DELETE request
 }
