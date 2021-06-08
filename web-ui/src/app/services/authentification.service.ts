@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DOCUMENT } from '@angular/common';
 
 const cookieName = "_oauth2_proxy_csrf";
 
@@ -17,7 +18,7 @@ export class AuthentificationService {
   checkIfLogged(): boolean {
     // test if the cookie exist
     if (document.cookie.indexOf(cookieName) > -1 ) {
-      this.isLogged = false;
+      this.isLogged = true;
       return true;
     } else {
       this.isLogged = false;
@@ -31,14 +32,18 @@ export class AuthentificationService {
 
   logout() {
     this.deleteCookie(cookieName);
+    this.checkIfLogged();
     this.router.navigate(['']); // navigate to the home page
   }
 
   login() {
-    //TODO: login
+    window.location.href = loginPage;
+    this.checkIfLogged();
   }
 
   signUp() {
-
+    //TODO: pass signup parameter if possible
+    window.location.href = loginPage;
+    this.checkIfLogged();
   }
 }

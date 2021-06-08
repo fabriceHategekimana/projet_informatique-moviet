@@ -6,7 +6,6 @@ import { Group } from '../shared/interfaces/group'
 import { UsersStatus } from '../shared/interfaces/users-status'
 import { UserStatusValue } from '../shared/interfaces/users-status'
 import { MoviePreferences } from '../shared/interfaces/movie-preferences'
-import { group } from 'node:console'
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -44,7 +43,10 @@ export class GroupService {
   }
 
   createGroup(): Observable<any> {
-    return this.http.post<Group>(this.groupsUrl, {name: 'newGroup'}, this.httpOptionsPost)
+    // in production mode, the backend will check and add the user
+    //TODO: random group name
+    let body = environment.production ? {"name": 'newGroup'} : {"name":"newGroup", "admin_id": "1"}; //!MOCK
+    return this.http.post<Group>(this.groupsUrl, body, this.httpOptionsPost)
                   .pipe(catchError(this.handleError<Group>('createGroup', undefined)));
   }
 
@@ -53,8 +55,10 @@ export class GroupService {
                   .pipe(catchError(this.handleError<UsersStatus>('getUsersStatus', undefined)));
   }
 
-  addUserToGroup(groupId: number) {
-    return this.http.post<any>(this.groupsUrl + "/" + groupId + "/" + "users/", {}, this.httpOptionsPost)
+  addUserToGroup(groupId: number, userId: string) {
+    // in production mode, the backend will check and add the user
+    let body = environment.production ? {} : {"id": userId};
+    return this.http.post<any>(this.groupsUrl + "/" + groupId + "/" + "users", body, this.httpOptionsPost)
                   .pipe(catchError(this.handleError<any>('addUserToGroup', undefined)));
   }
 
@@ -73,10 +77,9 @@ export class GroupService {
     };
   }
 
-  sendPreferences(groupId: number, moviePreferences: MoviePreferences): Observable<any> { // send the user preferences
-    //! MOCK
-    //TODO: send preferences
-    return of();
+  sendPreferences(groupId: number, userId: string, moviePreferences: MoviePreferences): Observable<any> { // send the user preferences
+    return this.http.post<MoviePreferences>(this.groupsUrl + "/" + groupId + "/" + "users/" + userId + "/movie_preferences", moviePreferences, this.httpOptionsPut)
+                  .pipe(catchError(this.handleError<any>('sendPreferences', undefined)));
   }
 
   getMoviesSuggestions(): Observable<number[]> {
@@ -96,7 +99,6 @@ export class GroupService {
   }
 
   setUserStatus(groupId: number, userId: string, status: UserStatusValue): Observable<any> {
-    // console.log(this.groupsUrl + "/" + groupId + "/" + "users/" + userId + "/status");
     return this.http.put<UserStatusValue>(this.groupsUrl + "/" + groupId + "/" + "users/" + userId + "/status", status, this.httpOptionsPut)
                   .pipe(catchError(this.handleError<any>('setUserStatus', undefined)));
   }

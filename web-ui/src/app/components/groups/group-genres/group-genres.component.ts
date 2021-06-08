@@ -10,6 +10,7 @@ import { UserStatusValue } from '../../../shared/interfaces/users-status'
 import { UserService } from '../../../services/user.service'
 import { GroupService } from 'src/app/services/group.service'
 import { MoviePreferences } from '../../../shared/interfaces/movie-preferences'
+import { User } from 'src/app/shared/interfaces/user'
 
 @Component({
   selector: 'app-group-genres',
@@ -35,7 +36,9 @@ export class GroupGenresComponent implements OnInit {
 
   isAdmin: boolean = false;
 
-  constructor(private movieService: MovieService, private groupService: GroupService, private groupsComponent : GroupsComponent, private router: Router, private route: ActivatedRoute) { }
+  myUser?: User;
+
+  constructor(private movieService: MovieService, private userService: UserService, private groupService: GroupService, private groupsComponent : GroupsComponent, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.groupsComponent.getGroup( // get the group
@@ -43,6 +46,10 @@ export class GroupGenresComponent implements OnInit {
       () => {
         this.currentGroup = this.groupsComponent.currentGroup; // save the current group
         // console.log(this.currentGroup);
+        this.getMyUser(() => {
+          // Test if admin:
+          this.testIfAdmin();
+        });
       }
     );
     
@@ -50,9 +57,6 @@ export class GroupGenresComponent implements OnInit {
     this.getTags();
 
     this.getGenres();
-
-    // Test if admin:
-    this.testIfAdmin();
   }
 
   getTags(): void {
@@ -156,7 +160,7 @@ export class GroupGenresComponent implements OnInit {
         preferences.yearTo = this.yearTo;
       }
 
-      this.groupService.sendPreferences(this.currentGroup.id, preferences);
+      this.groupService.sendPreferences(this.currentGroup.id, this.getMyUserId(), preferences);
       this.setUserStatus(() => {this.goToWaitPref();});
     }
   }
@@ -194,12 +198,31 @@ export class GroupGenresComponent implements OnInit {
     });
   }
 
-  getMyUserId(): string { //! Temporary
-    return '1';
+  getMyUserId(): string {
+    if (this.myUser != undefined) {
+      return this.myUser.id;
+    } else {
+      return '';
+    }
+  }
+
+  getMyUser(then: ()=>any = ()=>void 0) {
+    this.userService.whoAmI()
+      .subscribe((user) => {
+        this.myUser = user;
+        then();
+      });
   }
 
   testIfAdmin() { // test if the user is admin
-    //! MOCK
-    this.isAdmin = true;
+    if (this.currentGroup != undefined) {
+      if (this.myUser != undefined) {
+        if (this.myUser.id == this.currentGroup.admin_id) {
+          this.isAdmin = true;
+        } else {
+          this.isAdmin = false;
+        }
+      }
+    }
   }
 }
