@@ -20,6 +20,7 @@ export class MovieService {
 
     })};
 
+    
 
   private movieUrl : string = environment.API_URL + movie_API_URL + "movies"; //! MOCK
   private genresUrl : string = environment.API_URL + movie_API_URL + "movies/genres"; //! MOCK
