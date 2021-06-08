@@ -1,14 +1,124 @@
+/* variables: */
+/* :root {
+    --input-height: 2em;
+} */
+/** --------------- */
+
+/* background */
+.background-box {
+    background-image: url("../../../../assets/background/background-groups.jpg");
+}
+
 .btn-container {
     display: flex;
     margin-left: 0.5em;
 }
 
 #preferences-container {
+    margin: 0 auto;
+    padding: 5em;
+
+    border-radius: 1em;
+
+    -webkit-transform: translateY(5vh);
+    transform: translateY(5vh);
+    position: relative;
+    width: fit-content;
+    justify-content: center;
     text-align: center;
+    align-items: center;
+
+    background-color: white;
+}
+
+.genres-container {
+    text-align: center;
+    justify-content: center;
+    flex-flow: row wrap;
+    max-width: 50em;
+    margin: 0 auto;
+}
+
+.genre {
+    margin-top: 0.5em;
+}
+
+/* .proposed-keyword {
+    
+} */
+
+.selected-keywords-container {
+    margin: 0.5em auto;
+    justify-content: center;
+    max-width: 50em;
+}
+
+.selected-keyword {
+    margin-left: 0.5em;
+}
+
+.selected-keyword-name {
+    margin-right: 0.5em;
+}
+
+.proposed-keyword {
+    text-decoration: none;
+}
+
+.proposed-keyword:hover {
+    cursor: pointer;
+}
+
+#input-keywords {
+    height: 2em;
+}
+
+#input-container {
+    width: fit-content;
+    margin: 0 auto;
+    justify-content: center;
+    height: 7em;
+    overflow: visible;
+}
+
+.proposed-keywords-container {
+    width: fit-content;
+    margin-left: 0;
+    max-height: 5em;
+    overflow-y: scroll;
+}
+
+/* display the scroll bar: */
+.proposed-keywords-container::-webkit-scrollbar {
+    all: unset;
+}
+
+/* width */
+.proposed-keywords-container::-webkit-scrollbar {
+    width: 0.5em;
+}
+
+/* Track */
+.proposed-keywords-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+.proposed-keywords-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 0.5em;
+}
+
+/* Handle on hover */
+.proposed-keywords-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.dates-container {
+    margin: 0 auto;
     justify-content: center;
 }
 
-.tag-values-container {
-    text-align: center;
-    justify-content: center;
+.year-input {
+    margin: 0 1em;
 }
