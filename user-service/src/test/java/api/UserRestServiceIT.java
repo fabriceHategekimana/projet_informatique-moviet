@@ -59,7 +59,7 @@ class UserRestServiceIT {
         get("/{id}", 1).
         then().
             statusCode(200). // OK
-            body("id", equalTo(1),
+            body("id", equalTo("1"),
                     "firstName", containsStringIgnoringCase("Stephane"));
     }
 
@@ -71,21 +71,13 @@ class UserRestServiceIT {
             statusCode(404); // NOT FOUND
     }
 
-    @Test
-    void testGetUser_bad_request(){ // GET
-        when().
-            get("/{id}","$").
-        then().
-            statusCode(400); // BAD REQUEST
-    }
-
 
     /* --------------------------------------------------------
     IT for createUser
      */
     @Test
     void testCreateUser_created(){ // POST
-        String myJson="{\"firstName\": \"new\", \"lastName\":\"user\", \"age\": \"42\"}";
+        String myJson="{\"id\": 10,\"firstName\": \"new\", \"lastName\":\"user\", \"age\": \"42\"}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -93,7 +85,7 @@ class UserRestServiceIT {
             post("/").
         then().
             statusCode(201).
-            body("id", notNullValue(),
+            body("id", equalTo("10"),
                     "firstName", equalTo("new"),
 		    		"lastName", equalTo("user"),
 					"age", equalTo("42")).
@@ -101,24 +93,8 @@ class UserRestServiceIT {
     }
 
     @Test
-    void testCreateUser_created_id_0(){ // POST
-        String myJson="{\"id\": 0,\"firstName\": \"new\", \"lastName\":\"user\", \"age\": \"42\"}";  // id 0 is like not even adding id in the JSON
-        given().
-            contentType(ContentType.JSON).
-            body(myJson).
-        when().
-            post("/").
-        then().
-            statusCode(201).
-            body("id", notNullValue(),
-                    "firstName", equalTo("new"),
-		    		"lastName", equalTo("user"),
-					"age", equalTo("42"));
-    }
-
-    @Test
     void testCreateUser_bad_request_attributes(){ // POST, null params.. Id 0 is okay
-        String myJson="{\"id\": 0}";
+        String myJson="{\"id\": 10}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -130,7 +106,7 @@ class UserRestServiceIT {
 
     @Test
     void testCreateUser_bad_request_id(){ // POST
-        String myJson="{\"id\": 100,\"firstName\": \"new\", \"lastName\":\"user\", \"age\": \"42\"}";
+        String myJson="{\"id\": 0,\"firstName\": \"new\", \"lastName\":\"user\", \"age\": \"42\"}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -142,7 +118,7 @@ class UserRestServiceIT {
 
     @Test
     void testCreateUser_bad_request_id_attributes(){ // POST
-        String myJson="{\"id\": 4}";
+        String myJson="{\"id\": 0}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -259,7 +235,7 @@ class UserRestServiceIT {
             delete("/").
         then().
             statusCode(200). // OK
-            body("id", equalTo(3),
+            body("id", equalTo("3"),
                     "firstName", notNullValue(),
 		    		"lastName", notNullValue(),
 					"age", notNullValue());
@@ -274,17 +250,6 @@ class UserRestServiceIT {
             delete("/").
         then().
             statusCode(404); // NOT FOUND
-    }
-
-    @Test
-    void testDeleteUser_bad_request(){ // DELETE
-        given().
-            contentType(ContentType.JSON).
-            body(""). // id
-        when().
-            delete("/").
-        then().
-            statusCode(400); // BAD REQUEST
     }
 
 }

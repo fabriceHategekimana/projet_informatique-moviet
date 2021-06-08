@@ -92,15 +92,6 @@ class UserServiceImplTest {
 
 
     @Test
-    void testCreateWithIdUser() {
-        initDataStore();  // create new users
-        List<User> users = userServiceImpl.getAllUsers(); // get list of users through the business service
-        int random_choice = (int) (Math.random() * users.size());
-        User user = users.get(random_choice);
-        assertNull(userServiceImpl.createUser(user)); // check if null because trying to create user with an id
-    }
-
-    @Test
     void testUpdateUserFirstName() { // TODO: test User input entered in updateUser in Impl
         // create a user and modify its name
         userServiceImpl.createUser(getRandomUser());

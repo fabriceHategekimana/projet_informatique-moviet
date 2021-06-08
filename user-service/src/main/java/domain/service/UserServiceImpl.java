@@ -53,12 +53,17 @@ public class UserServiceImpl implements UserService{
         /*
         Can always create.. no restriction due to auto increment of unique identifier / primary key
          */
-        if ((!"0".equals(user.getId())) || (user.getFirstName() == null) || (user.getLastName() == null)){ // if non initialized.
+        if (("0".equals(user.getId())) || (user.getId() == null) || (user.getFirstName() == null) || (user.getLastName() == null)){ // if non initialized.
             // Actually if we do not check. SQL will throw an error because NOT NULL for the attributein the table
             // To put Only other attributes than id are (must be) initialized: " + user in the logs
             return null;
         }
-        em.persist(user);
+        if (em.find(User.class, user.getId()) != null){
+            em.persist(user);
+        }
+        else{
+            em.merge(user);
+        }
         return user;
     }
 
