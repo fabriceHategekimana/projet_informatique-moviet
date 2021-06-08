@@ -1,8 +1,5 @@
 package domain.service;
-
-import domain.service.GroupServiceImpl;
 import domain.model.Group;
-import domain.model.User;
 
 // Unit/Component testing using JUnit 5
 // https://junit.org/junit5/docs/current/user-guide/#writing-tests
@@ -188,7 +185,6 @@ class GroupServiceImplTest {
     }
 
     private Group getRandomGroupNoName() {
-        Group g = new Group();
-        return g;
+        return new Group();
     }
 }
