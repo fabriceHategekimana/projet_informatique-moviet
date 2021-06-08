@@ -76,7 +76,7 @@ class UserTest {
 
     @Test
     void testGetIdNoArgsConstructor(){
-        assertNull(new User().getId() );
+        assertEquals("0", new User().getId() );
     }
 
     @Test
