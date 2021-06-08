@@ -44,6 +44,10 @@ public class Count {
         this(group_id, movie_id, 0, 0, 0);
     }
 
+    public float computeScore() {
+        return (float) (nb_yes - nb_no + .5 * nb_maybe);
+    }
+
     public void checkValidity() {
         if (group_id <= 0) {
             throw new IllegalArgumentException(String.format("group_id should be a strictly positive integer, given %d", group_id));

@@ -8,8 +8,12 @@ import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 
 public class VoteManager implements VoteManagerInterface {
     @SuppressWarnings("unused")
@@ -31,29 +35,42 @@ public class VoteManager implements VoteManagerInterface {
     }
 
     @Override
+    @Transactional
     public Count incrementYes(@NotNull int group_id, @NotNull int movie_id) {
-        return null;
+        Count count = em.find(Count.class, new KeyGroupMovie(group_id, movie_id));
+        count.setNb_yes(count.getNb_yes() + 1);
+        return count;
     }
 
     @Override
     public Count incrementNo(@NotNull int group_id, @NotNull int movie_id) {
-        return null;
+        Count count = em.find(Count.class, new KeyGroupMovie(group_id, movie_id));
+        count.setNb_no(count.getNb_no() + 1);
+        return count;
     }
 
     @Override
     public Count incrementMaybe(@NotNull int group_id, @NotNull int movie_id) {
-        return null;
+        Count count = em.find(Count.class, new KeyGroupMovie(group_id, movie_id));
+        count.setNb_maybe(count.getNb_maybe() + 1);
+        return count;
     }
 
     @Override
     public List<Count> getPolls(@NotNull int group_id) {
-        return null;
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<Count> criteria = builder.createQuery(Count.class);
+        criteria.from(Count.class);
+        List<Count> polls = em.createQuery(criteria).getResultList();
+        polls.removeIf(count -> !Objects.equals(count.getGroup_id(), group_id));
+        return polls;
     }
 
     @Override
     public List<Count> getResults(@NotNull int group_id) {
         return null;
-    }
+    }  // get
+
 
     @Override
     public Count deletePoll(@NotNull int group_id, @NotNull int movie_id) {
@@ -66,7 +83,7 @@ public class VoteManager implements VoteManagerInterface {
     }
 
     @Override
-    public List<Count> deletePolls(@NotNull int group_id) {
+    public List<Count> deleteAllPolls(@NotNull int group_id) {
         return null;
     }
 
