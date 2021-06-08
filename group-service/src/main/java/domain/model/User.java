@@ -23,7 +23,7 @@ import javax.validation.constraints.NotNull;
 public class User {
     @Id @NotNull // no automatic generation
     @Column(name="user_id", length=255)
-    private String id;
+    private String id = "0";
 
     @ManyToMany(mappedBy = "users")
     @Setter @JsonIgnore
