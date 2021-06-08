@@ -30,7 +30,6 @@ public class UserServiceImpl implements UserService{
     @PersistenceContext(unitName = "UserPU") // name is the same as in persistence.xml file
     private EntityManager em;
 
-
     public List<User> getAllUsers(){
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<User> criteria = builder.createQuery( User.class );
@@ -53,7 +52,7 @@ public class UserServiceImpl implements UserService{
         /*
         Can always create.. no restriction due to auto increment of unique identifier / primary key
          */
-        if (("0".equals(user.getId())) || (user.getId() == null) || (user.getFirstName() == null) || (user.getLastName() == null)){ // if non initialized.
+        if ((user.getId().equals("0")) || (user.getId() == null)  || (user.getUsername() == null)){ // if non initialized.
             // Actually if we do not check. SQL will throw an error because NOT NULL for the attributein the table
             // To put Only other attributes than id are (must be) initialized: " + user in the logs
             return null;
@@ -70,8 +69,8 @@ public class UserServiceImpl implements UserService{
     @Transactional
     public User updateUser(@NonNull User user){
         // User need to has a non null id.
-        User g = em.find(User.class, user.getId());
-        if (g == null) {
+        User u = em.find(User.class, user.getId());
+        if (u == null) {
             return null; // error 404 not found in the user
         }
         em.merge(user);

@@ -45,8 +45,7 @@ class UserRestServiceIT {
         // https://github.com/rest-assured/rest-assured/wiki/Usage#deserialization-with-generics
         get("/").
         then().
-            statusCode(200). // OK
-            body(containsStringIgnoringCase("erwan"));
+            statusCode(405); // I don't want getAllusers to be used here
     }
 
     /* --------------------------------------------------------
@@ -60,7 +59,7 @@ class UserRestServiceIT {
         then().
             statusCode(200). // OK
             body("id", equalTo("1"),
-                    "firstName", containsStringIgnoringCase("Stephane"));
+                    "username", containsStringIgnoringCase("Stephane"));
     }
 
     @Test
@@ -77,7 +76,7 @@ class UserRestServiceIT {
      */
     @Test
     void testCreateUser_created(){ // POST
-        String myJson="{\"id\": 10,\"firstName\": \"new\", \"lastName\":\"user\", \"age\": \"42\"}";
+        String myJson="{\"id\": 10,\"username\": \"test\"}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -86,9 +85,7 @@ class UserRestServiceIT {
         then().
             statusCode(201).
             body("id", equalTo("10"),
-                    "firstName", equalTo("new"),
-		    		"lastName", equalTo("user"),
-					"age", equalTo("42")).
+                    "username", equalTo("test")).
             header("Location", notNullValue());
     }
 
@@ -106,7 +103,7 @@ class UserRestServiceIT {
 
     @Test
     void testCreateUser_bad_request_id(){ // POST
-        String myJson="{\"id\": 0,\"firstName\": \"new\", \"lastName\":\"user\", \"age\": \"42\"}";
+        String myJson="{\"id\": 0,\"firstName\": \"new\"}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -127,26 +124,13 @@ class UserRestServiceIT {
         then().
             statusCode(400);
     }
-
-    @Test
-    void testCreateUser_bad_request_age_negative(){ // POST
-        String myJson="{\"firstName\": \"new\", \"lastName\":\"user, \"age\": \"-1\"}";
-        given().
-            contentType(ContentType.JSON).
-            body(myJson).
-        when().
-            post("/").
-        then().
-            statusCode(400);
-    }	
-
     // -------------------------------------------------------
     /*
     IT for updateUser
      */
     @Test
     void testUpdateUser_ok(){
-        String myJson="{\"id\": 2,\"firstName\": \"Ethan\", \"lastName\":\"Icet\", \"age\": \"20\"}"; // no other test will delete this user otherwise we can have errors
+        String myJson="{\"id\": 2,\"username\": \"Ethan\"}"; // no other test will delete this user otherwise we can have errors
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -155,15 +139,13 @@ class UserRestServiceIT {
         then().
             statusCode(200).
             body("id", notNullValue(),
-                    "firstName", equalTo("Ethan"),
-		    		"lastName", equalTo("Icet"),
-					"age", equalTo("20"));
+                    "username", equalTo("Ethan"));
     }
 
     @Test
     void testUpdateUser_not_found(){
         // no other test will delete this user otherwise we can have errors
-        String myJson="{\"id\": ".concat(String.valueOf(Integer.MAX_VALUE)).concat(" ,\"firstName\": \"Ethan\", \"lastName\":\"Icet\", \"age\": \"20\"}");
+        String myJson="{\"id\": ".concat(String.valueOf(Integer.MAX_VALUE)).concat(" ,\"username\": \"Ethan\"}");
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -187,7 +169,7 @@ class UserRestServiceIT {
 
     @Test
     void testUpdateUser_bad_request_id(){
-        String myJson="{\"firstName\": \"new_name\"}";
+        String myJson="{\"username\": \"new_name\"}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -208,19 +190,6 @@ class UserRestServiceIT {
         then().
             statusCode(400);
     }
-
-    @Test
-    void testUpdateUser_bad_request_age_negative(){
-        String myJson="{\"id\": 2,\"firstName\": \"Ethan\", \"lastName\":\"Icet\", \"age\": \"-20\"}";
-        given().
-            contentType(ContentType.JSON).
-            body(myJson).
-        when().
-            put("/").
-        then().
-            statusCode(400);
-    }
-
     // --------------------------------------------------------
     /*
     IT for deleteUser
@@ -236,9 +205,7 @@ class UserRestServiceIT {
         then().
             statusCode(200). // OK
             body("id", equalTo("3"),
-                    "firstName", notNullValue(),
-		    		"lastName", notNullValue(),
-					"age", notNullValue());
+                    "username", notNullValue());
     }
 
     @Test

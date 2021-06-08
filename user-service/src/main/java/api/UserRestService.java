@@ -43,14 +43,6 @@ public class UserRestService {
     private UserService userService; // no more instantiation in the constructor
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "GET a list of all users")
-    public Response getAllUsers() {
-        log.info("Trying to get all users");
-        return Response.ok(userService.getAllUsers()).build(); // we can even add headers using .header() before .build()
-    }
-
-    @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "GET a particular user")
@@ -65,7 +57,7 @@ public class UserRestService {
             return Response.ok(user).build();
         }
         catch(NumberFormatException e){ // invalid id
-            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid id, it should be numerical: id = " + str_id).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid id, it should be a string: id = " + str_id).build();
         }
     }
     /*
@@ -90,7 +82,7 @@ public class UserRestService {
         */
         log.info("Trying to create using User: " + user);
         // only want non init id and non null first/last names, otherwise bad request
-        if ((user.getId().equals("0")) || (user.getId() == null) || (user.getFirstName() == null) || (user.getLastName() == null) || (user.getAge() == null) || !(Integer.parseInt(user.getAge()) > 0)){
+        if ((user.getId().equals("0")) || (user.getId() == null)  || (user.getUsername() == null)){
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : all attributes must be initialized correctly: " + user).build();
         }
 
@@ -114,7 +106,7 @@ public class UserRestService {
          */
         log.info("Trying to update using User: " + user);
         // only want initialized id and non null names, otherwise bad request
-        if ((user.getId().equals("0")) || (user.getId() == null)  || (user.getFirstName() == null) || (user.getLastName() == null) || (user.getAge() == null) || !(Integer.parseInt(user.getAge()) > 0)){
+        if ((user.getId().equals("0")) || (user.getId() == null)  || (user.getUsername() == null)){
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : all attributes need to be correctly instantiated: " + user).build();
         }
         User returnedUser=userService.updateUser(user); // get all users and check if user inside list of users
