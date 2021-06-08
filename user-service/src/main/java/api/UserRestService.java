@@ -57,8 +57,7 @@ public class UserRestService {
     public Response getUser(@PathParam("id") String str_id) {
         try {
             log.info("Trying to get a user using: id=" + str_id);
-            int id = Integer.parseInt(str_id);
-            User user=userService.getUser(id);
+            User user=userService.getUser(str_id);
             if (user == null) { // user not found
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
@@ -82,7 +81,7 @@ public class UserRestService {
     public Response createUser(User user, final @Context UriInfo uriInfo){
         /*
         Create a user and returns HTTP status code and the location of the newly created object. It's possible to create multiple
-        users with same name. The unique identifier is its id that auto increments. We cannot input a user having an id !!
+        users with same name. We cannot input an user WITHOUT ID
 
         Example with curl:
         - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10082/users -d '{"name":"test"}'
@@ -91,14 +90,14 @@ public class UserRestService {
         */
         log.info("Trying to create using User: " + user);
         // only want non init id and non null first/last names, otherwise bad request
-        if ((user.getId() != 0) || (user.getFirstName() == null) || (user.getLastName() == null) || (user.getAge() == null) || !(Integer.parseInt(user.getAge()) > 0)){
-            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : other attributes than id must be initialized correctly: " + user).build();
+        if ((user.getId().equals("0")) || (user.getId() == null) || (user.getFirstName() == null) || (user.getLastName() == null) || (user.getAge() == null) || !(Integer.parseInt(user.getAge()) > 0)){
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : all attributes must be initialized correctly: " + user).build();
         }
 
-        User returnedUser=userService.createUser(user); // can never have conflict if id are auto-incremented.
+        User returnedUser=userService.createUser(user); // TODO : manage when conflict of ID !!
         // returnedUser can be null in general but we tested the input before so it's not null.. otherwise bad request..
         UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder(); // https://www.logicbig.com/tutorials/java-ee-tutorial/jax-rs/uri-info.html
-        uriBuilder.path(Integer.toString(returnedUser.getId()));
+        uriBuilder.path(returnedUser.getId());
         return Response.created(uriBuilder.build()).entity(returnedUser).build(); // 201
     }
 
@@ -115,7 +114,7 @@ public class UserRestService {
          */
         log.info("Trying to update using User: " + user);
         // only want initialized id and non null names, otherwise bad request
-        if ((user.getId() == 0) || (user.getFirstName() == null) || (user.getLastName() == null) || (user.getAge() == null) || !(Integer.parseInt(user.getAge()) > 0)){
+        if ((user.getId().equals("0")) || (user.getId() == null)  || (user.getFirstName() == null) || (user.getLastName() == null) || (user.getAge() == null) || !(Integer.parseInt(user.getAge()) > 0)){
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : all attributes need to be correctly instantiated: " + user).build();
         }
         User returnedUser=userService.updateUser(user); // get all users and check if user inside list of users
@@ -141,8 +140,7 @@ public class UserRestService {
          */
         try {
             log.info("Trying to delete a user using: id=" + str_id);
-            int id = Integer.parseInt(str_id);
-            User returnedUser=userService.deleteUser(id); // get all users and check if user inside users
+            User returnedUser=userService.deleteUser(str_id); // get all users and check if user inside users
             // will delete the user if exists, otherwise return null
             if (returnedUser == null){
                 // user does not exist already

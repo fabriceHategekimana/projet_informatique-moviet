@@ -7,14 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 // https://projectlombok.org/features/all
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
 // https://youtu.be/FeZ5BC0PirQ
 
 @ToString
@@ -22,8 +18,9 @@ import javax.persistence.Table;
 @NoArgsConstructor // need this otherwise can have some problems with PUT (create) requests
 @Entity @Table( name="T_users")// JPA, mapping class - table
 public class User {
-    @Id @GeneratedValue( strategy=GenerationType.IDENTITY ) // Generated Value, automatically generated following how the db was configured
-    private int id;
+    @Id
+    @Column(length=255)
+    private String id="0"; // no auto increment
     @Setter @NotNull
     private String firstName;
 	@Setter @NotNull
@@ -34,7 +31,8 @@ public class User {
 
 //	private ArrayList<String> prefs;
 
-    public User(String firstName, String lastName, String age){
+    public User(String id, String firstName, String lastName, String age){
+        this.id = id;
         this.firstName = firstName;
 		this.lastName = lastName;
 		this.age = age;

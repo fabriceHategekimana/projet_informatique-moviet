@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService{
     }
 
     // find by ID, names are not unique
-    public User getUser(int id){
+    public User getUser(String id){
         /* Need to find the user then return it, Id's are unique
         if not in the list return null, the Rest Service will take care of returning some HTTP code (404 not found here)
         https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html#find-java.lang.Class-java.lang.Object-
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService{
         /*
         Can always create.. no restriction due to auto increment of unique identifier / primary key
          */
-        if ((user.getId() != 0) || (user.getFirstName() == null) || (user.getLastName() == null)){ // if non initialized.
+        if ((!"0".equals(user.getId())) || (user.getFirstName() == null) || (user.getLastName() == null)){ // if non initialized.
             // Actually if we do not check. SQL will throw an error because NOT NULL for the attributein the table
             // To put Only other attributes than id are (must be) initialized: " + user in the logs
             return null;
@@ -74,7 +74,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Transactional
-    public User deleteUser(int id){
+    public User deleteUser(String id){
         User user = em.find(User.class, id);
         if (user == null) {
             return null; // user does not exist, return null -> will be HTTP status code 404 not found

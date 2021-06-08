@@ -56,7 +56,7 @@ class UserServiceImplTest {
         initDataStore();  // create new users
         List<User> users = userServiceImpl.getAllUsers(); // get list of users through the business service
         int random_choice = (int) (Math.random() * users.size());
-        int id = users.get(random_choice).getId(); // get the id through Java object ! (list of users)
+        String id = users.get(random_choice).getId(); // get the id through Java object ! (list of users)
 
         User usr= userServiceImpl.getUser(id); // get the specific user through the business service
         assertEquals(users.get(random_choice).getId(), usr.getId()); // check the ids
@@ -67,14 +67,14 @@ class UserServiceImplTest {
 
     @Test
     void testGetNonExistantUser() {
-        assertNull(userServiceImpl.getUser(Integer.MAX_VALUE)); // check if null (when we get a non existant user)
+        assertNull(userServiceImpl.getUser(String.valueOf(Integer.MAX_VALUE))); // check if null (when we get a non existant user)
     }
 
     @Test
     void testCreateUser() { // TODO: test User input entered in createUser in Impl
         User user = getRandomUser();
         User returned_user = userServiceImpl.createUser(user);
-        assertNotEquals(0, returned_user.getId()); // check if id not 0 (meaning that the id was incremented and initialized)
+        assertNotEquals("0", returned_user.getId()); // check if id not 0 (meaning that the id was incremented and initialized)
     }
 
     @Test
@@ -108,7 +108,7 @@ class UserServiceImplTest {
         User user = users.get(users.size() - 1);  // get last user
 
         assertNotNull(user);
-        int id = user.getId();
+        String id = user.getId();
         user.setFirstName("XXX");
         userServiceImpl.updateUser(user);
         user = userServiceImpl.getUser(id);
@@ -123,7 +123,7 @@ class UserServiceImplTest {
         User user = users.get(users.size() - 1);  // get last user
 
         assertNotNull(user);
-        int id = user.getId();
+        String id = user.getId();
         user.setLastName("XXX");
         userServiceImpl.updateUser(user);
         user = userServiceImpl.getUser(id);
@@ -138,7 +138,7 @@ class UserServiceImplTest {
         User user = users.get(users.size() - 1);  // get last user
 
         assertNotNull(user);
-        int id = user.getId();
+        String id = user.getId();
         user.setAge("20");
         userServiceImpl.updateUser(user);
         user = userServiceImpl.getUser(id);
@@ -152,7 +152,7 @@ class UserServiceImplTest {
         // delete the last one
         User old_user = users.get(users.size() - 1);  // get last user
         assertNotNull(old_user);
-        int id = old_user.getId();
+        String id = old_user.getId();
         userServiceImpl.deleteUser(id);
         User user = userServiceImpl.getUser(id);
         assertNull(user); // check that the user disappeared
@@ -175,7 +175,7 @@ class UserServiceImplTest {
         User user = users.get(users.size() - 1);  // get last user
 
         assertNotNull(user);
-        int id = user.getId();
+        String id = user.getId();
         userServiceImpl.deleteUser(id);
         user = userServiceImpl.getUser(id);
         assertNull(user); // check that the user disappeared
@@ -183,7 +183,7 @@ class UserServiceImplTest {
 
     @Test
     void testDeleteNonExistantUser() {
-        assertNull(userServiceImpl.deleteUser(Integer.MAX_VALUE));  // check that we "cannot delete" non existant user
+        assertNull(userServiceImpl.deleteUser(String.valueOf(Integer.MAX_VALUE)));  // check that we "cannot delete" non existant user
     }
 
 
@@ -206,12 +206,7 @@ class UserServiceImplTest {
     }
 
     private User getRandomUser() {
-        User u = new User();
-	int rand_num = (int) Math.random() * 10000;
-        u.setFirstName(UUID.randomUUID().toString());  // random name first name/last name/age
-		u.setLastName(UUID.randomUUID().toString());
-		u.setAge(String.valueOf(rand_num));
-        return u;
+	    return new User(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString());
     }
 
     private User getRandomUserNoName() {
