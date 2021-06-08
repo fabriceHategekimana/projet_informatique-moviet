@@ -12,12 +12,12 @@ public interface MovieServiceRequesterInterface {
     //      * discoverMovie
     //      * info necessary to compute pertinence score: (special class to implement in Movie-Service) only popularity for now
 
-    @GET("discover/id")
+    @GET("movie-service/discover/id")
     Call<List<Integer>> discoverId(
             @Query("page") Integer page,
             @Query("sortBy") String sortBy,
-            @Query("release_date_gte") String release_date_gte,
-            @Query("release_date_lte") String release_date_lte,
+            @Query("release_year_gte") String release_date_gte,
+            @Query("release_year_lte") String release_date_lte,
             @Query("genres") Integer[] genres,
             @Query("keywords") Integer[] keywords,
             @Query("banned_genres") Integer[] banned_genres,
