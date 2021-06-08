@@ -194,8 +194,8 @@ export class GroupGenresComponent implements OnInit {
     });
   }
 
-  getMyUserId(): number { //! Temporary
-    return 1;
+  getMyUserId(): string { //! Temporary
+    return '1';
   }
 
   testIfAdmin() { // test if the user is admin

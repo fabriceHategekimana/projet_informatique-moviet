@@ -58,7 +58,7 @@ export class GroupShowResultComponent implements OnInit {
     this.router.navigate(['group-info'], { relativeTo: this.route.parent, skipLocationChange: true});
   }
 
-  getMyUserId(): number { //! Temporary
-    return 1;
+  getMyUserId(): string { //! Temporary
+    return '1';
   }
 }

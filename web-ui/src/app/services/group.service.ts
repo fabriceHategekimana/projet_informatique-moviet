@@ -30,7 +30,7 @@ export class GroupService {
   private httpOptionsPut = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
-    }),
+    })
   };
 
   private groupsUrl : string = environment.API_URL +  "groups"; // url using api
@@ -51,6 +51,11 @@ export class GroupService {
   getUsersStatus(id : number): Observable<any> { // type any because get can return httpEvent or Observable<UsersStatus>
     return this.http.get<UsersStatus>(this.groupsUrl + "/" + id + "/users_status", this.httpOptionsGet)
                   .pipe(catchError(this.handleError<UsersStatus>('getUsersStatus', undefined)));
+  }
+
+  addUserToGroup(groupId: number) {
+    return this.http.post<any>(this.groupsUrl + "/" + groupId + "/" + "users/", {}, this.httpOptionsPost)
+                  .pipe(catchError(this.handleError<any>('addUserToGroup', undefined)));
   }
 
   //** handle error function from https://angular.io/tutorial/toh-pt6
@@ -84,13 +89,13 @@ export class GroupService {
     return of(123);
   }
 
-  getUserStatus(groupId: number, userId: number): Observable<any> {
+  getUserStatus(groupId: number, userId: string): Observable<any> {
     // console.log(this.groupsUrl + "/" + groupId + "/" + "users/" + userId + "/status");
     return this.http.get<UserStatusValue>(this.groupsUrl + "/" + groupId + "/" + "users/" + userId + "/status", this.httpOptionsGet)
                   .pipe(catchError(this.handleError<any>('getUserStatus', undefined)));
   }
 
-  setUserStatus(groupId: number, userId: number, status: UserStatusValue): Observable<any> {
+  setUserStatus(groupId: number, userId: string, status: UserStatusValue): Observable<any> {
     // console.log(this.groupsUrl + "/" + groupId + "/" + "users/" + userId + "/status");
     return this.http.put<UserStatusValue>(this.groupsUrl + "/" + groupId + "/" + "users/" + userId + "/status", status, this.httpOptionsPut)
                   .pipe(catchError(this.handleError<any>('setUserStatus', undefined)));

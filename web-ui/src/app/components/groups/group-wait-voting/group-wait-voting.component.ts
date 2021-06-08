@@ -54,8 +54,8 @@ export class GroupWaitVotingComponent implements OnInit {
     }
   }
 
-  getMyUserId(): number { //! Temporary
-    return 1;
+  getMyUserId(): string { //! Temporary
+    return '1';
   }
 
   setUserStatus(then: () => any = () => void 0, onError?: () => any) {
