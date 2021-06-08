@@ -36,7 +36,7 @@ class GroupTest {
 
     @Test
     void testGetGroup_status(){
-        assertEquals(0, new Group().getUsers().size() );
+        assertEquals(Status.CHOOSING, new Group().getGroup_status() );
     }
 
     @Test
@@ -104,7 +104,9 @@ class GroupTest {
 
     @Test
     void testSetGroup_status(){
-        assertEquals(Status.CHOOSING, new Group().getGroup_status() );
+        Group grp = new Group();
+        grp.setGroup_status(Status.READY);
+        assertEquals(Status.READY, grp.getGroup_status() );
     }
 
     @Test
