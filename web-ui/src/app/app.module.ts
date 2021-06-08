@@ -22,6 +22,9 @@ import { GroupWaitVotingComponent } from './components/groups/group-wait-voting/
 import { DisplayUsersStatusComponent } from './shared/components/display-users-status/display-users-status.component';
 import { GroupShowResultComponent } from './components/groups/group-show-result/group-show-result.component';
 import { GroupWaitResultComponent } from './components/groups/group-wait-result/group-wait-result.component';
+import { SignupButtonComponent } from './shared/components/signup-button/signup-button.component';
+import { LogoutButtonComponent } from './shared/components/logout-button/logout-button.component';
+import { LoginButtonComponent } from './shared/components/login-button/login-button.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +45,10 @@ import { GroupWaitResultComponent } from './components/groups/group-wait-result/
     GroupWaitVotingComponent,
     DisplayUsersStatusComponent,
     GroupShowResultComponent,
-    GroupWaitResultComponent
+    GroupWaitResultComponent,
+    SignupButtonComponent,
+    LogoutButtonComponent,
+    LoginButtonComponent
   ],
   imports: [
     BrowserModule,

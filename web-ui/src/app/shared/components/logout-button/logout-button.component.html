@@ -1,0 +1,1 @@
+<a class="btn nav-link" routerLinkActive="active" #currentLink="routerLinkActive" (click)="auth.checkIfLogged(); auth.logout()" [attr.aria-current]="currentLink.isActive ? 'page' : ''">Log out</a>
