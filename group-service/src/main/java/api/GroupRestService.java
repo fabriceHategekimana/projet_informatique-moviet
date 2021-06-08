@@ -4,7 +4,7 @@ package api;
 import javax.inject.Inject; // dependency injection
 import javax.ws.rs.*;
 
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.*;  // Multivalued map
 
 // MediaType
 import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singleton
@@ -85,15 +85,19 @@ public class GroupRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create, add a group to the existing groups")
-    public Response createGroup(Group group, final @Context UriInfo uriInfo){ // no auto increment id for users
+    public Response createGroup(Group group, final @Context UriInfo uriInfo, final @HeaderParam("X-User") String user_id){ // no auto increment id for users
         /*
         Create a group and returns HTTP status code and the location of the newly created object. It's possible to create multiple
         groups with same name. The unique identifier is its id that auto increments. We cannot input a group having an id !!
 
+        Admin_id is just override by the user who created the group if connected (if X-User header exists..)
+
         Examples with curl:
         - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test"}'
-        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test", "admin_id": 1000}'
-        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test", "admin_id": 1000, "users": [{"id": 10}, {"id": 42}, {"id":3}, {"id":6}]}'
+        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test", "admin_id": "1000"}'
+        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test", "admin_id": "1000", "users": [{"id": 10}, {"id": 42}, {"id":3}, {"id":6}]}'
+
+        - curl --verbose -H "Content-Type: application/json" -H "X-User: google-oauth2|111914113827195845617" -X POST http://localhost:10080/groups -d '{"name":"test", "admin_id": 1000, "users": [{"id": 10}, {"id": 42}, {"id":3}, {"id":6}]}'
 
          Then you use GET to see the created object
         */
@@ -107,6 +111,19 @@ public class GroupRestService {
             group.setUsers(new HashSet<>()); // empty set
         }
 
+        /*
+        MultivaluedMap<String, String> my_headers = headers.getRequestHeaders();
+        // X-User
+        String user_id = my_headers.getFirst("X-User");
+        */
+        if (user_id != null) {
+            group.setAdmin_id(user_id);
+            group.addUser(new User(user_id));
+        }
+        if (group.getAdmin_id() == null){
+            group.setAdmin_id("0");
+        }
+
         Group returnedGroup=groupService.createGroup(group); // can never have conflict if id are auto-incremented.
         if (returnedGroup == null){
             log.severe("Tried to create Group: id=" + group.getId() + " name=" +group.getId()+ " admin_id="+group.getAdmin_id() + " with some users but either id was non zero or group had null name or some of the users had user id was 1");
@@ -118,22 +135,59 @@ public class GroupRestService {
         return Response.created(uriBuilder.build()).entity(returnedGroup).build(); // 201
     }
 
+    /*s
+    @GET
+    @Path("/testing_header_parsing")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "testing header parsing")
+    public Response getHeader(@Context HttpHeaders headers){ // dependency injection..
+        MultivaluedMap<String, String> my_headers = headers.getRequestHeaders();
+        // X-User
+        String user_id = my_headers.getFirst("X-User");
+        return Response.ok(my_headers).build();    //building the server response
+    }
+    */
+
     @POST
     @Path("/{group_id}/users/")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Adding an user to an existing group")
-    public Response addUserToGroup(@PathParam("group_id") String str_id, User user){
+    public Response addUserToGroup(@PathParam("group_id") String str_id, User user, final @HeaderParam("X-User") String user_id, final @HeaderParam("Add-Another-User") String add_another_user){
         /*
         Add an user to an existing group. Need to know the id of the group to update. Return modified object.
+
+        We can add either another user or current user by specifying in the headers (by default, add current user).
+        Add-Another-User : if (null (key not existing) or not true) and X-user exists -> will add current user
+
+        otherwise add another user
+
+        Example:
+        The user with id "user" won't be created
+        - curl --verbose -H "Content-Type: application/json" -H "X-User:google-oauth2|test_user_id" -X POST http://localhost:10080/groups/2/users -d '{"id": "test"}'
+        The user with id "google-oauth2|test_user_id" won't be created
+        - curl --verbose -H "Content-Type: application/json" -H "X-User:google-oauth2|test_user_id" -H "Add-Another-User:true" -X POST http://localhost:10080/groups/2/users -d '{"id": "test"}'
          */
 
         try {
+            /*
+            MultivaluedMap<String, String> my_headers = headers.getRequestHeaders();
+            // X-User
+            String user_id = my_headers.getFirst("X-User");
+            String add_another_user = my_headers.getFirst("Add-Another-User");  // null if key not in the map
+            */
+            // adding current user who called the method
+            if ((user_id != null) && (!"true".equalsIgnoreCase(add_another_user))) {
+                User new_user = new User(user_id);
+                new_user.setGroups(user.getGroups());
+                user = new_user;
+            }
+            // else: adding another user, not the one calling so we ignore the headers
+
             log.info("Trying to add user with user_id=" + user.getId() + " in a Group having id=" + str_id);
             int id = Integer.parseInt(str_id);
 
             // user id can be 0..
-
             if (user.getGroups() == null){
                 user.setGroups(new HashSet<>()); // empty set
             }
@@ -156,11 +210,36 @@ public class GroupRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Removing/kicking user from an existing group")
-    public Response removeUserFromGroup(@PathParam("group_id") String str_group_id, String str_user_id){
+    public Response removeUserFromGroup(@PathParam("group_id") String str_group_id, String str_user_id, final @HeaderParam("X-User") String user_id, final @HeaderParam("Remove-Another-User") String remove_another_user){
         /*
         Remove an user from an existing group. Need to know the id of the group and the id of the user to remove. Return modified object.
+
+        We can remove either another user or current user by specifying in the headers (by default, remove current user).
+        Remove-Another-User : if (null (key not existing) or not true) and X-user exists -> will remove current user
+
+        otherwise add another user
+
+        Examples:
+        The user with id "user" won't be created
+        - curl --verbose -H "Content-Type: application/json" -H "X-User:google-oauth2|test_user_id" -X DELETE http://localhost:10080/groups/2/users -d test
+
+        The user with id "google-oauth2|test_user_id" won't be removed from the group
+        - curl --verbose -H "Content-Type: application/json" -H "X-User:google-oauth2|test_user_id" -H "Remove-Another-User:true" -X DELETE http://localhost:10080/groups/2/users -d test
+
          */
         try {
+            /*
+            MultivaluedMap<String, String> my_headers = headers.getRequestHeaders();
+            // X-User
+            String user_id = my_headers.getFirst("X-User");
+            String remove_another_user = my_headers.getFirst("Remove-Another-User");  // null if key not in the map
+            */
+            // adding current user who called the method
+            if ((user_id != null) && (!"true".equalsIgnoreCase(remove_another_user))) {
+                str_user_id = user_id;
+            }
+            // else: remove another user, not the one calling so we ignore the headers
+
             log.info("Trying to remove user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
             int group_id = Integer.parseInt(str_group_id);
 
@@ -386,8 +465,11 @@ public class GroupRestService {
     @Path("/testing_header_parsing")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "testing header parsing")
-    public Response getHeader(@Context HttpHeaders headers){
+    public Response getHeader(@Context HttpHeaders headers){ // dependency injection..
         MultivaluedMap<String, String> my_headers = headers.getRequestHeaders();
+        // X-User
+        String user_id = my_headers.getFirst("X-User");
+        log.info("This is my X-User: " + user_id);
         return Response.ok(my_headers).build();    //building the server response
     }
 

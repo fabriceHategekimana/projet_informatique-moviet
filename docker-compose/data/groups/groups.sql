@@ -11,7 +11,7 @@ CREATE TYPE status_type AS ENUM ('CHOOSING','READY', 'VOTING', 'DONE');
 CREATE TABLE T_groups (
     group_id serial primary key,
     name varchar(255) not null,
-    admin_id int not null,
+    admin_id varchar(255) not null,
     group_status status_type DEFAULT 'CHOOSING'
 );
 -- Grant SQL commands: https://www.ibm.com/docs/en/qmf/11.2?topic=privileges-sql-grant-statement

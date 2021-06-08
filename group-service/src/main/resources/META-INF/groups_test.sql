@@ -7,7 +7,7 @@ DROP TYPE if exists status_type;
 -- choosing : for short term preferences, ready: before vote
 CREATE TYPE status_type AS ENUM ('CHOOSING','READY', 'VOTING', 'DONE');
 -- need to be in one-line otherwise tons of errors..
-CREATE TABLE T_groups (group_id serial primary key, name varchar(255) not null, admin_id int not null, group_status status_type DEFAULT 'CHOOSING');
+CREATE TABLE T_groups (group_id serial primary key, name varchar(255) not null, admin_id varchar(255) not null, group_status status_type DEFAULT 'CHOOSING');
 -- Grant SQL commands: https://www.ibm.com/docs/en/qmf/11.2?topic=privileges-sql-grant-statement
 -- GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA public to group-service;
 -- Truncate is here to purge the table without deleting the table: https://sql.sh/cours/truncate-table

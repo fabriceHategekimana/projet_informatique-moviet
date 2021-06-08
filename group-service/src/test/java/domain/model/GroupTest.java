@@ -26,7 +26,7 @@ class GroupTest {
 
     @Test
     void testGetAdmin_id(){
-        assertEquals(0, group.getAdmin_id() );
+        assertEquals("0", group.getAdmin_id() );
     }
 
     @Test
@@ -49,8 +49,8 @@ class GroupTest {
     @Test
     void testSetAdmin_id(){
         Group tmpgroup = new Group("hello world");
-        tmpgroup.setAdmin_id(10);
-        assertEquals(10, tmpgroup.getAdmin_id() );
+        tmpgroup.setAdmin_id("10");
+        assertEquals("10", tmpgroup.getAdmin_id() );
     }
 
     @Test
@@ -119,7 +119,7 @@ class GroupTest {
 
     @Test
     void testGetAdmin_idNoArgsConstructor(){
-        assertEquals(0, new Group().getAdmin_id() );
+        assertEquals("0", new Group().getAdmin_id() );
     }
 
     @Test
