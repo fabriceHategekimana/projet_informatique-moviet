@@ -474,6 +474,26 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Transactional
+    public MoviePreferences getMoviePreferences(int group_id, int user_id){
+        Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
+        if ((group == null) || (group.getUsers() == null)){
+            return null; // not found group.. or no user meaning that we cannot get the status of an user..
+        }
+        // we know that the group exists and that there are users up to this point
+        GroupUser groupUser = getGroupUser(group_id, user_id); // groupUser becomes managed
+        if (groupUser == null){
+            return null; // particular user not found
+        }
+        Integer year_from = null;
+        Integer year_to = null;
+        if (groupUser.getYear_range() != null){
+            year_from = groupUser.getYear_range().getYear_from();
+            year_to = groupUser.getYear_range().getYear_to();
+        }
+        return new MoviePreferences(groupUser.getKeywords_id(), groupUser.getGenres_id(), year_from, year_to);
+    }
+
+    @Transactional
     public Group deleteGroup(int group_id){
         Group group = getGroup(group_id);  // group becomes managed as well as users in the group
         if (group == null){

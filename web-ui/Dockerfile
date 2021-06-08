@@ -15,11 +15,6 @@ COPY ./ /app/
 # RUN npm run build -- --output-path=./dist/web-ui --configuration $configuration
 RUN ng build --prod
 
-# Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
-FROM nginx:1.18
-#Copy ci-dashboard-dist
-COPY --from=build-stage /app/dist/web-ui/ /usr/share/nginx/html
-#Copy default nginx configuration
-COPY ./nginx-custom.conf /etc/nginx/conf.d/default.conf
+CMD ng serve --host 0.0.0.0 --port 4200 --disable-host-check --prod
 
 #docker build -t site:dev .
