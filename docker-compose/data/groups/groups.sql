@@ -11,7 +11,7 @@ CREATE TYPE status_type AS ENUM ('CHOOSING','READY', 'VOTING', 'DONE');
 CREATE TABLE T_groups (
     group_id serial primary key,
     name varchar(255) not null,
-    admin_id int not null,
+    admin_id varchar(255) not null,
     group_status status_type DEFAULT 'CHOOSING'
 );
 -- Grant SQL commands: https://www.ibm.com/docs/en/qmf/11.2?topic=privileges-sql-grant-statement
@@ -25,7 +25,7 @@ INSERT INTO T_groups (name, admin_id) VALUES ('raphael', 1);
 
 -- no auto id incremented
 CREATE TABLE T_users (
-    user_id int primary key
+    user_id varchar(255) primary key
 );
 TRUNCATE TABLE T_users;
 INSERT INTO T_users (user_id) VALUES (1);
@@ -41,7 +41,7 @@ INSERT INTO T_users (user_id) VALUES (4);
 CREATE TABLE T_groups_users (
     id serial primary key,
     group_id int REFERENCES T_groups(group_id),
-    user_id int REFERENCES T_users(user_id),
+    user_id varchar(255) REFERENCES T_users(user_id),
     user_status status_type NOT NULL DEFAULT 'CHOOSING',
     year_from int,
     year_to int
@@ -63,7 +63,7 @@ INSERT INTO T_groups_users (group_id, user_id, user_status) VALUES (2, 4, 'READY
 -- https://javabydeveloper.com/mapping-collection-of-basic-value-types-jpa-with-hibernate/
 CREATE TABLE T_groups_users_keywords (
     group_id int NOT NULL REFERENCES T_groups(group_id),
-    user_id int NOT NULL REFERENCES T_users(user_id),
+    user_id varchar(255) NOT NULL REFERENCES T_users(user_id),
     keyword_id int NOT NULL,
     primary key (group_id, user_id, keyword_id)
 );
@@ -75,7 +75,7 @@ INSERT INTO T_groups_users_keywords (group_id, user_id, keyword_id) VALUES (2, 1
 
 CREATE TABLE T_groups_users_genres (
     group_id int NOT NULL REFERENCES T_groups(group_id),
-    user_id int NOT NULL REFERENCES T_users(user_id),
+    user_id varchar(255) NOT NULL REFERENCES T_users(user_id),
     genre_id int NOT NULL,
     primary key (group_id, user_id, genre_id)
 );

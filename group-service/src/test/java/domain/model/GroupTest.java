@@ -26,7 +26,7 @@ class GroupTest {
 
     @Test
     void testGetAdmin_id(){
-        assertEquals(0, group.getAdmin_id() );
+        assertEquals("0", group.getAdmin_id() );
     }
 
     @Test
@@ -36,7 +36,7 @@ class GroupTest {
 
     @Test
     void testGetGroup_status(){
-        assertEquals(0, new Group().getUsers().size() );
+        assertEquals(Status.CHOOSING, new Group().getGroup_status() );
     }
 
     @Test
@@ -49,15 +49,15 @@ class GroupTest {
     @Test
     void testSetAdmin_id(){
         Group tmpgroup = new Group("hello world");
-        tmpgroup.setAdmin_id(10);
-        assertEquals(10, tmpgroup.getAdmin_id() );
+        tmpgroup.setAdmin_id("10");
+        assertEquals("10", tmpgroup.getAdmin_id() );
     }
 
     @Test
     void testSetUsers(){
         Group tmpgroup = new Group("hello world");
-        User usr1 = new User(1);
-        User usr2 = new User(2);
+        User usr1 = new User("1");
+        User usr2 = new User("2");
         Set<User> users = new HashSet<>();
         users.add(usr1);
         users.add(usr2);
@@ -70,8 +70,8 @@ class GroupTest {
     @Test
     void testAddUsers(){
         Group tmpgroup = new Group("hello world");
-        User usr1 = new User(1);
-        User usr2 = new User(2);
+        User usr1 = new User("1");
+        User usr2 = new User("2");
         Set<User> users = new HashSet<>();
         users.add(usr1);
         users.add(usr2);
@@ -85,8 +85,8 @@ class GroupTest {
     @Test
     void testRemoveUsers(){
         Group tmpgroup = new Group("hello world");
-        User usr1 = new User(1);
-        User usr2 = new User(2);
+        User usr1 = new User("1");
+        User usr2 = new User("2");
         Set<User> users = new HashSet<>();
         users.add(usr1);
         users.add(usr2);
@@ -104,7 +104,9 @@ class GroupTest {
 
     @Test
     void testSetGroup_status(){
-        assertEquals(Status.CHOOSING, new Group().getGroup_status() );
+        Group grp = new Group();
+        grp.setGroup_status(Status.READY);
+        assertEquals(Status.READY, grp.getGroup_status() );
     }
 
     @Test
@@ -119,7 +121,7 @@ class GroupTest {
 
     @Test
     void testGetAdmin_idNoArgsConstructor(){
-        assertEquals(0, new Group().getAdmin_id() );
+        assertEquals("0", new Group().getAdmin_id() );
     }
 
     @Test

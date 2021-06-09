@@ -22,14 +22,14 @@ import javax.validation.constraints.NotNull;
 @Entity @Table( name="T_users")// JPA, mapping class - table
 public class User {
     @Id @NotNull // no automatic generation
-    @Column(name="user_id")
-    private int id;
+    @Column(name="user_id", length=255)
+    private String id = "0";
 
     @ManyToMany(mappedBy = "users")
     @Setter @JsonIgnore
     private Set<Group> groups = new HashSet<>();  // https://www.appsdeveloperblog.com/infinite-recursion-in-objects-with-bidirectional-relationships/
     // https://thorben-janssen.com/6-hibernate-mappings-you-should-avoid-for-high-performance-applications/
-    public User(int id){
+    public User(String id){
         this.id=id;
     }
 

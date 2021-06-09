@@ -59,8 +59,8 @@ class UserRestServiceIT {
         get("/{id}", 1).
         then().
             statusCode(200). // OK
-            body("id", equalTo(1),
-                    "name", equalTo("erwan"));
+            body("id", equalTo("1"),
+                    "firstName", containsStringIgnoringCase("Stephane"));
     }
 
     @Test
@@ -71,21 +71,13 @@ class UserRestServiceIT {
             statusCode(404); // NOT FOUND
     }
 
-    @Test
-    void testGetUser_bad_request(){ // GET
-        when().
-            get("/{id}","$").
-        then().
-            statusCode(400); // BAD REQUEST
-    }
-
 
     /* --------------------------------------------------------
     IT for createUser
      */
     @Test
     void testCreateUser_created(){ // POST
-        String myJson="{\"name\":\"new_user\"}";
+        String myJson="{\"id\": 10,\"firstName\": \"new\", \"lastName\":\"user\", \"age\": \"42\"}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -93,28 +85,16 @@ class UserRestServiceIT {
             post("/").
         then().
             statusCode(201).
-            body("id", notNullValue(),
-                    "name", equalTo("new_user")).
+            body("id", equalTo("10"),
+                    "firstName", equalTo("new"),
+		    		"lastName", equalTo("user"),
+					"age", equalTo("42")).
             header("Location", notNullValue());
     }
 
     @Test
-    void testCreateUser_created_id_0(){ // POST
-        String myJson="{\"id\": 0, \"name\":\"new_user\"}";  // id 0 is like not even adding id in the JSON
-        given().
-            contentType(ContentType.JSON).
-            body(myJson).
-        when().
-            post("/").
-        then().
-            statusCode(201).
-            body("id", notNullValue(),
-                    "name", equalTo("new_user"));
-    }
-
-    @Test
-    void testCreateUser_bad_request_name(){ // POST, null name.. Id 0 is okay
-        String myJson="{\"id\": 0}";
+    void testCreateUser_bad_request_attributes(){ // POST, null params.. Id 0 is okay
+        String myJson="{\"id\": 10}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -126,7 +106,7 @@ class UserRestServiceIT {
 
     @Test
     void testCreateUser_bad_request_id(){ // POST
-        String myJson="{\"id\": 100,\"name\":\"ethan\" }";
+        String myJson="{\"id\": 0,\"firstName\": \"new\", \"lastName\":\"user\", \"age\": \"42\"}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -137,8 +117,8 @@ class UserRestServiceIT {
     }
 
     @Test
-    void testCreateUser_bad_request_id_name(){ // POST
-        String myJson="{\"id\": 4}";
+    void testCreateUser_bad_request_id_attributes(){ // POST
+        String myJson="{\"id\": 0}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -147,6 +127,18 @@ class UserRestServiceIT {
         then().
             statusCode(400);
     }
+
+    @Test
+    void testCreateUser_bad_request_age_negative(){ // POST
+        String myJson="{\"firstName\": \"new\", \"lastName\":\"user, \"age\": \"-1\"}";
+        given().
+            contentType(ContentType.JSON).
+            body(myJson).
+        when().
+            post("/").
+        then().
+            statusCode(400);
+    }	
 
     // -------------------------------------------------------
     /*
@@ -154,7 +146,7 @@ class UserRestServiceIT {
      */
     @Test
     void testUpdateUser_ok(){
-        String myJson="{\"id\": 2,\"name\":\"ethan\" }"; // no other test will delete this user otherwise we can have errors
+        String myJson="{\"id\": 2,\"firstName\": \"Ethan\", \"lastName\":\"Icet\", \"age\": \"20\"}"; // no other test will delete this user otherwise we can have errors
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -162,14 +154,16 @@ class UserRestServiceIT {
             put("/").
         then().
             statusCode(200).
-            body("id", equalTo(2),
-                    "name", equalTo("ethan"));
+            body("id", notNullValue(),
+                    "firstName", equalTo("Ethan"),
+		    		"lastName", equalTo("Icet"),
+					"age", equalTo("20"));
     }
 
     @Test
     void testUpdateUser_not_found(){
         // no other test will delete this user otherwise we can have errors
-        String myJson="{\"id\": ".concat(String.valueOf(Integer.MAX_VALUE)).concat(" ,\"name\":\"ethan\" }");
+        String myJson="{\"id\": ".concat(String.valueOf(Integer.MAX_VALUE)).concat(" ,\"firstName\": \"Ethan\", \"lastName\":\"Icet\", \"age\": \"20\"}");
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -193,7 +187,7 @@ class UserRestServiceIT {
 
     @Test
     void testUpdateUser_bad_request_id(){
-        String myJson="{\"name\": \"new_name\"}";
+        String myJson="{\"firstName\": \"new_name\"}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -206,6 +200,18 @@ class UserRestServiceIT {
     @Test
     void testUpdateUser_bad_request_id_name(){
         String myJson="{\"id\": 0}";
+        given().
+            contentType(ContentType.JSON).
+            body(myJson).
+        when().
+            put("/").
+        then().
+            statusCode(400);
+    }
+
+    @Test
+    void testUpdateUser_bad_request_age_negative(){
+        String myJson="{\"id\": 2,\"firstName\": \"Ethan\", \"lastName\":\"Icet\", \"age\": \"-20\"}";
         given().
             contentType(ContentType.JSON).
             body(myJson).
@@ -229,8 +235,10 @@ class UserRestServiceIT {
             delete("/").
         then().
             statusCode(200). // OK
-            body("id", equalTo(3), // also returns body
-            "name", notNullValue());
+            body("id", equalTo("3"),
+                    "firstName", notNullValue(),
+		    		"lastName", notNullValue(),
+					"age", notNullValue());
     }
 
     @Test
@@ -242,17 +250,6 @@ class UserRestServiceIT {
             delete("/").
         then().
             statusCode(404); // NOT FOUND
-    }
-
-    @Test
-    void testDeleteUser_bad_request(){ // DELETE
-        given().
-            contentType(ContentType.JSON).
-            body(""). // id
-        when().
-            delete("/").
-        then().
-            statusCode(400); // BAD REQUEST
     }
 
 }

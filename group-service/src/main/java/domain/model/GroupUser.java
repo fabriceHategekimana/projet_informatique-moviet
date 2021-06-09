@@ -32,8 +32,8 @@ public class GroupUser implements Serializable {
     // No setters for group_id and user_id, we do not use this class to change it directly
     @NotNull
     private int group_id;
-    @NotNull
-    private int user_id;
+    @NotNull @Column(length = 255)
+    private String user_id;
 
     @Setter @Enumerated(EnumType.STRING) @Type( type = "status_db_enum" )
     private Status user_status = Status.CHOOSING;
