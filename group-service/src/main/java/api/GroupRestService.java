@@ -337,10 +337,10 @@ public class GroupRestService {
 
 
     @GET
-    @Path("/{group_id}/users/{user_id}/status")
+    @Path("/{group_id}/users/{encoded_user_id}/status")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "GET a particular user status")
-    public Response getUserStatus(@PathParam("group_id") String str_group_id, @PathParam("user_id") String encoded_user_id) {
+    public Response getUserStatus(@PathParam("group_id") String str_group_id, @PathParam("encoded_user_id") String encoded_user_id) {
         String str_user_id = java.net.URLDecoder.decode(encoded_user_id, StandardCharsets.UTF_8);
         try {
             log.info("Trying to get a user status of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
@@ -360,10 +360,10 @@ public class GroupRestService {
     }
 
     @PUT
-    @Path("/{group_id}/users/{user_id}/status")
+    @Path("/{group_id}/users/{encoded_user_id}/status")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update a particular user status")
-    public Response updateUserStatus(@PathParam("group_id") String str_group_id, @PathParam("user_id") String encoded_user_id, String status) {
+    public Response updateUserStatus(@PathParam("group_id") String str_group_id, @PathParam("encoded_user_id") String encoded_user_id, String status) {
         String str_user_id = java.net.URLDecoder.decode(encoded_user_id, StandardCharsets.UTF_8);
         try {
             log.info("Trying to update a user status of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
@@ -388,10 +388,10 @@ public class GroupRestService {
     }
 
     @PUT
-    @Path("/{group_id}/users/{user_id}/movie_preferences")
+    @Path("/{group_id}/users/{encoded_user_id}/movie_preferences")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update a particular user Movie Preferences (short term preferences composed of genres, keywords, year from, year to)")
-    public Response updateMoviePreferences(@PathParam("group_id") String str_group_id, @PathParam("user_id") String encoded_user_id, MoviePreferences movie_preferences) {
+    public Response updateMoviePreferences(@PathParam("group_id") String str_group_id, @PathParam("encoded_user_id") String encoded_user_id, MoviePreferences movie_preferences) {
         String str_user_id = java.net.URLDecoder.decode(encoded_user_id, StandardCharsets.UTF_8);
         try {
             log.info("Trying to update movie preferences of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
@@ -416,10 +416,10 @@ public class GroupRestService {
     }
 
     @GET
-    @Path("/{group_id}/users/{user_id}/movie_preferences")
+    @Path("/{group_id}/users/{encoded_user_id}/movie_preferences")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "GET a particular user Movie Preferences (short term preferences composed of genres, keywords, year from, year to)")
-    public Response getMoviePreferences(@PathParam("group_id") String str_group_id, @PathParam("user_id") String encoded_user_id) {
+    public Response getMoviePreferences(@PathParam("group_id") String str_group_id, @PathParam("encoded_user_id") String encoded_user_id) {
         String str_user_id = java.net.URLDecoder.decode(encoded_user_id, StandardCharsets.UTF_8);
         try {
             log.info("Trying to get movie preferences of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
