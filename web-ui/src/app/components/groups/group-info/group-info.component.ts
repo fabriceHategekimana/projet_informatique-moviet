@@ -30,6 +30,7 @@ export class GroupInfoComponent implements OnInit {
 
     this.groupsComponent.getGroup(undefined, () => {
         thenGroupimport();
+        this.groupService.addUserToGroup(this.currentGroup!.id);
         this.autoNavigate(); // auto navigate
       });
 
@@ -42,9 +43,9 @@ export class GroupInfoComponent implements OnInit {
   }
 
   // get a single user:
-  getUser(id : number, then: () => any = () => void 0, onError: () => any = () => void 0 ): void {
+  getUser(id : string, then: () => any = () => void 0, onError: () => any = () => void 0 ): void {
     let user: User;
-    this.userService.getUser(Number(id))
+    this.userService.getUser(id)
       .subscribe(r => {
         user = r;
         if (user) { // if the user exist
@@ -117,8 +118,8 @@ export class GroupInfoComponent implements OnInit {
     }
   }
 
-  getMyUserId(): number { //! Temporary
-    return 1;
+  getMyUserId(): string { //! Temporary
+    return '1';
   }
 
   goToFindMatch() { // go to the find-match page

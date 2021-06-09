@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
+import { AuthentificationService } from '../../../services/authentification.service'
 
 @Component({
   selector: 'app-header',
@@ -10,10 +11,12 @@ export class HeaderComponent implements OnInit {
 
   isTogglerShown = false; // true if the toggler is displayed
 
-  constructor(private location: Location) { }
+  isLogged = false;
+
+  constructor(private location: Location, public auth: AuthentificationService) { }
 
   ngOnInit(): void {
-
+    this.auth.checkIfLogged();
   }
   
 }

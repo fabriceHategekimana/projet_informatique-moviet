@@ -36,9 +36,9 @@ export class DisplayUsersStatusComponent implements OnInit, OnChanges {
   }
 
   // get a single user:
-  getUser(id : number, then: () => any = () => void 0, onError: () => any = () => void 0 ): void {
+  getUser(id : string, then: () => any = () => void 0, onError: () => any = () => void 0 ): void {
     let user: User;
-    this.userService.getUser(Number(id))
+    this.userService.getUser(id)
       .subscribe(r => {
         user = r;
         if (user) { // if the user exist
@@ -132,7 +132,7 @@ export class DisplayUsersStatusComponent implements OnInit, OnChanges {
     }
   }
 
-  getUserStatus(userId: number): UserStatusValue { // get status of a single user
+  getUserStatus(userId: string): UserStatusValue { // get status of a single user
     if (userId in this.usersStatus) { // if the id exists
       return this.usersStatus[userId];
     }

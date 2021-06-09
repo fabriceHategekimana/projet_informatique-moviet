@@ -144,8 +144,8 @@ export class GroupFindMatchComponent implements OnInit {
     this.startTimer(maxSec);
   }
 
-  getMyUserId(): number { //! Temporary
-    return 1;
+  getMyUserId(): string { //! Temporary
+    return '1';
   }
 
   setUserStatus(then: () => any = () => void 0, onError?: () => any) {
