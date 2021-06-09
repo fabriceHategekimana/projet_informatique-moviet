@@ -1,34 +1,17 @@
 package api;
 
 // Injection
-import javax.inject.Inject; // dependency injection
-import javax.ws.rs.*;
 
-import javax.ws.rs.core.*;
-
-// MediaType
-import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singleton
-
-//  import classes of domain
 import domain.model.User;
-
-// service
 import domain.service.UserService;
-
-/*
-https://thorntail.io/posts/wildfly-swarm-s-got-swagger/
-
-In simple terms, Swagger is a JSON representation of a RESTful API, typically made available over HTTP at /swagger.json.
-This JSON document contains information about your APIs, including names, paths, endpoints, parameters, descriptions,
-keywords, expected responses, and more.
-Per the Open API Specification, the goal of Swagger is to "define a standard, language-agnostic interface to REST APIs
-which allows both humans and computers to discover and understand the capabilities of the service without access to
-source code, documentation, or through network traffic inspection".
-
- */
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.java.Log;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
 
 // https://www.restapitutorial.com/lessons/httpmethods.html
 
@@ -70,23 +53,34 @@ public class UserRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create, add a user to the existing users")
-    public Response createUser(User user, final @Context UriInfo uriInfo){
+    public Response createUser(
+            final @HeaderParam("X-User") String user_id,
+            String username,
+            final @Context UriInfo uriInfo) {
         /*
-        Create a user and returns HTTP status code and the location of the newly created object. It's possible to create multiple
-        users with same name. We cannot input an user WITHOUT ID
+        Create a user and returns HTTP status code and the location of the newly created object.
 
         Example with curl:
         - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10082/users -d '{"name":"test"}'
 
          Then you use GET to see the created object
         */
+
+        log.info("Testing if user exists");
+        User testExists = userService.getUser(user_id);
+        if (testExists != null) {
+            return Response.status(Response.Status.CONFLICT.getStatusCode(), "A user already associated to this id").build();  //! malpractice
+        }
+
+        User user = new User(user_id, username);
+
         log.info("Trying to create using User: " + user);
         // only want non init id and non null first/last names, otherwise bad request
-        if ((user.getId().equals("0")) || (user.getId() == null)  || (user.getUsername() == null)){
+        if ((user.getId().equals("0")) || (user.getId() == null) || (user.getUsername() == null)) {
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : all attributes must be initialized correctly: " + user).build();
         }
 
-        User returnedUser=userService.createUser(user); // TODO : manage when conflict of ID !!
+        User returnedUser = userService.createUser(user);
         // returnedUser can be null in general but we tested the input before so it's not null.. otherwise bad request..
         UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder(); // https://www.logicbig.com/tutorials/java-ee-tutorial/jax-rs/uri-info.html
         uriBuilder.path(returnedUser.getId());
