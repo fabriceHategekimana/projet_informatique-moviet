@@ -382,7 +382,7 @@ public class GroupServiceImpl implements GroupService{
                 }
             }
         }
-        if (all_ready){
+        if (all_ready && status.equalsIgnoreCase("READY")){
             // set all to status VOTING if all users in the group were ready
             for (User user : group.getUsers()) {
                 GroupUser gU = getGroupUser(group_id, user.getId());
@@ -395,7 +395,7 @@ public class GroupServiceImpl implements GroupService{
             em.merge(group);
             status = "voting";
         }
-        else if (all_done){
+        else if (all_done && status.equalsIgnoreCase("DONE")){
             groupUser.setUser_status(Status.valueOf(status.toUpperCase())); // https://www.tutorialspoint.com/how-to-convert-a-string-to-an-enum-in-java
             em.merge(groupUser);
             // set group status to DONE
