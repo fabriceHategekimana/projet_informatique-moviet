@@ -144,4 +144,26 @@ public class UserRestService {
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid id, it should be numerical: id = " + str_id).build();
         }
     }
+
+    @GET
+    @Path("/whoami")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "get the user associated with an authenticated client")
+    public Response whoami(final @HeaderParam("X-User") String user_id) {
+		    User user=userService.getUser(user_id);
+				if(user == null){
+						return Response.status(Response.Status.NOT_FOUND).build();
+				}
+        return Response.ok(user).build();
+    }
+
 }
+
+
+
+
+
+
+
+
+

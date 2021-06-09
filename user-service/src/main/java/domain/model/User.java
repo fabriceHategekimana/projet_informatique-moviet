@@ -14,15 +14,18 @@ import javax.validation.constraints.NotNull;
 // https://youtu.be/FeZ5BC0PirQ
 
 @ToString
-@Getter
+
 @NoArgsConstructor
+@Getter
 @Entity @Table( name="T_users")// JPA, mapping class - table
 public class User {
 
+		
     @Id
     @Column(length=255)
     private String id="0"; // no auto increment
 
+		@Getter
     @Setter @NotNull
     private String username;
 
