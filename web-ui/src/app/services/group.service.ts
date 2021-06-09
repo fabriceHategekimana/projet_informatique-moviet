@@ -78,7 +78,7 @@ export class GroupService {
   }
 
   sendPreferences(groupId: number, userId: string, moviePreferences: MoviePreferences): Observable<any> { // send the user preferences
-    return this.http.post<MoviePreferences>(this.groupsUrl + "/" + groupId + "/" + "users/" + userId + "/movie_preferences", moviePreferences, this.httpOptionsPut)
+    return this.http.post<MoviePreferences>(this.groupsUrl + "/" + groupId + "/" + "users/" + encodeURI(userId) + "/movie_preferences", moviePreferences, this.httpOptionsPut)
                   .pipe(catchError(this.handleError<any>('sendPreferences', undefined)));
   }
 
@@ -94,12 +94,12 @@ export class GroupService {
 
   getUserStatus(groupId: number, userId: string): Observable<any> {
     // console.log(this.groupsUrl + "/" + groupId + "/" + "users/" + userId + "/status");
-    return this.http.get<UserStatusValue>(this.groupsUrl + "/" + groupId + "/" + "users/" + userId + "/status", this.httpOptionsGet)
+    return this.http.get<UserStatusValue>(this.groupsUrl + "/" + groupId + "/" + "users/" + encodeURI(userId) + "/status", this.httpOptionsGet)
                   .pipe(catchError(this.handleError<any>('getUserStatus', undefined)));
   }
 
   setUserStatus(groupId: number, userId: string, status: UserStatusValue): Observable<any> {
-    return this.http.put<UserStatusValue>(this.groupsUrl + "/" + groupId + "/" + "users/" + userId + "/status", status, this.httpOptionsPut)
+    return this.http.put<UserStatusValue>(this.groupsUrl + "/" + groupId + "/" + "users/" + encodeURI(userId) + "/status", status, this.httpOptionsPut)
                   .pipe(catchError(this.handleError<any>('setUserStatus', undefined)));
   }
 
