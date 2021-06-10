@@ -9,72 +9,30 @@ import org.junit.jupiter.api.Test;
 
 // just a test for unit testing
 class UserTest {
-    private final User user = new User("1", "hello", "world", "42");
+    private final User user = new User("Hello", "world");
 
     @Test
     void testGetId(){
-        assertEquals("1", user.getId() );
+        assertEquals("Hello", user.getId() );
     }
     
     @Test
-    void testGetFirstName(){
-        assertEquals("hello", user.getFirstName());
+    void testGetUsername(){
+        assertEquals("world", user.getUsername());
     }
 
-    @Test
-    void testGetLastName(){
-        assertEquals("world", user.getLastName());
-    } 
 
     @Test
-    void testGetAge(){
-        assertEquals("42", user.getAge());
-    }
-
-    @Test
-    void testSetFirstName(){
-        User tmpuser = new User("1", "hello", "world", "42");
-        tmpuser.setFirstName("well");
-        assertEquals("well", tmpuser.getFirstName() );
-    }
-
-    @Test
-    void testSetLastName(){
-        User tmpuser = new User("1","well", "world", "42");
-        tmpuser.setLastName("Hello there");
-        assertEquals("Hello there", tmpuser.getLastName() );
-    }
-
-    @Test
-    void testSetAge(){
-        User tmpuser = new User("1","well", "hello there", "42");
-        tmpuser.setAge("504");
-        assertEquals("504", tmpuser.getAge() );
-    }
-
-    @Test
-    void testGetIdNoArgsConstructor(){
-        assertEquals("0", new User().getId() );
-    }
-
-    @Test
-    void testGetFirstNameNoArgsConstructor(){
-        assertNull(new User().getFirstName() );
-    }
-
-    @Test
-    void testGetLastNameNoArgsConstructor(){
-        assertNull(new User().getLastName() );
-    }
-
-    @Test
-    void testGetAgeNoArgsConstructor(){
-        assertNull(new User().getAge() );
+    void testSetUsername(){
+        User tmpuser = new User("hello", "world");
+        tmpuser.setUsername("well");
+        assertEquals("well", tmpuser.getUsername() );
     }
 
     @Test
     void testToString(){
-        assertEquals("User(id=1, firstName=hello, lastName=world, age=42)", user.toString() );
+				User tmpuser = new User("hello", "world");
+        assertEquals("User(id=hello, username=world)", tmpuser.toString() );
     }
     // fail a test -> Build failure
 }

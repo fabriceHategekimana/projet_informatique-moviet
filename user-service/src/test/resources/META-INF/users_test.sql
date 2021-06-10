@@ -11,4 +11,8 @@ INSERT INTO T_users (id, username) VALUES ('2', 'Fabrice');
 INSERT INTO T_users (id, username) VALUES ('3', 'mohsen');
 INSERT INTO T_users (id, username) VALUES ('a', 'ethan');
 INSERT INTO T_users (id, username) VALUES ('b', 'raphael');
+<<<<<<< HEAD
 INSERT INTO T_users (id, username) VALUES ('c', 'erwan');
+=======
+INSERT INTO T_users (id, username) VALUES ('c', 'erwan');
+>>>>>>> origin/user-service
