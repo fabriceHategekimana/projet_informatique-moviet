@@ -12,23 +12,17 @@ public class TmdbConfiguration implements TmdbConfigurationInterface {
     private static final Logger LOGGER = Logger.getLogger(TmdbConfiguration.class.getName());
 
     private final static TmdbConfiguration instance = new TmdbConfiguration();
-    private final String API_KEY;
     private final Tmdb tmdb;
     private final String BASE_URL;
 
     private TmdbConfiguration() {
-        API_KEY = initApiKey();
+        String API_KEY = initApiKey();
         tmdb = new Tmdb(API_KEY);
         BASE_URL = initBaseUrl();
     }
 
     public static TmdbConfiguration getInstance() {
         return instance;
-    }
-
-    @Override
-    public String getApiKey() {
-        return API_KEY;
     }
 
     @Override

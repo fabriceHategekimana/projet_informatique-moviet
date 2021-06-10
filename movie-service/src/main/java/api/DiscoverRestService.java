@@ -5,7 +5,6 @@ import com.uwetrottmann.tmdb2.entities.Genre;
 import com.uwetrottmann.tmdb2.entities.MovieResultsPage;
 import com.uwetrottmann.tmdb2.entities.TmdbDate;
 import com.uwetrottmann.tmdb2.enumerations.SortBy;
-import domain.helper.DiscoverFilterBuilder;
 import domain.helper.MovieConverter;
 import domain.model.DiscoverRequest;
 import domain.model.MovieDisplayInfo;
@@ -36,8 +35,8 @@ public class DiscoverRestService {
     public Response discoverPage(
             @QueryParam("page") Integer page,
             @QueryParam("sortBy") SortBy sortBy,
-            @QueryParam("release_date_gte") TmdbDate release_date_gte,
-            @QueryParam("release_date_lte") TmdbDate release_date_lte,
+            @QueryParam("release_year_gte") String release_year_gte,
+            @QueryParam("release_year_lte") String release_year_lte,
             @QueryParam("genres") Integer[] genres,
             @QueryParam("keywords") Integer[] keywords,
             @QueryParam("banned_genres") Integer[] banned_genres,
@@ -47,8 +46,8 @@ public class DiscoverRestService {
 
         MovieResultsPage movieResultsPage = movieRequester.discover(new Query(
                 sortBy,
-                release_date_gte,
-                release_date_lte,
+                release_year_gte,
+                release_year_lte,
                 genres,
                 keywords,
                 banned_genres,
@@ -69,8 +68,8 @@ public class DiscoverRestService {
     public Response discoverId(
             @QueryParam("page") Integer page,
             @QueryParam("sortBy") SortBy sortBy,
-            @QueryParam("release_date_gte") TmdbDate release_date_gte,
-            @QueryParam("release_date_lte") TmdbDate release_date_lte,
+            @QueryParam("release_year_gte") String release_year_gte,
+            @QueryParam("release_year_lte") String release_year_lte,
             @QueryParam("genres") Integer[] genres,
             @QueryParam("keywords") Integer[] keywords,
             @QueryParam("banned_genres") Integer[] banned_genres,
@@ -80,8 +79,8 @@ public class DiscoverRestService {
 
         List<Integer> ids = MovieConverter.pageToIds(movieRequester.discover(new Query(
                 sortBy,
-                release_date_gte,
-                release_date_lte,
+                release_year_gte,
+                release_year_lte,
                 genres,
                 keywords,
                 banned_genres,
@@ -102,8 +101,8 @@ public class DiscoverRestService {
     public Response discoverDisplayInfo(
             @QueryParam("page") Integer page,
             @QueryParam("sortBy") SortBy sortBy,
-            @QueryParam("release_date_gte") TmdbDate release_date_gte,
-            @QueryParam("release_date_lte") TmdbDate release_date_lte,
+            @QueryParam("release_year_gte") String release_year_gte,
+            @QueryParam("release_year_lte") String release_year_lte,
             @QueryParam("genres") Integer[] genres,
             @QueryParam("keywords") Integer[] keywords,
             @QueryParam("banned_genres") Integer[] banned_genres,
@@ -113,8 +112,8 @@ public class DiscoverRestService {
 
         List<MovieDisplayInfo> movieDisplayInfoList = MovieConverter.pageToDisplayInfo(movieRequester.discover(new Query(
                 sortBy,
-                release_date_gte,
-                release_date_lte,
+                release_year_gte,
+                release_year_lte,
                 genres,
                 keywords,
                 banned_genres,
@@ -160,8 +159,8 @@ public class DiscoverRestService {
 
     public static class Query {
         public SortBy sortBy;
-        public TmdbDate release_date_gte;
-        public TmdbDate release_date_lte;
+        public String release_year_gte;
+        public String release_year_lte;
         public Integer[] genres;
         public Integer[] keywords;
         public Integer[] banned_genres;
@@ -170,8 +169,8 @@ public class DiscoverRestService {
         public String keywords_operator;
 
         public Query(SortBy sortBy,
-                     TmdbDate release_date_gte,
-                     TmdbDate release_date_lte,
+                     String release_year_gte,
+                     String release_year_lte,
                      Integer[] genres,
                      Integer[] keywords,
                      Integer[] banned_genres,
@@ -179,8 +178,8 @@ public class DiscoverRestService {
                      String genres_operator,
                      String keywords_operator) {
             this.sortBy = sortBy;
-            this.release_date_gte = release_date_gte;
-            this.release_date_lte = release_date_lte;
+            this.release_year_gte = release_year_gte;
+            this.release_year_lte = release_year_lte;
             this.genres = genres;
             this.keywords = keywords;
             this.banned_genres = banned_genres;
@@ -189,18 +188,25 @@ public class DiscoverRestService {
             this.keywords_operator = keywords_operator;
         }
 
-        public DiscoverRequest toDiscoverRequest() {
-            return new DiscoverRequest(
-                    sortBy,
-                    release_date_gte,
-                    release_date_lte,
-                    DiscoverFilterBuilder.build(stringToSeparator(genres_operator), genres),
-                    DiscoverFilterBuilder.build(stringToSeparator(keywords_operator), keywords),
-                    new DiscoverFilter(banned_genres),
-                    new DiscoverFilter(banned_keywords));
+        public static TmdbDate stringToTmdbDate(String year, String month, String day) {
+            return new TmdbDate(year + "-" + month + "-" + day);
         }
 
-        public DiscoverFilter.Separator stringToSeparator(String s) {
+        private static TmdbDate yearLteToDate(String yearLte) {
+            if (yearLte == null) {
+                return null;
+            }
+            return stringToTmdbDate(yearLte, "01", "01");
+        }
+
+        private static TmdbDate yearGteToDate(String yearGte) {
+            if (yearGte == null) {
+                return null;
+            }
+            return stringToTmdbDate(yearGte, "12", "31");
+        }
+
+        public static DiscoverFilter.Separator stringToSeparator(String s) {
             if (s == null) {
                 return DiscoverFilter.Separator.AND;
             }
@@ -212,6 +218,17 @@ public class DiscoverRestService {
                 default:
                     throw new IllegalArgumentException();
             }
+        }
+
+        public DiscoverRequest toDiscoverRequest() {
+            return new DiscoverRequest(
+                    sortBy,
+                    yearGteToDate(release_year_gte),
+                    yearLteToDate(release_year_lte),
+                    new DiscoverFilter(stringToSeparator(genres_operator), genres),
+                    new DiscoverFilter(stringToSeparator(keywords_operator), keywords),
+                    new DiscoverFilter(banned_genres),
+                    new DiscoverFilter(banned_keywords));
         }
     }
 }
