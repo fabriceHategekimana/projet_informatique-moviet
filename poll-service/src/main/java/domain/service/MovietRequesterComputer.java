@@ -1,5 +1,6 @@
 package domain.service;
 
+import domain.model.MoviePreferences;
 import domain.model.MovieSuggestionInfo;
 import retrofit2.Response;
 
@@ -52,12 +53,12 @@ public class MovietRequesterComputer {
         return ids;
     }
 
-    public MovieSuggestionInfo getSuggestionInfo(int id) throws IOException {
+    public MovieSuggestionInfo getSuggestionInfo(int movie_id) throws IOException {
         MovieSuggestionInfo suggestionInfo;
 
         MovieServiceRequesterInterface moviesService = moviet.movieRequester();
         Response<MovieSuggestionInfo> response = moviesService
-                .getSuggestionInfo(id)
+                .getSuggestionInfo(movie_id)
                 .execute();
 
         if (response.isSuccessful()) {
@@ -67,5 +68,22 @@ public class MovietRequesterComputer {
         }
 
         return suggestionInfo;
+    }
+
+    public List<MoviePreferences> getMoviePreferences(int group_id) throws IOException {
+        List<MoviePreferences> preferences;
+
+        GroupServiceRequesterInterface groupService = moviet.groupRequester();
+        Response<List<MoviePreferences>> response = groupService
+                .getMoviePreferences(String.valueOf(group_id))
+                .execute();
+
+        if (response.isSuccessful()) {
+            preferences = response.body();
+        } else {
+            throw new InternalServerErrorException(response.message());
+        }
+
+        return preferences;
     }
 }

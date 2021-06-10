@@ -14,7 +14,6 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @ToString
@@ -74,21 +73,31 @@ public class SuggestionWithCriteria {
         int movie_id = suggestion.getMovie_id();
 
         MovieSuggestionInfo suggestionInfo = null;
+        GroupPreferences groupPreferences = null;
+
+        MovietRequesterComputer moviet = new MovietRequesterComputer();
 
         try {
-            suggestionInfo = new MovietRequesterComputer().getSuggestionInfo(movie_id);
+            suggestionInfo = moviet.getSuggestionInfo(movie_id);
+        } catch (IOException ignore) {
+            // Malpractice
+        }
+
+        try {
+            groupPreferences = GroupPreferences.fromMoviePreferences(moviet.getMoviePreferences(group_id));
         } catch (IOException ignore) {
             // Malpractice
         }
 
 
         assert suggestionInfo != null;
+        assert groupPreferences != null;
         float popularity = (float) suggestionInfo.popularity;
-        int n_sat_w_genre = countSatisfaction(new HashSet<>(suggestionInfo.genre_ids), null);
-        int n_sat_b_genre = countSatisfaction(new HashSet<>(suggestionInfo.genre_ids), null);
-        int n_match_w_keyword = countMatch(new HashSet<>(suggestionInfo.keyword_ids), null);
-        int n_match_b_keyword = countMatch(new HashSet<>(suggestionInfo.keyword_ids), null);
-        int n_sat_date = countSatDate(suggestionInfo.release_year, null);
+        int n_sat_w_genre = countSatisfaction(new HashSet<>(suggestionInfo.genre_ids), groupPreferences.genresList);
+        int n_sat_b_genre = 0;
+        int n_match_w_keyword = countMatch(new HashSet<>(suggestionInfo.keyword_ids), groupPreferences.keywordsList);
+        int n_match_b_keyword = 0;
+        int n_sat_date = countSatDate(suggestionInfo.release_year, groupPreferences.yearBoundList);
 
         // TODO use other services
         return new SuggestionWithCriteria(
@@ -115,11 +124,8 @@ public class SuggestionWithCriteria {
         return count;
     }
 
-    public static int countSatDate(int year, List<Objects> listYears) {
-        // TODO replace by YearBounds
-        Integer y_gte = 0;
-        Integer y_lte = 3000;
-        return (int) listYears.stream().filter(years -> (y_gte == null || y_gte <= year) && (y_lte == null || year <= y_lte)).count();
+    public static int countSatDate(int year, List<GroupPreferences.YearBound> listYears) {
+        return (int) listYears.stream().filter(years -> (years.year_from == null || years.year_from <= year) && (years.year_to == null || year <= years.year_to)).count();
     }
 
     public void checkValidity() throws IllegalArgumentException {

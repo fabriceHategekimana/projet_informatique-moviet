@@ -1,5 +1,6 @@
 package domain.model;
 
+import domain.service.MovietRequesterComputer;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 
 @ToString
 @Data
@@ -84,6 +86,12 @@ public class Proposition {
     public static Proposition fromSuggestionWithCriteria(SuggestionWithCriteria suggestion) {
         int group_id = suggestion.getGroup_id();
         int movie_id = suggestion.getMovie_id();
+        int n_voters = 1;
+        try {
+            n_voters = new MovietRequesterComputer().getMoviePreferences(group_id).size();
+        } catch (IOException ignore) {
+            // Malpractice
+        }
         float score = computeScore(
                 suggestion.getPopularity(),
                 suggestion.getN_sat_w_genre(),
@@ -92,10 +100,9 @@ public class Proposition {
                 suggestion.getN_match_b_keyword(),
                 suggestion.getN_sat_date(),
                 100,
-                6,
-                6,
-                6);
-        // TODO get n_voters from Group-Service
+                n_voters,
+                n_voters,
+                n_voters);
         // mean_popularity should be a more clever metrics eventually evolving though time, needs a memory of previous popularity...
         // max_match also but can be approximated by setting to n_voters
 
