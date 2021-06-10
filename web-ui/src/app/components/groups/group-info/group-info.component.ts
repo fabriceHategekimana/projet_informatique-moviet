@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { GroupsComponent } from '../groups.component'
 import { Group } from '../../../shared/interfaces/group';
 import { User } from '../../../shared/interfaces/user'
@@ -14,28 +14,51 @@ import { fromEventPattern } from 'rxjs';
   templateUrl: './group-info.component.html',
   styleUrls: ['./group-info.component.css']
 })
-export class GroupInfoComponent implements OnInit {
+export class GroupInfoComponent implements OnInit, OnDestroy {
 
   currentGroup?: Group;
+
   users: User[] = [];
+
+  myUser?: User;
+
+  isAdmin: boolean = false;
+
+  interval?: NodeJS.Timeout;
 
   constructor(private groupsComponent : GroupsComponent, private groupService: GroupService, private router: Router, private route: ActivatedRoute, private userService: UserService) { }
 
   ngOnInit(): void {
-    let thenGroupimport = () => {
-      this.currentGroup = this.groupsComponent.currentGroup; // save the current group
+    let thenGroupimport = (then: ()=>any = ()=> void 0) => {
+      this.currentGroup = this.groupsComponent.currentGroup; // save the current 
+      this.getMyUser(() => {
+        this.testIfAdmin();
+        then();
+      });
       // import all users:
       this.getAllUsers();
     };
 
     this.groupsComponent.getGroup(undefined, () => {
-        thenGroupimport();
-        this.groupService.addUserToGroup(this.currentGroup!.id);
+        thenGroupimport(() => {
+          this.groupService.addUserToGroup(this.currentGroup!.id, this.myUser!.id)
+            .subscribe((data) => {
+              // console.log(data);
+            }, (data) => {
+              console.error(data);
+            });
+        });
         this.autoNavigate(); // auto navigate
       });
 
     // refresh group info every x seconds:
-    setInterval(() => {this.groupsComponent.getGroup(undefined, thenGroupimport);}, 1000);
+    this.interval = setInterval(() => {this.groupsComponent.getGroup(undefined, thenGroupimport);}, 1000);
+  }
+
+  ngOnDestroy() {
+    if (this.interval != undefined) {
+      clearInterval(this.interval); 
+    }
   }
 
   goToGenres() { // go to the genres selection page
@@ -118,8 +141,33 @@ export class GroupInfoComponent implements OnInit {
     }
   }
 
-  getMyUserId(): string { //! Temporary
-    return '1';
+  getMyUserId(): string {
+    if (this.myUser != undefined) {
+      return this.myUser.id;
+    } else {
+      return '';
+    }
+  }
+
+  getMyUser(then: ()=>any = ()=>void 0) {
+    this.userService.whoAmI()
+      .subscribe((user) => {
+        this.myUser = user;
+        then();
+      });
+  }
+
+
+  testIfAdmin() { // test if the user is admin
+    if (this.currentGroup != undefined) {
+      if (this.myUser != undefined) {
+        if (this.myUser.id == this.currentGroup.admin_id) {
+          this.isAdmin = true;
+        } else {
+          this.isAdmin = false;
+        }
+      }
+    }
   }
 
   goToFindMatch() { // go to the find-match page

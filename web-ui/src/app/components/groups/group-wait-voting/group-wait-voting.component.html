@@ -9,7 +9,7 @@
             Waiting for all participants to be ready.
         </p>
         <app-display-users-status [currentGroup]="currentGroup"></app-display-users-status>
-        <div type="button" class="btn btn-primary btn-lg btn-block mt-5" id="endVotes" (click)="endVoting()">End votes
+        <div *ngIf="isAdmin" type="button" class="btn btn-primary btn-lg btn-block mt-5" id="endVotes" (click)="endVoting()">End votes
         </div>
     </div>
 </div>

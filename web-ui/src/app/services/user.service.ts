@@ -25,11 +25,20 @@ export class UserService {
 
   private usersUrl : string = environment.API_URL + "users"; // url using api
   
+  public myUserInfo? : User;
+
   constructor(private http: HttpClient) { }
 
   getUser(id : string): Observable<any> { // type any because get can return httpEvent or Observable<User>
-    return this.http.get<User>(this.usersUrl + "/" + id, this.httpOptionsGet)
+    return this.http.get<User>(this.usersUrl + "/" + encodeURI(id), this.httpOptionsGet)
                   .pipe(catchError(this.handleError<User>('getUser', undefined)));
+  }
+
+  whoAmI(): Observable<any> {
+    // return this.http.get<User>(this.usersUrl + "/whoAmI", this.httpOptionsGet)
+    //               .pipe(catchError(this.handleError<User>('whoAmI', undefined)));
+    //!MOCK
+    return of({name: "nom", id: "1"});
   }
 
   //** handle error function from https://angular.io/tutorial/toh-pt6
