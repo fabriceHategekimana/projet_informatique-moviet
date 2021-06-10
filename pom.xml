@@ -15,20 +15,19 @@
         <module>group-service</module>
         <module>movie-service</module>
         <module>api-gateway</module>
+        <module>user-service</module>
         <!-- Add here if need to add a module ! In the module, you have to define the parent -->
     </modules>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <!--maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>-->
+        <maven.compiler.release>11</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Unit test -->
-        <!-- -->
-        <version.junit>5.6.0</version.junit>
-
-        <!-- Mockito -->
+        <version.junit>5.7.0</version.junit>
         <mockito.version>3.3.0</mockito.version>
 
         <java-ee-api.version>8.0.1</java-ee-api.version>
@@ -36,15 +35,16 @@
         <!-- DB: Used in the pom of modules + and can be in resources, module.xml-->
         <postgresql.jdbc.driver.version>42.2.14</postgresql.jdbc.driver.version>
         <hibernate-entitymanager.version>5.4.27.Final</hibernate-entitymanager.version>
-        <!--  -->
+        <!-- H2 in memory database used for tests-->
+        <version.h2>1.4.200</version.h2>
 
         <version.thorntail>2.7.0.Final</version.thorntail> <!-- careful about the version -->
-
         <!-- used to bypass some warning, say to maven that we do not need web xml -->
         <failOnMissingWebXml>false</failOnMissingWebXml>
 
         <!-- Added for building docker images, only building for modules, /!\ need to set to false for modules -->
         <skip-docker-build>true</skip-docker-build>
+        <skip-ITs>false</skip-ITs> <!-- cannot skip the pre-integration test and post-integration test in submodules apart for Jacoco-->
         <!-- has to set it to true in the super-pom because do not want to build a Docker image for it but false in modules pom-->
         <dockerHost>tcp://localhost:2375</dockerHost> <!-- need to search why these values in particular -->
 
@@ -56,23 +56,12 @@
         <dependencies>
             <dependency>
                 <groupId>io.thorntail</groupId>
-                <artifactId>bom-all</artifactId>
+                <artifactId>bom</artifactId>
                 <version>${version.thorntail}</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
-
-            <!-- "Swagger is a JSON representation of a RESTful API,
-            typically made available over HTTP at /swagger.json. This JSON document contains information about
-            your APIs, including names, paths, endpoints, parameters, descriptions, keywords, expected responses, and more."
-            More informations can be found here: https://thorntail.io/posts/wildfly-swarm-s-got-swagger/ -->
-            <dependency>
-                <groupId>io.thorntail</groupId>
-                <artifactId>swagger</artifactId>
-                <version>${version.thorntail}</version>
-            </dependency>
-
-            <!-- https://github.com/dadrus/jpa-unit -->
+            <!-- https://github.com/dadrus/jpa-unit , testing db-->
             <dependency>
                 <groupId>com.github.dadrus.jpa-unit</groupId>
                 <artifactId>jpa-unit-bom</artifactId>
@@ -105,21 +94,49 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- Also restassured used to test REST services (integration test) -->
-            <!-- https://github.com/crystalzenchi/microservices/blob/master/counterparty-service/src/test/java/api/CounterpartyRestServiceIT.java -->
+            <!-- H2 in memory database used for tests-->
             <dependency>
-                <groupId>io.rest-assured</groupId>
-                <artifactId>rest-assured</artifactId>
-                <version>4.3.3</version>
-                <scope>test</scope>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${version.h2}</version>
+            </dependency>
+
+            <!-- "Swagger is a JSON representation of a RESTful API,
+            typically made available over HTTP at /swagger.json. This JSON document contains information about
+            your APIs, including names, paths, endpoints, parameters, descriptions, keywords, expected responses, and more."
+            More informations can be found here: https://thorntail.io/posts/wildfly-swarm-s-got-swagger/ -->
+            <dependency>
+                <groupId>io.thorntail</groupId>
+                <artifactId>swagger</artifactId>
+                <version>${version.thorntail}</version>
             </dependency>
 
             <!-- Unit Testing -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${version.junit}</version>
+                <scope>test</scope>
+                <type>pom</type>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>${version.junit}</version>
+                <scope>test</scope>
+            </dependency>
             <!-- http://maven.apache.org/surefire/maven-surefire-plugin/examples/junit-platform.html -->
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
                 <version>${version.junit}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-launcher</artifactId>
+                <version>1.7.0</version>
                 <scope>test</scope>
             </dependency>
 
@@ -135,12 +152,27 @@
                 <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
-
             <!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-junit-jupiter</artifactId>
                 <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!--<dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>2.3.1</version>
+                <scope>test</scope>
+            </dependency>-->
+
+            <!-- Also restassured used to test REST services (integration test) -->
+            <!-- https://github.com/crystalzenchi/microservices/blob/master/counterparty-service/src/test/java/api/CounterpartyRestServiceIT.java -->
+            <dependency>
+                <groupId>io.rest-assured</groupId>
+                <artifactId>rest-assured</artifactId>
+                <version>4.3.3</version>
                 <scope>test</scope>
             </dependency>
 
@@ -218,19 +250,34 @@
 
     <!-- BUILD -->
     <build>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    
         <pluginManagement>
             <plugins>
+                <!-- <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.3.1</version>
+                </plugin> -->
                 <plugin>
                     <!-- Compile source files + test files, think about javac -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.1</version>
-
-                    <!-- -->
+                    <configuration>
+                        <release>${maven.compiler.release}</release>
+                    </configuration>
+                    <!--
                     <configuration>
                         <source>${maven.compiler.source}</source>
                         <target>${maven.compiler.target}</target>
-                    </configuration>
+                    </configuration>-->
                 </plugin>
 
                 <!-- Unit test -->
@@ -247,7 +294,12 @@
                     <version>3.0.0-M4</version>
                 </plugin>
                 <!-- http://maven.apache.org/surefire/maven-failsafe-plugin/ -->
-
+                <!-- Java Code Coverage-->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.6</version>
+                </plugin>
                 <plugin>
                     <groupId>io.thorntail</groupId>
                     <artifactId>thorntail-maven-plugin</artifactId>
@@ -263,6 +315,25 @@
         </pluginManagement>
         <!-- -->
         <plugins>
+                <!-- <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                        <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                        <rules>
+                            <requireMavenVersion>
+                            <version>3.8</version>
+                            </requireMavenVersion>
+                        </rules>    
+                        </configuration>
+                    </execution>
+                    </executions>
+                </plugin> -->
             <!-- Compile source files + test files, think about javac -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -282,8 +353,8 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <runOrder>filesystem</runOrder> <!-- alphabetic order.. -->
-                    <!-- can use <skipITs>true</skipITs> -->
-                    <skipITs>true</skipITs>
+                    <!-- can use <skipITs>true</skipITs> to skip IT-->
+                    <skipITs>${skip-ITs}</skipITs>
                 </configuration>
                 <executions>
                     <execution>
@@ -308,7 +379,7 @@
                 </executions>
             </plugin>
         </plugins>
-
+        <defaultGoal>install</defaultGoal>
     </build>
 
     <!-- profiles copied from https://github.com/PInfo-2020/Exercises/blob/master/maven/super-project/pom.xml-->
@@ -337,6 +408,8 @@
         </profile>
 
         <profile>
+            <!-- It's not this profile that does the coverage, only building docker images here.-->
+            <!-- Jacoco does the coverage. Thorntail-maven-plugin does the some packaging + start .war in pre-integration-test, not docker containers -->
             <id>package-docker-image</id>
             <build>
                 <plugins>
@@ -359,7 +432,7 @@
                                         </ports>
                                     </run>
                                     <build>
-                                        <from>java:openjdk-8-jdk</from>
+                                        <from>openjdk:11-jdk</from>
                                         <ports>
                                             <port>8080</port>
                                         </ports>
@@ -390,101 +463,6 @@
                                 <phase>package</phase>
                                 <goals>
                                     <goal>build</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                </plugins>
-
-            </build>
-        </profile>
-
-
-        <!-- To obtain docker images and run docker containers for IT -->
-        <!-- Some additional informations : https://medium.com/@fndomoraes/running-docker-containers-on-maven-integration-tests-ee071bcd743f-->
-        <profile>
-            <id>package-docker-image-with-IT</id>
-            <build>
-                <plugins>
-
-                    <plugin>
-                        <groupId>io.fabric8</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.35.0</version>
-                        <configuration>
-                            <skip>${skip-docker-build}</skip>
-                            <useColor>true</useColor>
-                            <dockerHost>${dockerHost}</dockerHost>
-                            <images>
-                                <image>
-                                    <name>%g/%a:%l</name>
-                                    <run>
-                                        <ports>
-                                            <!-- bind 8080 port of container to TCP port <microservice.port> on localhost of the host machine-->
-                                            <port>${microservice.port}:8080</port>
-                                        </ports>
-                                        <!-- important, maybe because the service needs some time at the beginning-->
-                                        <!-- section which is a readiness check when starting the service -->
-                                        <wait>
-                                            <!-- Waiting for a container to startup based on time, the reachability of an URL, or a pattern in the log output -->
-                                            <!-- can also use <time>20000</time> instead of log -->
-                                            <log>(?i)(Thorntail is Ready)|(GET \/ HTTP\/1.1" 200 5961)</log> <!-- case insentive matching, block until match-->
-                                            <!-- Thorntail is Ready : for microservices-->
-                                            <!-- GET / HTTP/1.1" 200 5961 : for api-gateway to not be stuck.. -->
-                                            <!-- "Regular expression which is applied against the log output of an -->
-                                            <!-- "container and blocks until the pattern is matched.-->
-                                            <!-- You can use (?s) in the pattern to switch on multi line matching."-->
-                                            <!-- https://dmp.fabric8.io/#java-regular-expression-patterns, https://regex101.com-->
-                                        </wait>
-                                        <!-- If have errors : make sure to verify your IT and if wait is long enough or order of tests -->
-                                    </run>
-                                    <build>
-                                        <from>java:openjdk-8-jdk</from>
-                                        <ports>
-                                            <port>8080</port>
-                                        </ports>
-
-                                        <assembly>
-                                            <basedir>/</basedir>
-                                            <inline>
-                                                <files>
-                                                    <file>
-                                                        <source>${project.build.directory}/${project.build.finalName}-thorntail.jar</source>
-                                                        <outputDirectory>/opt</outputDirectory>
-                                                    </file>
-                                                </files>
-                                            </inline>
-                                        </assembly>
-                                        <entryPoint>
-                                            <shell>java -Djava.net.preferIPv4Stack=true -jar \
-                                                /opt/${project.build.finalName}-thorntail.jar</shell>
-                                        </entryPoint>
-                                    </build>
-                                </image>
-                            </images>
-                        </configuration>
-
-                        <executions>
-                            <execution>
-                                <id>build_docker_images</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>run_containers</id>
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>start</goal> <!-- docker start -->
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>stop_containers</id>
-                                <phase>post-integration-test</phase>
-                                <goals>
-                                    <goal>stop</goal> <!-- docker stop -->
                                 </goals>
                             </execution>
                         </executions>

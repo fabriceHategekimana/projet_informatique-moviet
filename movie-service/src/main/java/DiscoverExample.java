@@ -9,7 +9,7 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 public class DiscoverExample {
-    private static final String API_KEY = "FILL_ME";
+    private static final String API_KEY = "1d667fd973287ca06ba66af7c1a33de0";
 
     public static void main(String[] args) {
         // Create an instance of the service you wish to use

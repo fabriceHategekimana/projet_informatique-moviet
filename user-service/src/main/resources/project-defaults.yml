@@ -1,0 +1,25 @@
+thorntail:
+  datasources:
+    jdbc-drivers:
+      postgresql:
+        driver-class-name: org.postgresql.Driver
+        xa-datasource-class-name: org.postgresql.xa.PGXADataSource
+        driver-module-name: org.postgresql
+      myh2:  # we use it for IT
+        driver-class-name: org.h2.Driver
+        xa-datasource-name: org.h2.jdbcx.JdbcDataSource
+        driver-module-name: com.h2database.h2
+    data-sources:
+      userds:
+        driver-name: myh2
+        connection-url: jdbc:h2:${java.io.tmpdir}/target/UserDB;AUTO_SERVER=TRUE;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE  # check the pom with codehaus
+        user-name: sa
+        password: sa
+
+# This datasource replaces H2 database if run from docker-compose.. Why ? Because we use h2 for tests. Unit tests AND Integration tests
+# Informations about this datasource are in the docker-compose
+#      userds:
+#        driver-name: postgresql
+#        connection-url: jdbc:postgresql://user-service-database:5432/user-service # name of the database, not table
+#        user-name: user-service
+#        password: user-service

@@ -1,10 +1,9 @@
 #group-choice {
     position: relative;
     width: 20em;
-    height: 50em;
     margin: 0 auto;
-    -webkit-transform: translateY(-4em);
-    transform: translateY(-4em);
+    -webkit-transform: translateY(30vh);
+    transform: translateY(30vh);
 }
 
 /* background */

@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.List;
 
 public class DataExample {
-    private static final String API_KEY = "fill me";  // secret! Do not share nor commit
+    private static final String API_KEY = "1d667fd973287ca06ba66af7c1a33de0";  // secret! Do not share nor commit
 
     // DISCLAIMER: here the job is dirty, it's just an example of how the data is used.
     // Don't do it this dirty for on your own usages, refer to RequestExample.java for a bit cleaner request

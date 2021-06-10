@@ -1,10 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Movie } from '../shared/interfaces/movie' // import the movie interface
+import { Genre } from '../shared/interfaces/genre' // import the genre interface
+import { Keyword, KeywordResults } from '../shared/interfaces/keyword' // import keyword interface
 import { Tag, Tags } from '../shared/interfaces/tags'
 import { Observable, of } from 'rxjs'; // Observable => HTTP methods return Observable objects
 import { HttpClient, HttpHeaders } from '@angular/common/http' // http requests
 import { catchError, map, tap } from 'rxjs/operators' // error handling
+import { environment } from '../../environments/environment';
 
+const movie_API_URL = environment.production ? 'movie-service/' : 'movie-service/Mock_';
 @Injectable({
   providedIn: 'root'
 })
@@ -16,14 +20,17 @@ export class MovieService {
 
     })};
 
+    
 
-  private movieUrl : string = "http://localhost:10081/Mock_movies/0"; //! MOCK
+  private movieUrl : string = environment.API_URL + 'movie-service/' + "movies"; //! MOCK
+  private genresUrl : string = environment.API_URL + 'movie-service/' + "movies/genres"; //! MOCK
+  private keywordUrl : string = environment.API_URL + 'movie-service/' + "search/keyword"; //! MOCK
 
   constructor(private http: HttpClient) { }
 
-  getMovie(): Observable<any> { // type any because get can return httpEvent or Observable<Movie>
+  getMovie(movieId: number): Observable<any> { // type any because get can return httpEvent or Observable<Movie>
     // console.log(this.http.get<Movie>(movieUrl, httpOptions));
-    return this.http.get<Movie>(this.movieUrl, this.httpOptions)
+    return this.http.get<Movie>(this.movieUrl + '/' + movieId, this.httpOptions)
                   .pipe(catchError(this.handleError<Movie>('getMovie', undefined)));
     // return mock
     // return of({
@@ -45,6 +52,22 @@ export class MovieService {
         {name: "OtherTag", values: ["value1", "value2", "value3"]}
       ]
     })
+  }
+
+  getGenres(): Observable<any> { // type any because get can return httpEvent or Observable<Genre[]>
+    //! return Mock
+    return this.http.get<Genre[]>(this.genresUrl, this.httpOptions)
+                  .pipe(catchError(this.handleError<Movie>('getGenres', undefined)));
+  }
+
+  getKeywords(input: string): Observable<any> { // type any because get can return httpEvent or Observable<Genre[]>
+    //! return Mock
+    if (input.length == 0) { // if input is empty
+      input = '*';
+    }
+    console.log(this.keywordUrl + '/' + input);
+    return this.http.get<KeywordResults>(this.keywordUrl + '/' + input, this.httpOptions)
+                  .pipe(catchError(this.handleError<Movie>('getKeywords', undefined)));
   }
 
   //** handle error function from https://angular.io/tutorial/toh-pt6

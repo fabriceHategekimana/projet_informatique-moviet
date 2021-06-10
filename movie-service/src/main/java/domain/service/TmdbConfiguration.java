@@ -37,7 +37,7 @@ public class TmdbConfiguration implements TmdbConfigurationInterface {
 
     private String initApiKey() {
         // TODO implement (when secrets are available)
-        return "api_key";
+        return "1d667fd973287ca06ba66af7c1a33de0";
     }
 
     private String initBaseUrl() {

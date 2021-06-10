@@ -14,7 +14,7 @@ Powered by our partnership with JustWatch, you can query this method to get a li
 */
 
 public class WatchProvidersExample {
-    private static final String API_KEY = "fill me";
+    private static final String API_KEY = "1d667fd973287ca06ba66af7c1a33de0";
 
     public static void main(String[] args) {
         Tmdb tmdb = new Tmdb(API_KEY);
