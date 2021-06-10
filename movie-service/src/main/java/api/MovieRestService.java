@@ -2,6 +2,7 @@ package api;
 
 import com.uwetrottmann.tmdb2.entities.Genre;
 import domain.model.MovieDisplayInfo;
+import domain.model.MovieSuggestionInfo;
 import domain.service.MovieRequester;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -34,6 +35,20 @@ public class MovieRestService {
         }
 
         return Response.ok(displayInfo).build();
+    }
+
+    @GET
+    @Path("/suggestion-info/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getSuggestionInfo(@PathParam("id") int id) {
+
+        MovieSuggestionInfo suggestionInfoInfo = movieRequester.getSuggestionInfo(id);
+
+        if (suggestionInfoInfo == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(suggestionInfoInfo).build();
     }
 
     @GET

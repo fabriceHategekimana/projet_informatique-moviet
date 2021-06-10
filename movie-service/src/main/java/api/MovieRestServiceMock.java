@@ -2,6 +2,7 @@ package api;
 
 import com.uwetrottmann.tmdb2.entities.Genre;
 import domain.model.MovieDisplayInfo;
+import domain.model.MovieSuggestionInfo;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.GET;
@@ -36,6 +37,20 @@ public class MovieRestServiceMock {
                 Arrays.asList("Aventure", "Science-Fiction", "Action"));
 
         return Response.ok(displayInfo).build();
+    }
+
+    @GET
+    @Path("/suggestion-info/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getSuggestionInfo(@PathParam("id") int id) {
+
+        MovieSuggestionInfo suggestionInfo = new MovieSuggestionInfo(
+                299534,
+                248.234,
+                Arrays.asList(12, 878, 28),
+                Arrays.asList(3801, 4379, 5455, 9663, 9717, 14909, 155030, 173776, 180547, 186760, 218015, 240303, 241738),
+                2019);
+        return Response.ok(suggestionInfo).build();
     }
 
     @GET

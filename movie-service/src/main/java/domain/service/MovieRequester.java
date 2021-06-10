@@ -1,16 +1,15 @@
 package domain.service;
 
 import com.uwetrottmann.tmdb2.DiscoverMovieBuilder;
-import com.uwetrottmann.tmdb2.entities.Genre;
-import com.uwetrottmann.tmdb2.entities.GenreResults;
-import com.uwetrottmann.tmdb2.entities.Movie;
-import com.uwetrottmann.tmdb2.entities.MovieResultsPage;
+import com.uwetrottmann.tmdb2.entities.*;
+import com.uwetrottmann.tmdb2.enumerations.AppendToResponseItem;
 import com.uwetrottmann.tmdb2.enumerations.SortBy;
 import com.uwetrottmann.tmdb2.services.DiscoverService;
 import com.uwetrottmann.tmdb2.services.GenresService;
 import com.uwetrottmann.tmdb2.services.MoviesService;
 import domain.model.DiscoverRequest;
 import domain.model.MovieDisplayInfo;
+import domain.model.MovieSuggestionInfo;
 import org.jetbrains.annotations.Nullable;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -57,6 +56,34 @@ public class MovieRequester implements MovieRequesterInterface {
         }
 
         return displayInfo;
+    }
+
+    @Override
+    public MovieSuggestionInfo getSuggestionInfo(int id) {
+        MovieSuggestionInfo suggestionInfo = null;
+
+        MoviesService moviesService = tmdbConfiguration.getTmdb().moviesService();
+
+        try {
+            AppendToResponseItem[] items = {
+                    AppendToResponseItem.KEYWORDS
+            };
+            AppendToResponse appendToResponse = new AppendToResponse(items);
+            Response<Movie> response = moviesService
+                    .summary(id, language, appendToResponse)
+                    .execute();
+            if (response.isSuccessful()) {
+                Movie movie = response.body();
+
+                if (movie != null) {
+                    suggestionInfo = new MovieSuggestionInfo(movie, poster_size, backdrop_size);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, String.format("Couldn't retrieve movie information. (id: %s)", id), e);
+        }
+
+        return suggestionInfo;
     }
 
     @Override
