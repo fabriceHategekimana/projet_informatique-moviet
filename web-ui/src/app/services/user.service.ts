@@ -30,18 +30,20 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   getUser(id : string): Observable<any> { // type any because get can return httpEvent or Observable<User>
-    console.log(this.usersUrl + "/" + encodeURI(id));
+    console.log("getUser:", this.usersUrl + "/" + encodeURI(id));
     return this.http.get<User>(this.usersUrl + "/" + encodeURI(id), this.httpOptionsGet)
                   .pipe(catchError(this.handleError<User>('getUser', undefined)));
   }
 
   createUser(): Observable<any> { // create a user
+    console.log("createUser:", this.usersUrl);
     let body = environment.production ? "" : "NewUser";
     return this.http.post<string>(this.usersUrl, body, this.httpOptionsPost)
                   .pipe(catchError(this.handleError<any>('createUser', undefined)));
   }
 
   whoAmI(): Observable<any> {
+    console.log("whoAmI:", this.usersUrl + "/whoami");
     if (environment.production) {
       return this.http.get<User>(this.usersUrl + "/whoami", this.httpOptionsGet)
         .pipe(catchError(this.handleError<User>('whoAmI', undefined))); 

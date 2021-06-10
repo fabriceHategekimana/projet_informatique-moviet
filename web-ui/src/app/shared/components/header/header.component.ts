@@ -16,7 +16,8 @@ export class HeaderComponent implements OnInit {
   constructor(private location: Location, public auth: AuthentificationService) { }
 
   ngOnInit(): void {
-    this.auth.checkIfLogged();
+    this.isLogged = this.auth.checkIfLogged();
+    console.log(this.isLogged);
   }
   
 }

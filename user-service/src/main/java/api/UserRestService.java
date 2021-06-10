@@ -28,10 +28,11 @@ public class UserRestService {
     private UserService userService; // no more instantiation in the constructor
 
     @GET
-    @Path("{id}")
+    @Path("{id:.*}")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "GET a particular user")
-    public Response getUser(@PathParam("id") String str_id) {
+    public Response getUser(@PathParam("id") String encoded_str_id) {
+        String str_id = java.net.URLDecoder.decode(encoded_str_id, StandardCharsets.UTF_8);
         try {
             log.info("Trying to get a user using: id=" + str_id);
             User user=userService.getUser(str_id);
@@ -83,7 +84,7 @@ public class UserRestService {
 
         log.info("Trying to create using User: " + user);
         // only want non init id and non null first/last names, otherwise bad request
-        if ((user.getId().equals("0")) || (user.getId() == null) || (user.getUsername() == null)) {
+        if ((user.getId().equals("0")) || (user.getId() == null) || (user.getUsername() == null) || (user.getUsername() == "")) {
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : all attributes must be initialized correctly: " + user).build();
         }
 
