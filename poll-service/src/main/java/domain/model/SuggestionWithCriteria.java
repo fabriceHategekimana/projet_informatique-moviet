@@ -1,5 +1,6 @@
 package domain.model;
 
+import domain.service.MovietRequesterComputer;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,21 +11,33 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @ToString
 @Data
 @NoArgsConstructor
-@Entity @Table( name="T_unprocessed")
+@Entity
+@Table(name = "T_unprocessed")
 @IdClass(KeyGroupMovie.class)
 public class SuggestionWithCriteria {
-    @Id @Setter @NotNull
+    @Id
+    @Setter
+    @NotNull
     private int group_id;
-    @Id @Setter @NotNull
+    @Id
+    @Setter
+    @NotNull
     private int movie_id;
 
-    @Setter @NotNull
+    @Setter
+    @NotNull
     private float popularity;
-    @Setter @NotNull
+    @Setter
+    @NotNull
     private int n_sat_w_genre;
     @Setter
     @NotNull
@@ -59,12 +72,23 @@ public class SuggestionWithCriteria {
     public static SuggestionWithCriteria fromRawSuggestion(RawSuggestion suggestion) {
         int group_id = suggestion.getGroup_id();
         int movie_id = suggestion.getMovie_id();
-        float popularity = 42;  // from Movie-Service
-        int n_sat_w_genre = 42;  // genres from Movie-Service w_genres from Group-Service
-        int n_sat_b_genre = 42;  // genres from Movie-Service b_genres from Group-Service
-        int n_match_w_keyword = 42;  // keyword from Movie-Service w_keywords from Group-Service
-        int n_match_b_keyword = 42;  // keyword from Movie-Service b_keywords from Group-Service
-        int n_sat_date = 42;  // dates from Movie-Service w_dates from Group-Service
+
+        MovieSuggestionInfo suggestionInfo = null;
+
+        try {
+            suggestionInfo = new MovietRequesterComputer().getSuggestionInfo(movie_id);
+        } catch (IOException ignore) {
+            // Malpractice
+        }
+
+
+        assert suggestionInfo != null;
+        float popularity = (float) suggestionInfo.popularity;
+        int n_sat_w_genre = countSatisfaction(new HashSet<>(suggestionInfo.genre_ids), null);
+        int n_sat_b_genre = countSatisfaction(new HashSet<>(suggestionInfo.genre_ids), null);
+        int n_match_w_keyword = countMatch(new HashSet<>(suggestionInfo.keyword_ids), null);
+        int n_match_b_keyword = countMatch(new HashSet<>(suggestionInfo.keyword_ids), null);
+        int n_sat_date = countSatDate(suggestionInfo.release_year, null);
 
         // TODO use other services
         return new SuggestionWithCriteria(
@@ -73,6 +97,29 @@ public class SuggestionWithCriteria {
                 n_sat_w_genre, n_sat_b_genre,
                 n_match_w_keyword, n_match_b_keyword,
                 n_sat_date);
+    }
+
+    public static int countSatisfaction(Set<Integer> ids, List<Set<Integer>> listUserPrefs) {
+        // https://www.leveluplunch.com/java/examples/count-boolean-true-values-in-arraylist/#java8
+        // https://stackoverflow.com/questions/8708542/something-like-contains-any-for-java-set
+        return (int) listUserPrefs.stream().filter(userPref -> userPref.stream().anyMatch(ids::contains)).count();
+    }
+
+    public static int countMatch(Set<Integer> ids, List<Set<Integer>> listUserPrefs) {
+        int count = 0;
+        for (Set<Integer> userPref : listUserPrefs) {
+            Set<Integer> intersection = new HashSet<>(ids); // use the copy constructor
+            intersection.retainAll(userPref);
+            count += intersection.size();
+        }
+        return count;
+    }
+
+    public static int countSatDate(int year, List<Objects> listYears) {
+        // TODO replace by YearBounds
+        Integer y_gte = 0;
+        Integer y_lte = 3000;
+        return (int) listYears.stream().filter(years -> (y_gte == null || y_gte <= year) && (y_lte == null || year <= y_lte)).count();
     }
 
     public void checkValidity() throws IllegalArgumentException {

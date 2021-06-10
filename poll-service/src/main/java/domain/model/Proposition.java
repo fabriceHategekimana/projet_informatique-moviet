@@ -84,7 +84,20 @@ public class Proposition {
     public static Proposition fromSuggestionWithCriteria(SuggestionWithCriteria suggestion) {
         int group_id = suggestion.getGroup_id();
         int movie_id = suggestion.getMovie_id();
-        float score = -42; // TODO use Proposition.computeScore
+        float score = computeScore(
+                suggestion.getPopularity(),
+                suggestion.getN_sat_w_genre(),
+                suggestion.getN_sat_b_genre(),
+                suggestion.getN_match_w_keyword(),
+                suggestion.getN_match_b_keyword(),
+                suggestion.getN_sat_date(),
+                100,
+                6,
+                6,
+                6);
+        // TODO get n_voters from Group-Service
+        // mean_popularity should be a more clever metrics eventually evolving though time, needs a memory of previous popularity...
+        // max_match also but can be approximated by setting to n_voters
 
         return new Proposition(group_id, movie_id, score);
     }
