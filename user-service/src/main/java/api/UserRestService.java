@@ -13,6 +13,8 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
+import java.nio.charset.StandardCharsets;
+
 // https://www.restapitutorial.com/lessons/httpmethods.html
 
 @Log // lombok log
@@ -55,6 +57,7 @@ public class UserRestService {
     @ApiOperation(value = "Create, add a user to the existing users")
     public Response createUser(
             final @HeaderParam("X-User") String user_id,
+            final @HeaderParam("X-Email") String encoded_user_email,
             String username,
             final @Context UriInfo uriInfo) {
         /*
@@ -66,6 +69,10 @@ public class UserRestService {
          Then you use GET to see the created object
         */
 
+        if (username == null || username == "") { // replace username by user_email
+            username = java.net.URLDecoder.decode(encoded_user_email, StandardCharsets.UTF_8);
+        }
+    
         log.info("Testing if user exists");
         User testExists = userService.getUser(user_id);
         if (testExists != null) {
@@ -143,8 +150,9 @@ public class UserRestService {
     @Path("/whoami")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "get the user associated with an authenticated client")
-    public Response whoami(final @HeaderParam("X-User") String user_id) {
-		    User user=userService.getUser(user_id);
+    public Response whoami(final @HeaderParam("X-User") String user_id, final @HeaderParam("X-Email") String encoded_user_email) {
+            String user_email = java.net.URLDecoder.decode(encoded_user_email, StandardCharsets.UTF_8);
+		    User user = userService.getUser(user_id);
 				if(user == null){
 						return Response.status(Response.Status.NOT_FOUND).build();
 				}

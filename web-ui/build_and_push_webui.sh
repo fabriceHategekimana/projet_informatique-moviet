@@ -1,0 +1,1 @@
+sudo docker build -t fabricehategekimana/web-ui:latest . && sudo docker push fabricehategekimana/web-ui:latest

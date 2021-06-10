@@ -35,11 +35,19 @@ export class UserService {
                   .pipe(catchError(this.handleError<User>('getUser', undefined)));
   }
 
+  createUser(): Observable<any> { // create a user
+    let body = environment.production ? "" : "NewUser";
+    return this.http.post<string>(this.usersUrl, body, this.httpOptionsPost)
+                  .pipe(catchError(this.handleError<any>('createUser', undefined)));
+  }
+
   whoAmI(): Observable<any> {
-    // return this.http.get<User>(this.usersUrl + "/whoAmI", this.httpOptionsGet)
-    //               .pipe(catchError(this.handleError<User>('whoAmI', undefined)));
-    //!MOCK
-    return of({username: "nom", id: "1"});
+    if (environment.production) {
+      return this.http.get<User>(this.usersUrl + "/whoami", this.httpOptionsGet)
+        .pipe(catchError(this.handleError<User>('whoAmI', undefined))); 
+    } else {
+      return of({username: "nom", id: "1"});
+    }
   }
 
   //** handle error function from https://angular.io/tutorial/toh-pt6

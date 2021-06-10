@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { GroupService } from 'src/app/services/group.service';
+import { UserService } from '../../services/user.service'
 import { Group } from '../../shared/interfaces/group';
 
 @Component({
@@ -13,10 +14,11 @@ import { Group } from '../../shared/interfaces/group';
 export class GroupsComponent implements OnInit {
   currentGroup?: Group;
 
-  constructor(private route: ActivatedRoute, private groupService: GroupService, private router: Router) { } // route contain the current path
+  constructor(private route: ActivatedRoute, private groupService: GroupService, private router: Router, private userService: UserService) { } // route contain the current path
 
   ngOnInit(): void {
     // this.getGroup();
+    this.createUser();
   }
 
   // the default "then" function is empty and the default "onError" = error 404 if groupId does not exist
@@ -53,4 +55,11 @@ export class GroupsComponent implements OnInit {
       });
   }
 
+  createUser(then: () => any = () => void 0) {
+    this.userService.createUser()
+      .subscribe((data) => {
+        then();
+      });
+  }
+  
 }
