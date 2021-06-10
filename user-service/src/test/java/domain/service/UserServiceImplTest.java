@@ -60,9 +60,7 @@ class UserServiceImplTest {
 
         User usr= userServiceImpl.getUser(id); // get the specific user through the business service
         assertEquals(users.get(random_choice).getId(), usr.getId()); // check the ids
-        assertEquals(users.get(random_choice).getFirstName(), usr.getFirstName());
-		assertEquals(users.get(random_choice).getLastName(), usr.getLastName());
-		assertEquals(users.get(random_choice).getAge(), usr.getAge());
+        assertEquals(users.get(random_choice).getUsername(), usr.getUsername());
     }
 
     @Test
@@ -78,13 +76,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testCreateNoNameUser() {
-        User user = getRandomUserNoName();
-        User returned_user = userServiceImpl.createUser(user);
-        assertNull(returned_user); // check if null because trying to create user without attributes
-    }
-
-    @Test
     void testCreateNullUser(){
         User usr = null;
         assertThrows(NullPointerException.class, ()-> userServiceImpl.createUser(usr)); // due to @NotNull annotation in Impl
@@ -92,7 +83,7 @@ class UserServiceImplTest {
 
 
     @Test
-    void testUpdateUserFirstName() { // TODO: test User input entered in updateUser in Impl
+    void testUpdateUserUsername() { // TODO: test User input entered in updateUser in Impl
         // create a user and modify its name
         userServiceImpl.createUser(getRandomUser());
         List<User> users = userServiceImpl.getAllUsers(); // get list of users through the business service
@@ -100,41 +91,12 @@ class UserServiceImplTest {
 
         assertNotNull(user);
         String id = user.getId();
-        user.setFirstName("XXX");
+        user.setUsername("XXX");
         userServiceImpl.updateUser(user);
         user = userServiceImpl.getUser(id);
-        assertEquals("XXX", user.getFirstName());
+        assertEquals("XXX", user.getUsername());
     }
 
-    @Test
-    void testUpdateUserLastName() { // TODO: test User input entered in updateUser in Impl
-        // create a user and modify its name
-        userServiceImpl.createUser(getRandomUser());
-        List<User> users = userServiceImpl.getAllUsers(); // get list of users through the business service
-        User user = users.get(users.size() - 1);  // get last user
-
-        assertNotNull(user);
-        String id = user.getId();
-        user.setLastName("XXX");
-        userServiceImpl.updateUser(user);
-        user = userServiceImpl.getUser(id);
-        assertEquals("XXX", user.getLastName());
-    }
-
-    @Test
-    void testUpdateUserAge() { // TODO: test User input entered in updateUser in Impl
-        // create a user and modify its name
-        userServiceImpl.createUser(getRandomUser());
-        List<User> users = userServiceImpl.getAllUsers(); // get list of users through the business service
-        User user = users.get(users.size() - 1);  // get last user
-
-        assertNotNull(user);
-        String id = user.getId();
-        user.setAge("20");
-        userServiceImpl.updateUser(user);
-        user = userServiceImpl.getUser(id);
-        assertEquals("20", user.getAge());
-    }
 
     @Test
     void testUpdateNonExistantUser() {
@@ -197,11 +159,6 @@ class UserServiceImplTest {
     }
 
     private User getRandomUser() {
-	    return new User(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString());
-    }
-
-    private User getRandomUserNoName() {
-        User u = new User();
-        return u;
+	    return new User(UUID.randomUUID().toString(), UUID.randomUUID().toString());
     }
 }
