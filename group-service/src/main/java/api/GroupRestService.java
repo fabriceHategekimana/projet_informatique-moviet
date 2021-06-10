@@ -335,7 +335,7 @@ public class GroupRestService {
 
 
     @GET
-    @Path("/{group_id}/users/{encoded_user_id}/status")
+    @Path("/{group_id}/users/{encoded_user_id:.*}/status")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "GET a particular user status")
     public Response getUserStatus(@PathParam("group_id") String str_group_id, @PathParam("encoded_user_id") String encoded_user_id) {
@@ -358,7 +358,7 @@ public class GroupRestService {
     }
 
     @PUT
-    @Path("/{group_id}/users/{encoded_user_id}/status")
+    @Path("/{group_id}/users/{encoded_user_id:.*}/status")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update a particular user status")
     public Response updateUserStatus(@PathParam("group_id") String str_group_id, @PathParam("encoded_user_id") String encoded_user_id, String status) {
@@ -386,7 +386,7 @@ public class GroupRestService {
     }
 
     @PUT
-    @Path("/{group_id}/users/{encoded_user_id}/movie_preferences")
+    @Path("/{group_id}/users/{encoded_user_id:.*}/movie_preferences")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update a particular user Movie Preferences (short term preferences composed of genres, keywords, year from, year to)")
     public Response updateMoviePreferences(@PathParam("group_id") String str_group_id, @PathParam("encoded_user_id") String encoded_user_id, MoviePreferences movie_preferences) {
@@ -442,7 +442,7 @@ public class GroupRestService {
     }
 
     @GET
-    @Path("/{group_id}/users/{encoded_user_id}/movie_preferences")
+    @Path("/{group_id}/users/{encoded_user_id:.*}/movie_preferences")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "GET a particular user Movie Preferences (short term preferences composed of genres, keywords, year from, year to)")
     public Response getMoviePreferences(@PathParam("group_id") String str_group_id, @PathParam("encoded_user_id") String encoded_user_id) {
