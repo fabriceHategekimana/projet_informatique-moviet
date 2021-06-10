@@ -9,6 +9,7 @@ public class KeyGroupMovie implements Serializable {
     private final int group_id;
     private final int movie_id;
 
+    @SuppressWarnings("unused")
     public KeyGroupMovie() {
         this.group_id = -1;
         this.movie_id = -1;
