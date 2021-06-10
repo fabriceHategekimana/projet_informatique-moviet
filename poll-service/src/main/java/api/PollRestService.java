@@ -13,8 +13,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,6 +31,16 @@ public class PollRestService {
         this.suggestionManager = new SuggestionManager();
         this.voteManager = new VoteManager();
         this.moviet = new MovietRequester();
+    }
+
+    @GET
+    @Path("/testing_header_parsing")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "testing header parsing")
+    public Response getHeader(@Context HttpHeaders headers){ // dependency injection..
+        MultivaluedMap<String, String> my_headers = headers.getRequestHeaders();
+        LOGGER.log(Level.WARNING, "This is my headers: " + my_headers);
+        return Response.ok(my_headers).build();    //building the server response
     }
 
     @POST
@@ -170,6 +179,7 @@ public class PollRestService {
     public Response getResults(@PathParam("group_id") int group_id) {
         List<Count> counts;
         try {
+            LOGGER.log(Level.WARNING, "HELLO I am in result");
             counts = voteManager.getResults(group_id);
             if (counts == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -187,7 +197,6 @@ public class PollRestService {
     @ApiOperation(value = "Clear t_proposition of group_id so new propositions can be filled in")
     public Response newRound(@PathParam("group_id") int group_id) {
         try {
-            LOGGER.log(Level.WARNING, "HELLO I am in result");
             if (voteManager.deleteAllPolls(group_id) == 0) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
