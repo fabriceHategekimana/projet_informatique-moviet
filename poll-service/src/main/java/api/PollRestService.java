@@ -7,6 +7,7 @@ import domain.service.MovietRequesterComputer;
 import domain.service.SuggestionManager;
 import domain.service.VoteManager;
 import domain.service.VoteProcessor;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -23,6 +24,8 @@ import java.util.logging.Logger;
 
 @ApplicationScoped // singleton
 @Path("/poll")
+@Api(value = "poll")
+@Produces({"application/json", "application/xml"})
 public class PollRestService {
     private static final Logger LOGGER = Logger.getLogger(PollRestService.class.getName());
 
