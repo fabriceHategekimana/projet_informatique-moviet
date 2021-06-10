@@ -38,7 +38,7 @@ public class SuggestionManager implements SuggestionManagerInterface {
     }
 
     @Override
-    public RawSuggestion fetchRawSuggestion(@Nullable Integer group_id) {
+    public RawSuggestion fetchRawSuggestion(@Nullable Integer group_id) throws NoResultException {
         Query query = em.createQuery("SELECT * FROM RawSuggestion ORDER BY added_at"); // limit 1?
         return (RawSuggestion) query.getSingleResult();
     }
@@ -86,7 +86,7 @@ public class SuggestionManager implements SuggestionManagerInterface {
 
 
     @Override
-    public SuggestionWithCriteria fetchSuggestionWithCriteria(@Nullable Integer group_id) {
+    public SuggestionWithCriteria fetchSuggestionWithCriteria(@Nullable Integer group_id) throws NoResultException {
         Query query = em.createQuery("SELECT * FROM SuggestionWithCriteria ORDER BY added_at");  // limit 1?
         return (SuggestionWithCriteria) query.getSingleResult();
     }

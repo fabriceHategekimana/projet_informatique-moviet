@@ -34,6 +34,12 @@ public class VoteManager implements VoteManagerInterface {
         return voting;
     }
 
+    @Override
+    public Boolean isVoting(@NotNull int group_id) {
+        Voting voting = em.find(Voting.class, group_id);
+        return voting != null;
+    }
+
     @Transactional
     private Voting removeVoting(@NotNull int group_id) throws EntityNotFoundException, IllegalArgumentException {
         Voting voting = em.find(Voting.class, group_id);

@@ -6,6 +6,7 @@ import domain.model.Voting;
 import domain.service.MovietRequesterComputer;
 import domain.service.SuggestionManager;
 import domain.service.VoteManager;
+import domain.service.VoteProcessor;
 import io.swagger.annotations.ApiOperation;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -15,6 +16,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,11 +29,13 @@ public class PollRestService {
     private final SuggestionManager suggestionManager;
     private final VoteManager voteManager;
     private final MovietRequesterComputer movietComputer;
+    private final ExecutorService pool;
 
     public PollRestService() {
         this.suggestionManager = new SuggestionManager();
         this.voteManager = new VoteManager();
         this.movietComputer = new MovietRequesterComputer();
+        this.pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
     @POST
@@ -104,6 +109,9 @@ public class PollRestService {
             LOGGER.log(Level.WARNING, "Encountered an exception in beginVote", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
+
+        Runnable r = new VoteProcessor(group_id);
+        pool.execute(r);
 
         return Response.status(Response.Status.OK).build();
     }

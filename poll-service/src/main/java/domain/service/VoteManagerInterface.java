@@ -10,6 +10,8 @@ public interface VoteManagerInterface {
 
     Voting beginVoting(@NotNull Voting voting);
 
+    Boolean isVoting(@NotNull int group_id);
+
     Voting endVoting(@NotNull int group_id);
 
     Count createPoll(@NotNull Count count);
