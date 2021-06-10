@@ -2,6 +2,7 @@ DROP TABLE if exists T_count;
 DROP TABLE if exists T_unprocessed;
 DROP TABLE if exists T_processed;
 DROP TABLE if exists T_propositions;
+DROP TABLE if exists T_voting;
 
 
 CREATE TABLE T_count (
@@ -73,3 +74,9 @@ INSERT INTO T_propositions (group_id, movie_id, score) VALUES (1, 1771, 69);
 INSERT INTO T_propositions (group_id, movie_id, score) VALUES (1, 284054, -50);
 INSERT INTO T_propositions (group_id, movie_id, score) VALUES (1, 1726, 99);
 INSERT INTO T_propositions (group_id, movie_id, score) VALUES (1, 10195, 0);
+
+CREATE TABLE T_voting (
+    group_id int not null primary key
+);
+TRUNCATE TABLE T_voting;
+INSERT INTO T_voting (group_id) VALUES (1);
