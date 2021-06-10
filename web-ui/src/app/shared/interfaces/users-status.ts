@@ -10,4 +10,4 @@ export enum UserStatusValue {
     DONE = "DONE",
   }
 
-export type UsersStatus = {[key: number] : UserStatusValue};
+export type UsersStatus = {[key: string] : UserStatusValue};

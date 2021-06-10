@@ -32,27 +32,30 @@
                         <input type="text" name="input-keywords" id="input-keywords" placeholder="keyword"
                             autocomplete="off" (keyup)="updateKeywords($event)">
                         <div class="list-group proposed-keywords-container">
-                            <div *ngFor="let keyword of proposedKeywords | slice:0:10"
-                                class="proposed-keyword list-group-item list-group-item-action"
-                                [attr.keyword-id]="keyword.id" [attr.keyword-name]="keyword.name"
-                                (click)="addKeyword($event)">
-                                <span class="proposed-keyword-name">{{keyword.name}}</span>
-                            </div>
+                          <div *ngFor="let keyword of proposedKeywords | slice:0:10"
+                               (click)="addKeyword($event)"
+                               [attr.keyword-id]="keyword.id" [attr.keyword-name]="keyword.name"
+                               class="proposed-keyword list-group-item list-group-item-action">
+                            <span class="proposed-keyword-name">{{keyword.name}}</span>
+                          </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="d-flex flex-column">
-                <h2>Dates</h2>
-                <div class="dates-container d-flex flex-inline">
-                    <input class="year-input" type="number" min="0" max="3000" name="year-from" id="year-from"
-                        placeholder="from" autocomplete="off">
-                    <input class="year-input" type="number" min="0" max="3000" name="year-to" id="year-to" placeholder="to" autocomplete="off">
-                </div>
+          <div class="d-flex flex-column">
+            <h2>Dates</h2>
+            <div class="dates-container d-flex flex-inline">
+              <input autocomplete="off" class="year-input" id="year-from" max="3000" min="0" name="year-from"
+                     placeholder="from" type="number">
+              <input autocomplete="off" class="year-input" id="year-to" max="3000" min="0" name="year-to"
+                     placeholder="to"
+                     type="number">
             </div>
-            <div *ngIf="isAdmin" type="button" class="btn btn-primary btn-lg btn-block mt-5" id="btn-start" (click)="processPreferences()">
-                Start voting
-            </div>
+          </div>
+          <div (click)="processPreferences()" class="btn btn-primary btn-lg btn-block mt-5" id="btn-start"
+               type="button">
+            Start voting
+          </div>
         </div>
     </ng-container>
 </div>

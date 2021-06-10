@@ -1,10 +1,11 @@
 package domain.model;
 
 // These three are from @Data but we add @Setter one by one and the constructor.
-import lombok.ToString;
+
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -23,19 +24,25 @@ import java.util.Set;
         name = "status_db_enum",
         typeClass = StatusDatabaseEnumType.class
 )
-@Entity @Table( name="T_groups_users")// JPA, mapping class - table
+@Entity
+@Table(name = "T_groups_users")// JPA, mapping class - table
 public class GroupUser implements Serializable {
     // serializable : serialize into JSO, XML or a representation different than from memory. Used to send in network
 
-    @Id @GeneratedValue( strategy=GenerationType.IDENTITY ) // Generated Value, automatically generated following how the db was configured
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // Generated Value, automatically generated following how the db was configured
     private int id;
     // No setters for group_id and user_id, we do not use this class to change it directly
     @NotNull
     private int group_id;
     @NotNull
-    private int user_id;
+    @Column(length = 255)
+    private String user_id;
 
-    @Setter @Enumerated(EnumType.STRING) @Type( type = "status_db_enum" )
+    @Setter
+    @Enumerated(EnumType.STRING)
+    @Type(type = "status_db_enum")
     private Status user_status = Status.CHOOSING;
 
     /*

@@ -1,31 +1,46 @@
 <div class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-      <a class="navbar-brand" routerLink="/">
-        <img src="../../../../assets/brand/logo.svg" alt="" width="30" class="d-inline-block align-text-top">
-        Moviet
-      </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" (click)="isTogglerShown=!isTogglerShown" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" [ngClass]="{ 'show': isTogglerShown }" id="navbarContent">
-        <!-- left aligned -->
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link" routerLinkActive="active" #currentLink="routerLinkActive" [attr.aria-current]="currentLink.isActive ? 'page' : ''" routerLink="/home">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLinkActive="active" #currentLink="routerLinkActive" [attr.aria-current]="currentLink.isActive ? 'page' : ''" routerLink="/groups">Groups</a>
-          </li>
+        <a class="navbar-brand" routerLink="/">
+            <img src="../../../../assets/brand/logo.svg" alt="" width="30" class="d-inline-block align-text-top">
+            Moviet
+        </a>
+        <button (click)="isTogglerShown=!isTogglerShown; auth.checkIfLogged()" aria-controls="navbarNav"
+                aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-target="#navbarNav"
+                data-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" [ngClass]="{ 'show': isTogglerShown }" id="navbarContent">
+            <!-- left aligned -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a #currentLink="routerLinkActive" (click)="auth.checkIfLogged()"
+                       [attr.aria-current]="currentLink.isActive ? 'page' : ''" class="nav-link" routerLink="/home"
+                       routerLinkActive="active">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a #currentLink="routerLinkActive" (click)="auth.checkIfLogged()"
+                       [attr.aria-current]="currentLink.isActive ? 'page' : ''" class="nav-link" routerLink="/groups"
+                       routerLinkActive="active">Groups</a>
+                </li>
         </ul>
         <!-- right aligned -->
-        <ul class="navbar-nav ml-auto mb-2">
-          <li class="nav-item">
-            <a class="nav-link" routerLinkActive="active" #currentLink="routerLinkActive" [attr.aria-current]="currentLink.isActive ? 'page' : ''" routerLink="/login">sign in</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLinkActive="active" #currentLink="routerLinkActive" [attr.aria-current]="currentLink.isActive ? 'page' : ''" routerLink="/register">sign up</a>
-          </li>
-        </ul>
+            <ul class="navbar-nav ml-auto mb-2">
+                <li *ngIf="auth.isLogged === false" class="nav-item">
+                    <app-login-button></app-login-button>
+                </li>
+                <li *ngIf="auth.isLogged === false" class="nav-item">
+                    <app-signup-button></app-signup-button>
+                </li>
+                <li *ngIf="auth.isLogged" class="nav-item">
+                    <app-logout-button></app-logout-button>
+                </li>
+                <!-- <li class="nav-item">
+                  <a class="nav-link" routerLinkActive="active" #currentLink="routerLinkActive" (click)="auth.checkIfLogged()" [attr.aria-current]="currentLink.isActive ? 'page' : ''" routerLink="/login">sign in</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" routerLinkActive="active" #currentLink="routerLinkActive" (click)="auth.checkIfLogged()" [attr.aria-current]="currentLink.isActive ? 'page' : ''" routerLink="/register">sign up</a>
+                </li> -->
+            </ul>
       </div>
     </div>
   </div>

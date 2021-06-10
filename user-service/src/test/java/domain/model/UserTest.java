@@ -2,43 +2,37 @@ package domain.model;
 
 // Unit/Component testing using JUnit 5
 // https://junit.org/junit5/docs/current/user-guide/#writing-tests
-import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 // just a test for unit testing
 class UserTest {
-    private final User user = new User("hello world");
+    private final User user = new User("Hello", "world");
 
     @Test
-    void testGetId(){
-        assertEquals(0, user.getId() );
-    }
-    
-    @Test
-    void testGetName(){
-        assertEquals("hello world", user.getName() );
+    void testGetId() {
+        assertEquals("Hello", user.getId());
     }
 
     @Test
-    void testSetName(){
-        User tmpuser = new User("hello world");
-        tmpuser.setName("hello universe");
-        assertEquals("hello universe", tmpuser.getName() );
+    void testGetUsername() {
+        assertEquals("world", user.getUsername());
+    }
+
+
+    @Test
+    void testSetUsername() {
+        User tmpuser = new User("hello", "world");
+        tmpuser.setUsername("well");
+        assertEquals("well", tmpuser.getUsername());
     }
 
     @Test
-    void testGetIdNoArgsConstructor(){
-        assertEquals(0, new User().getId() );
-    }
-
-    @Test
-    void testGetNameNoArgsConstructor(){
-        assertEquals(null, new User().getName() );
-    }
-
-    @Test
-    void testToString(){
-        assertEquals("User(id=0, name=hello world)", user.toString() );
+    void testToString() {
+        User tmpuser = new User("hello", "world");
+        assertEquals("User(id=hello, username=world)", tmpuser.toString());
     }
     // fail a test -> Build failure
 }

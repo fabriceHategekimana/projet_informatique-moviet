@@ -1,24 +1,19 @@
 package domain.service;
 
-import java.util.*;
-
 import domain.model.*;
-
-import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singleton
 import lombok.NonNull;
 import lombok.extern.java.Log;
 
-// JPA
+import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.transaction.Transactional;  // needed otherwise TransactionRequiredException will be thrown
-// See https://www.baeldung.com/jpa-hibernate-persistence-context for more informations
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
-import javax.persistence.NoResultException;
+import javax.transaction.Transactional;
+import java.util.*;
 
 
 @Log // lombok log
@@ -91,10 +86,10 @@ public class GroupServiceImpl implements GroupService{
         return group; // null if not found, 404
     }
 
-    private User getUser(int user_id){
+    private User getUser(String user_id) {
         // user id can be 0
         CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<User> criteria = builder.createQuery( User.class );
+        CriteriaQuery<User> criteria = builder.createQuery(User.class);
 
         Root<User> root = criteria.from(User.class);
         root.fetch("groups", JoinType.LEFT);
@@ -111,10 +106,10 @@ public class GroupServiceImpl implements GroupService{
         return user; // null if not found, 404
     }
 
-    private GroupUser getGroupUser(int group_id, int user_id){
+    private GroupUser getGroupUser(int group_id, String user_id) {
         // user id can be 0
         CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<GroupUser> criteria = builder.createQuery( GroupUser.class );
+        CriteriaQuery<GroupUser> criteria = builder.createQuery(GroupUser.class);
 
         Root<GroupUser> root = criteria.from(GroupUser.class);
         criteria.select(root);
@@ -171,7 +166,7 @@ public class GroupServiceImpl implements GroupService{
             group.setUsers(new HashSet<>()); // empty set
         }
         for (User usr: group.getUsers()){
-            if (usr.getId() == user.getId()){
+            if (usr.getId().equals(user.getId())) {
                 // user id already in group
                 em.merge(user);
                 em.merge(group);
@@ -198,13 +193,13 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Transactional
-    public Group removeUserFromGroup(int group_id, int user_id){
+    public Group removeUserFromGroup(int group_id, String user_id) {
         // Find group
         Group group = getGroup(group_id); // group becomes managed
-        if (group == null){
+        if (group == null) {
             return null; // not found group..
         }
-        if (group.getUsers() == null){
+        if (group.getUsers() == null) {
             group.setUsers(new HashSet<>()); // empty set
             return null; // cannot remove user if no users in the group
         }
@@ -220,7 +215,7 @@ public class GroupServiceImpl implements GroupService{
         GroupUser gU;
         // Have to check if user in the group, is yes, can remove it, otherwise return null
         for (User usr: group.getUsers()){
-            if (usr.getId() == user.getId()){
+            if (usr.getId().equals(user.getId())) {
                 // user id in the group ! so we can remove him
                 // remove keywords and genres
                 gU = getGroupUser(group_id, user.getId());
@@ -247,7 +242,7 @@ public class GroupServiceImpl implements GroupService{
         if (group.getUsers() == null){
             group.setUsers(new HashSet<>()); // empty set
         }
-        Set<Integer> user_ids_already_in_group = new HashSet<>();
+        Set<String> user_ids_already_in_group = new HashSet<>();
 
         for (User user: group.getUsers()){
             if (user_ids_already_in_group.contains(user.getId())){  // if id already in group, we merge
@@ -276,13 +271,13 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Transactional // Integer of user id
-    public Map<Integer,Status> getAllUserStatus(int group_id){
+    public Map<String, Status> getAllUserStatus(int group_id) {
         Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
-        if (group == null){
+        if (group == null) {
             return null; // not found group..
         }
         // we know that the group exists and that there can be no users
-        Map<Integer,Status> out = new HashMap<>();
+        Map<String, Status> out = new HashMap<>();
         for (User user : group.getUsers()) {
             GroupUser gU = getGroupUser(group_id, user.getId());
             out.put(user.getId(), gU.getUser_status());
@@ -292,28 +287,28 @@ public class GroupServiceImpl implements GroupService{
 
 
     @Transactional
-    public Status getUserStatus(int group_id, int user_id){
+    public Status getUserStatus(int group_id, String user_id) {
         Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
-        if ((group == null) || (group.getUsers() == null)){
+        if ((group == null) || (group.getUsers() == null)) {
             return null; // not found group.. or no user meaning that we cannot get the status of an user..
         }
         // we know that the group exists and that there are users up to this point
         GroupUser groupUser = getGroupUser(group_id, user_id); // groupUser becomes managed
-        if (groupUser == null){
+        if (groupUser == null) {
             return null; // particular user not found
         }
         return groupUser.getUser_status();
     }
 
     @Transactional
-    public Status updateUserStatus(int group_id, int user_id, String status){
+    public Status updateUserStatus(int group_id, String user_id, String status) {
         /*
         Update status of an user who is in a group, should also handle the case !
 
         When one user status is changed to CHOOSING, everyone else changes to CHOOSING used for reset..
          */
         Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
-        if ((group == null) || (group.getUsers() == null)){
+        if ((group == null) || (group.getUsers() == null)) {
             return null; // not found group.. or no user meaning that we cannot update the status of an user..
         }
         // we know that the group exists and that there are users up to this point
@@ -330,17 +325,17 @@ public class GroupServiceImpl implements GroupService{
         boolean all_ready=true;
         boolean all_done=true;
         for (User user : group.getUsers()){
-            if (user_id != user.getId()){
+            if (!user_id.equals(user.getId())) {
                 GroupUser gU = getGroupUser(group_id, user.getId());
                 if (status.equalsIgnoreCase("READY")) {
-                    all_done=false;
+                    all_done = false;
                     // check if everyone else in CHOOSING or READY, otherwise cannot update status !
                     if (!(gU.getUser_status().equals(Status.CHOOSING)) && !(gU.getUser_status().equals(Status.READY))) {
                         log.severe(cannot_change_msg + " because other users have status VOTING OR DONE");
                         throw new IllegalArgumentException(cannot_change_msg + " because other users have status VOTING OR DONE");
                     }
-                    if (!gU.getUser_status().equals(Status.READY)){
-                        all_ready=false;
+                    if (!gU.getUser_status().equals(Status.READY)) {
+                        all_ready = false;
                     }
                 }
                 else if (status.equalsIgnoreCase("VOTING")){
@@ -382,7 +377,7 @@ public class GroupServiceImpl implements GroupService{
                 }
             }
         }
-        if (all_ready){
+        if (all_ready && status.equalsIgnoreCase("READY")) {
             // set all to status VOTING if all users in the group were ready
             for (User user : group.getUsers()) {
                 GroupUser gU = getGroupUser(group_id, user.getId());
@@ -394,16 +389,14 @@ public class GroupServiceImpl implements GroupService{
             group.setGroup_status(Status.VOTING);
             em.merge(group);
             status = "voting";
-        }
-        else if (all_done){
+        } else if (all_done && status.equalsIgnoreCase("DONE")) {
             groupUser.setUser_status(Status.valueOf(status.toUpperCase())); // https://www.tutorialspoint.com/how-to-convert-a-string-to-an-enum-in-java
             em.merge(groupUser);
             // set group status to DONE
             group = getGroup(group_id);  // group becomes managed as well as existing users in the group
             group.setGroup_status(Status.DONE);
             em.merge(group);
-        }
-        else{
+        } else {
             groupUser.setUser_status(Status.valueOf(status.toUpperCase())); // https://www.tutorialspoint.com/how-to-convert-a-string-to-an-enum-in-java
             em.merge(groupUser);
         }
@@ -451,22 +444,18 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Transactional
-    public boolean updateMoviePreferences(int group_id, int user_id, MoviePreferences movie_preferences){
+    public boolean updateMoviePreferences(int group_id, String user_id, MoviePreferences movie_preferences) {
         Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
-        if ((group == null) || (group.getUsers() == null)){
+        if ((group == null) || (group.getUsers() == null)) {
             return false; // not found group.. or no user meaning that we cannot get the status of an user..
         }
         // we know that the group exists and that there are users up to this point
         GroupUser groupUser = getGroupUser(group_id, user_id); // groupUser becomes managed
-        if (groupUser == null){
+        if (groupUser == null) {
             return false; // particular user not found
         }
         log.info("Trying to update movies preferences to " + movie_preferences);
         groupUser.setYear_range(new YearRange(movie_preferences.getYear_from(), movie_preferences.getYear_to()));
-        /*
-        groupUser.getYear_range().setYear_from(movie_preferences.getYear_from());
-        groupUser.getYear_range().setYear_to(movie_preferences.getYear_to());
-        */
         groupUser.setKeywords_id(movie_preferences.getKeywords_id());
         groupUser.setGenres_id(movie_preferences.getGenres_id());
         em.merge(groupUser);
@@ -474,19 +463,19 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Transactional
-    public MoviePreferences getMoviePreferences(int group_id, int user_id){
+    public MoviePreferences getMoviePreferences(int group_id, String user_id) {
         Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
-        if ((group == null) || (group.getUsers() == null)){
+        if ((group == null) || (group.getUsers() == null)) {
             return null; // not found group.. or no user meaning that we cannot get the status of an user..
         }
         // we know that the group exists and that there are users up to this point
         GroupUser groupUser = getGroupUser(group_id, user_id); // groupUser becomes managed
-        if (groupUser == null){
+        if (groupUser == null) {
             return null; // particular user not found
         }
         Integer year_from = null;
         Integer year_to = null;
-        if (groupUser.getYear_range() != null){
+        if (groupUser.getYear_range() != null) {
             year_from = groupUser.getYear_range().getYear_from();
             year_to = groupUser.getYear_range().getYear_to();
         }
@@ -494,15 +483,38 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Transactional
-    public Group deleteGroup(int group_id){
+    public List<MoviePreferences> getAllMoviePreferences(int group_id) {
+        Group group = getGroup(group_id);  // group becomes managed as well as existing users in the group
+        if ((group == null) || (group.getUsers() == null)) {
+            return null; // not found group.. or no user meaning that we cannot get the status of an user..
+        }
+        Integer year_from = null;
+        Integer year_to = null;
+        List<MoviePreferences> all_movie_preferences = new ArrayList<>();
+        for (User user : group.getUsers()) {
+            GroupUser groupUser = getGroupUser(group_id, user.getId()); // groupUser becomes managed
+            if (groupUser == null) {
+                return null; // particular user not found
+            }
+            if (groupUser.getYear_range() != null) {
+                year_from = groupUser.getYear_range().getYear_from();
+                year_to = groupUser.getYear_range().getYear_to();
+            }
+            all_movie_preferences.add(new MoviePreferences(groupUser.getKeywords_id(), groupUser.getGenres_id(), year_from, year_to));
+        }
+        return all_movie_preferences;
+    }
+
+    @Transactional
+    public Group deleteGroup(int group_id) {
         Group group = getGroup(group_id);  // group becomes managed as well as users in the group
-        if (group == null){
+        if (group == null) {
             return null;
         }
         // Group need to exist.
         GroupUser gU;
         Iterator<User> it = group.getUsers().iterator();
-        while (it.hasNext()){
+        while (it.hasNext()) {
             User user = it.next();
             log.info("user id : " + user.getId() + " is being removed from users");
             // remove keywords and genres

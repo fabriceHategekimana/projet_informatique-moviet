@@ -1,19 +1,15 @@
 package domain.service;
 
-import java.util.List;
-
 import domain.model.User;
-
-import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singleton
 import lombok.NonNull;
 
-// JPA
+import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.transaction.Transactional;  // needed otherwise TransactionRequiredException will be thrown
+import javax.transaction.Transactional;
+import java.util.List;
 // See https://www.baeldung.com/jpa-hibernate-persistence-context for more informations
 
 
@@ -30,7 +26,6 @@ public class UserServiceImpl implements UserService{
     @PersistenceContext(unitName = "UserPU") // name is the same as in persistence.xml file
     private EntityManager em;
 
-
     public List<User> getAllUsers(){
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<User> criteria = builder.createQuery( User.class );
@@ -39,7 +34,7 @@ public class UserServiceImpl implements UserService{
     }
 
     // find by ID, names are not unique
-    public User getUser(int id){
+    public User getUser(String id) {
         /* Need to find the user then return it, Id's are unique
         if not in the list return null, the Rest Service will take care of returning some HTTP code (404 not found here)
         https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html#find-java.lang.Class-java.lang.Object-
@@ -49,24 +44,28 @@ public class UserServiceImpl implements UserService{
 
     // create a user using only the name
     @Transactional
-    public User createUser(@NonNull User user){
+    public User createUser(@NonNull User user) {
         /*
         Can always create.. no restriction due to auto increment of unique identifier / primary key
          */
-        if ((user.getId() != 0)|| (user.getName() == null)){ // if non initialized.
+        if ((user.getId().equals("0")) || (user.getId() == null) || (user.getUsername() == null)) { // if non initialized.
             // Actually if we do not check. SQL will throw an error because NOT NULL for the attributein the table
             // To put Only other attributes than id are (must be) initialized: " + user in the logs
             return null;
         }
-        em.persist(user);
+        if (em.find(User.class, user.getId()) != null) {
+            em.persist(user);
+        } else {
+            em.merge(user);
+        }
         return user;
     }
 
     @Transactional
-    public User updateUser(@NonNull User user){
+    public User updateUser(@NonNull User user) {
         // User need to has a non null id.
-        User g = em.find(User.class, user.getId());
-        if (g == null) {
+        User u = em.find(User.class, user.getId());
+        if (u == null) {
             return null; // error 404 not found in the user
         }
         em.merge(user);
@@ -74,7 +73,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Transactional
-    public User deleteUser(int id){
+    public User deleteUser(String id) {
         User user = em.find(User.class, id);
         if (user == null) {
             return null; // user does not exist, return null -> will be HTTP status code 404 not found

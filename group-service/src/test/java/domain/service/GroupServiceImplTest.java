@@ -1,11 +1,7 @@
 package domain.service;
 
-import domain.service.GroupServiceImpl;
 import domain.model.Group;
-import domain.model.User;
-
-// Unit/Component testing using JUnit 5
-// https://junit.org/junit5/docs/current/user-guide/#writing-tests
+import eu.drus.jpa.unit.api.JpaUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,19 +10,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import eu.drus.jpa.unit.api.JpaUnit;
+import java.util.*;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(JpaUnit.class) // see documentation of dadrus jpa unit, junit 5
 @ExtendWith(MockitoExtension.class)
@@ -188,7 +174,6 @@ class GroupServiceImplTest {
     }
 
     private Group getRandomGroupNoName() {
-        Group g = new Group();
-        return g;
+        return new Group();
     }
 }

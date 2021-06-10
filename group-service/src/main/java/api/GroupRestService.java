@@ -1,40 +1,26 @@
 package api;
 
 // Injection
-import javax.inject.Inject; // dependency injection
-import javax.ws.rs.*;
 
-import javax.ws.rs.core.*;
-
-// MediaType
-import javax.enterprise.context.ApplicationScoped; // ApplicationScoped ~singleton
-
-//  import classes of domain
 import domain.model.Group;
 import domain.model.MoviePreferences;
 import domain.model.Status;
 import domain.model.User;
-
-// service
 import domain.service.GroupService;
-
-import java.util.HashSet;
-import java.util.Map;
-
-/*
-https://thorntail.io/posts/wildfly-swarm-s-got-swagger/
-
-In simple terms, Swagger is a JSON representation of a RESTful API, typically made available over HTTP at /swagger.json.
-This JSON document contains information about your APIs, including names, paths, endpoints, parameters, descriptions,
-keywords, expected responses, and more.
-Per the Open API Specification, the goal of Swagger is to "define a standard, language-agnostic interface to REST APIs
-which allows both humans and computers to discover and understand the capabilities of the service without access to
-source code, documentation, or through network traffic inspection".
-
- */
+import domain.service.MovietRequester;
+import domain.service.PollServiceRequesterInterface;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.java.Log;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 // https://www.restapitutorial.com/lessons/httpmethods.html
 
@@ -47,6 +33,12 @@ public class GroupRestService {
     // Endpoint
     @Inject
     private GroupService groupService; // no more instantiation in the constructor
+
+    private final MovietRequester moviet;
+
+    public GroupRestService() {
+        this.moviet = new MovietRequester();
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -85,32 +77,49 @@ public class GroupRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create, add a group to the existing groups")
-    public Response createGroup(Group group, final @Context UriInfo uriInfo){ // no auto increment id for users
+    public Response createGroup(Group group, final @Context UriInfo uriInfo, final @HeaderParam("X-User") String user_id) { // no auto increment id for users
         /*
         Create a group and returns HTTP status code and the location of the newly created object. It's possible to create multiple
         groups with same name. The unique identifier is its id that auto increments. We cannot input a group having an id !!
 
+        Admin_id is just override by the user who created the group if connected (if X-User header exists..)
+
         Examples with curl:
         - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test"}'
-        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test", "admin_id": 1000}'
-        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test", "admin_id": 1000, "users": [{"id": 10}, {"id": 42}, {"id":3}, {"id":6}]}'
+        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test", "admin_id": "1000"}'
+        - curl --verbose -H "Content-Type: application/json" -X POST http://localhost:10080/groups -d '{"name":"test", "admin_id": "1000", "users": [{"id": 10}, {"id": 42}, {"id":3}, {"id":6}]}'
+
+        - curl --verbose -H "Content-Type: application/json" -H "X-User: google-oauth2|111914113827195845617" -X POST http://localhost:10080/groups -d '{"name":"test", "admin_id": 1000, "users": [{"id": 10}, {"id": 42}, {"id":3}, {"id":6}]}'
 
          Then you use GET to see the created object
         */
         log.info("Trying to create using Group: " + group);
         // only want non init id and non null name, otherwise bad request
-        if ((group.getId() != 0) || (group.getName() == null)){
+        if ((group.getId() != 0) || (group.getName() == null)) {
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : only other attributes than id are (must be) initialized: " + group).build();
         }
 
-        if (group.getUsers() == null){
+        if (group.getUsers() == null) {
             group.setUsers(new HashSet<>()); // empty set
         }
 
-        Group returnedGroup=groupService.createGroup(group); // can never have conflict if id are auto-incremented.
-        if (returnedGroup == null){
-            log.severe("Tried to create Group: id=" + group.getId() + " name=" +group.getId()+ " admin_id="+group.getAdmin_id() + " with some users but either id was non zero or group had null name or some of the users had user id was 1");
-            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Tried to create Group: id=" + group.getId() + " name=" +group.getId()+ " admin_id="+group.getAdmin_id() + " with some users but either id was non zero or group had null name or some of the users had user id was 1").build();
+        /*
+        MultivaluedMap<String, String> my_headers = headers.getRequestHeaders();
+        // X-User
+        String user_id = my_headers.getFirst("X-User");
+        */
+        if (user_id != null) {
+            group.setAdmin_id(user_id);
+            group.addUser(new User(user_id));
+        }
+        if (group.getAdmin_id() == null) {
+            group.setAdmin_id("0");
+        }
+
+        Group returnedGroup = groupService.createGroup(group); // can never have conflict if id are auto-incremented.
+        if (returnedGroup == null) {
+            log.severe("Tried to create Group: id=" + group.getId() + " name=" + group.getId() + " admin_id=" + group.getAdmin_id() + " with some users but either id was non zero or group had null name or some of the users had user id was 1");
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Tried to create Group: id=" + group.getId() + " name=" + group.getId() + " admin_id=" + group.getAdmin_id() + " with some users but either id was non zero or group had null name or some of the users had user id was 1").build();
         }
         // returnedGroup can be null in general but we tested the input before so it's not null.. otherwise bad request..
         UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder(); // https://www.logicbig.com/tutorials/java-ee-tutorial/jax-rs/uri-info.html
@@ -118,27 +127,58 @@ public class GroupRestService {
         return Response.created(uriBuilder.build()).entity(returnedGroup).build(); // 201
     }
 
+    /*s
+    @GET
+    @Path("/testing_header_parsing")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "testing header parsing")
+    public Response getHeader(@Context HttpHeaders headers){ // dependency injection..
+        MultivaluedMap<String, String> my_headers = headers.getRequestHeaders();
+        // X-User
+        String user_id = my_headers.getFirst("X-User");
+        return Response.ok(my_headers).build();    //building the server response
+    }
+    */
+
     @POST
     @Path("/{group_id}/users/")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Adding an user to an existing group")
-    public Response addUserToGroup(@PathParam("group_id") String str_id, User user){
+    public Response addUserToGroup(@PathParam("group_id") String str_id, User user, final @HeaderParam("X-User") String user_id, final @HeaderParam("Add-Another-User") String add_another_user) {
         /*
         Add an user to an existing group. Need to know the id of the group to update. Return modified object.
+
+        We can add either another user or current user by specifying in the headers (by default, add current user).
+        Add-Another-User : if (null (key not existing) or not true) and X-user exists -> will add current user
+
+        otherwise add another user
+
+        Example:
+        The user with id "user" won't be created
+        - curl --verbose -H "Content-Type: application/json" -H "X-User:google-oauth2|test_user_id" -X POST http://localhost:10080/groups/2/users -d '{"id": "test"}'
+        The user with id "google-oauth2|test_user_id" won't be created
+        - curl --verbose -H "Content-Type: application/json" -H "X-User:google-oauth2|test_user_id" -H "Add-Another-User:true" -X POST http://localhost:10080/groups/2/users -d '{"id": "test"}'
          */
 
         try {
+            // adding current user who called the method
+            if ((user_id != null) && (!"true".equalsIgnoreCase(add_another_user))) {
+                User new_user = new User(user_id);
+                new_user.setGroups(user.getGroups());
+                user = new_user;
+            }
+            // else: adding another user, not the one calling so we ignore the headers
+
             log.info("Trying to add user with user_id=" + user.getId() + " in a Group having id=" + str_id);
             int id = Integer.parseInt(str_id);
 
             // user id can be 0..
-
-            if (user.getGroups() == null){
+            if (user.getGroups() == null) {
                 user.setGroups(new HashSet<>()); // empty set
             }
 
-            Group returnedGroup=groupService.addUserToGroup(id, user);
+            Group returnedGroup = groupService.addUserToGroup(id, user);
             // will add user if the Group if exists, otherwise return null
             if (returnedGroup == null){
                 // group does not exist already
@@ -156,19 +196,37 @@ public class GroupRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Removing/kicking user from an existing group")
-    public Response removeUserFromGroup(@PathParam("group_id") String str_group_id, String str_user_id){
+    public Response removeUserFromGroup(@PathParam("group_id") String str_group_id, String str_user_id, final @HeaderParam("X-User") String user_id, final @HeaderParam("Remove-Another-User") String remove_another_user) {
         /*
         Remove an user from an existing group. Need to know the id of the group and the id of the user to remove. Return modified object.
+
+        We can remove either another user or current user by specifying in the headers (by default, remove current user).
+        Remove-Another-User : if (null (key not existing) or not true) and X-user exists -> will remove current user
+
+        otherwise add another user
+
+        Examples:
+        The user with id "user" won't be created
+        - curl --verbose -H "Content-Type: application/json" -H "X-User:google-oauth2|test_user_id" -X DELETE http://localhost:10080/groups/2/users -d test
+
+        The user with id "google-oauth2|test_user_id" won't be removed from the group
+        - curl --verbose -H "Content-Type: application/json" -H "X-User:google-oauth2|test_user_id" -H "Remove-Another-User:true" -X DELETE http://localhost:10080/groups/2/users -d test
+
          */
         try {
+            // adding current user who called the method
+            if ((user_id != null) && (!"true".equalsIgnoreCase(remove_another_user))) {
+                str_user_id = user_id;
+            }
+            // else: remove another user, not the one calling so we ignore the headers
+
             log.info("Trying to remove user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
             int group_id = Integer.parseInt(str_group_id);
-            int user_id = Integer.parseInt(str_user_id);
 
             // user id can be 0
-            Group returnedGroup=groupService.removeUserFromGroup(group_id, user_id);
+            Group returnedGroup = groupService.removeUserFromGroup(group_id, str_user_id);
             // will remove user if the Group if exists and if user exists, otherwise return null
-            if (returnedGroup == null){
+            if (returnedGroup == null) {
                 // group does not exist already or user did not exist
                 return Response.status(Response.Status.NOT_FOUND).build(); // 404
             }
@@ -223,7 +281,7 @@ public class GroupRestService {
             log.info("Trying to get all the users status in a Group having id=" + str_id);
             int group_id = Integer.parseInt(str_id);
 
-            Map<Integer, Status> outMap = groupService.getAllUserStatus(group_id);
+            Map<String, Status> outMap = groupService.getAllUserStatus(group_id);
             if (outMap == null){
                 // group does not exist already
                 return Response.status(Response.Status.NOT_FOUND).build(); // 404
@@ -258,18 +316,18 @@ public class GroupRestService {
 
 
     @GET
-    @Path("/{group_id}/users/{user_id}/status")
+    @Path("/{group_id}/users/{encoded_user_id}/status")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "GET a particular user status")
-    public Response getUserStatus(@PathParam("group_id") String str_group_id, @PathParam("user_id") String str_user_id) {
+    public Response getUserStatus(@PathParam("group_id") String str_group_id, @PathParam("encoded_user_id") String encoded_user_id) {
+        String str_user_id = java.net.URLDecoder.decode(encoded_user_id, StandardCharsets.UTF_8);
         try {
             log.info("Trying to get a user status of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
             int group_id = Integer.parseInt(str_group_id);
-            int user_id = Integer.parseInt(str_user_id);
 
             // user id can be 0
-            Status status=groupService.getUserStatus(group_id, user_id);
-            if (status == null){
+            Status status = groupService.getUserStatus(group_id, str_user_id);
+            if (status == null) {
                 // group does not exist already or user did not exist
                 return Response.status(Response.Status.NOT_FOUND).build(); // 404
             }
@@ -281,19 +339,19 @@ public class GroupRestService {
     }
 
     @PUT
-    @Path("/{group_id}/users/{user_id}/status")
+    @Path("/{group_id}/users/{encoded_user_id}/status")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update a particular user status")
-    public Response updateUserStatus(@PathParam("group_id") String str_group_id, @PathParam("user_id") String str_user_id, String status) {
+    public Response updateUserStatus(@PathParam("group_id") String str_group_id, @PathParam("encoded_user_id") String encoded_user_id, String status) {
+        String str_user_id = java.net.URLDecoder.decode(encoded_user_id, StandardCharsets.UTF_8);
         try {
             log.info("Trying to update a user status of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
             int group_id = Integer.parseInt(str_group_id);
-            int user_id = Integer.parseInt(str_user_id);
 
             // user id can be 0
             try {
-                Status returnedStatus = groupService.updateUserStatus(group_id, user_id, status);
-                if (returnedStatus == null){
+                Status returnedStatus = groupService.updateUserStatus(group_id, str_user_id, status);
+                if (returnedStatus == null) {
                     // group does not exist already or user did not exist
                     return Response.status(Response.Status.NOT_FOUND).build(); // 404
                 }
@@ -309,58 +367,105 @@ public class GroupRestService {
     }
 
     @PUT
-    @Path("/{group_id}/users/{user_id}/movie_preferences")
+    @Path("/{group_id}/users/{encoded_user_id}/movie_preferences")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update a particular user Movie Preferences (short term preferences composed of genres, keywords, year from, year to)")
-    public Response updateMoviePreferences(@PathParam("group_id") String str_group_id, @PathParam("user_id") String str_user_id, MoviePreferences movie_preferences) {
+    public Response updateMoviePreferences(@PathParam("group_id") String str_group_id, @PathParam("encoded_user_id") String encoded_user_id, MoviePreferences movie_preferences) {
+        String str_user_id = java.net.URLDecoder.decode(encoded_user_id, StandardCharsets.UTF_8);
         try {
             log.info("Trying to update movie preferences of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
             int group_id = Integer.parseInt(str_group_id);
-            int user_id = Integer.parseInt(str_user_id);
-
             // user id can be 0
             try {
-                boolean returnedBoolean = groupService.updateMoviePreferences(group_id, user_id, movie_preferences);
-                if (!returnedBoolean){
+                boolean returnedBoolean = groupService.updateMoviePreferences(group_id, str_user_id, movie_preferences);
+
+                // Send to poll-service, we do not
+                Response sendResponse = sendMoviePreferences(group_id, movie_preferences);
+
+                if (!returnedBoolean) {
                     // group does not exist already or user did not exist
                     return Response.status(Response.Status.NOT_FOUND).build(); // 404
                 }
-                return Response.ok(returnedBoolean).build(); // 200
-            }
-            catch (IllegalArgumentException e){
+                if (!(sendResponse.getStatusInfo().getStatusCode() == Response.Status.OK.getStatusCode())) {
+                    log.info("Response received from Poll-service: " + sendResponse.getStatusInfo().toString());
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build(); // 500
+                }
+                return Response.ok(true).build(); // 200
+            } catch (IllegalArgumentException e) {
                 return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Bad movie preferences requested: " + e).build();
             }
+        } catch (NumberFormatException e) { // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id or user id, it should be numerical: group_id = " + str_group_id + ", user_id = " + str_user_id).build();
         }
-        catch(NumberFormatException e){ // invalid id
+    }
+
+    private Response sendMoviePreferences(int group_id, MoviePreferences movie_preferences) {
+        PollServiceRequesterInterface pollService = moviet.pollRequester();
+        try {
+            Integer[] genres = movie_preferences.getGenres_id().toArray(new Integer[0]);
+            Integer[] keywords = movie_preferences.getKeywords_id().toArray(new Integer[0]);
+            retrofit2.Response<Response> response = pollService
+                    .sendMoviePreferences(
+                            group_id,
+                            String.valueOf(movie_preferences.getYear_from()),
+                            String.valueOf(movie_preferences.getYear_to()),
+                            genres,
+                            keywords)
+                    .execute();
+            return Response.status(response.code(), response.message()).build();
+        } catch (Exception e) {
+            log.warning("Poll Request didn't succeed: " + e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
+                    "An exception has occurred while requesting Poll-Service:" + e).build();
+        }
+    }
+
+    @GET
+    @Path("/{group_id}/users/{encoded_user_id}/movie_preferences")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "GET a particular user Movie Preferences (short term preferences composed of genres, keywords, year from, year to)")
+    public Response getMoviePreferences(@PathParam("group_id") String str_group_id, @PathParam("encoded_user_id") String encoded_user_id) {
+        String str_user_id = java.net.URLDecoder.decode(encoded_user_id, StandardCharsets.UTF_8);
+        try {
+            log.info("Trying to get movie preferences of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
+            int group_id = Integer.parseInt(str_group_id);
+
+            // user id can be 0
+            try {
+                MoviePreferences returned_movie_preferences = groupService.getMoviePreferences(group_id, str_user_id);
+                if (returned_movie_preferences == null) {
+                    // group does not exist already or user did not exist
+                    return Response.status(Response.Status.NOT_FOUND).build(); // 404
+                }
+                return Response.ok(returned_movie_preferences).build(); // 200
+            } catch (IllegalArgumentException e) {
+                return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Bad movie preferences requested: " + e).build();
+            }
+        } catch (NumberFormatException e) { // invalid id
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id or user id, it should be numerical: group_id = " + str_group_id + ", user_id = " + str_user_id).build();
         }
     }
 
     @GET
-    @Path("/{group_id}/users/{user_id}/movie_preferences")
+    @Path("/{group_id}/movie_preferences")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "GET a particular user Movie Preferences (short term preferences composed of genres, keywords, year from, year to)")
-    public Response getMoviePreferences(@PathParam("group_id") String str_group_id, @PathParam("user_id") String str_user_id) {
+    @ApiOperation(value = "GET Movie Preferences of all users in the group (short term preferences composed of genres, keywords, year from, year to)")
+    public Response getAllMoviePreferences(@PathParam("group_id") String str_group_id) {
         try {
-            log.info("Trying to get movie preferences of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
+            log.info("Trying to get movie preferences of all users from a Group having group_id=" + str_group_id);
             int group_id = Integer.parseInt(str_group_id);
-            int user_id = Integer.parseInt(str_user_id);
-
-            // user id can be 0
             try {
-                MoviePreferences returned_movie_preferences = groupService.getMoviePreferences(group_id, user_id);
-                if (returned_movie_preferences == null){
-                    // group does not exist already or user did not exist
+                List<MoviePreferences> returned_all_movie_preferences = groupService.getAllMoviePreferences(group_id);
+                if (returned_all_movie_preferences == null) {
+                    // group does not exist already or no users
                     return Response.status(Response.Status.NOT_FOUND).build(); // 404
                 }
-                return Response.ok(returned_movie_preferences).build(); // 200
-            }
-            catch (IllegalArgumentException e){
+                return Response.ok(returned_all_movie_preferences).build(); // 200
+            } catch (IllegalArgumentException e) {
                 return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Bad movie preferences requested: " + e).build();
             }
-        }
-        catch(NumberFormatException e){ // invalid id
-            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id or user id, it should be numerical: group_id = " + str_group_id + ", user_id = " + str_user_id).build();
+        } catch (NumberFormatException e) { // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id, it should be numerical: group_id = " + str_group_id).build();
         }
     }
 
@@ -368,7 +473,7 @@ public class GroupRestService {
     @Path("/{group_id}/users_status")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Changes all the status in the group to Voting")
-    public Response skipAllUserStatus(@PathParam("group_id") String str_id){
+    public Response skipAllUserStatus(@PathParam("group_id") String str_id) {
         /*
         Skip group status ! Changes all the status in the group to Voting or to Done
          */
@@ -376,7 +481,7 @@ public class GroupRestService {
             log.info("Trying to change all the status in the group to Voting using: id=" + str_id);
             int group_id = Integer.parseInt(str_id);
             Status status = groupService.skipAllUserStatus(group_id);
-            if (status == null){
+            if (status == null) {
                 // group not found
                 return Response.status(Response.Status.NOT_FOUND).build(); // 404
             }
@@ -391,8 +496,11 @@ public class GroupRestService {
     @Path("/testing_header_parsing")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "testing header parsing")
-    public Response getHeader(@Context HttpHeaders headers){
+    public Response getHeader(@Context HttpHeaders headers) { // dependency injection..
         MultivaluedMap<String, String> my_headers = headers.getRequestHeaders();
+        // X-User
+        String user_id = my_headers.getFirst("X-User");
+        log.info("This is my X-User: " + user_id);
         return Response.ok(my_headers).build();    //building the server response
     }
 

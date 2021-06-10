@@ -1,0 +1,2 @@
+<a #currentLink="routerLinkActive" (click)="auth.checkIfLogged(); auth.login()"
+   [attr.aria-current]="currentLink.isActive ? 'page' : ''" class="btn nav-link" routerLinkActive="active">sign in</a>

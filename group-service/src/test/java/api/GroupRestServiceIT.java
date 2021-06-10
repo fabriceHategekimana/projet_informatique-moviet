@@ -1,32 +1,14 @@
 package api;
 
 // Integration Testing
-import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
-import static org.hamcrest.Matchers.*;
 
-import io.restassured.http.ContentType;
-
-import domain.model.User;
-import domain.model.Group;
-
-/*
-https://github.com/rest-assured/rest-assured/wiki/Usage#static-imports
-
-The names of the tests start with a letter for the alphabetic runOrder of maven failsafe plugin
-
-INTEGRATION TESTS SHOULD BE RUNNED WHILE SERVER IS RUNNING. (Either run docker containers or .war etc.)
-
-We use H2 database for the IT, the test database based on META-INF/groups_test.sql
- */
 import io.restassured.RestAssured;
-
-// Unit/Component testing using JUnit 5
-// https://junit.org/junit5/docs/current/user-guide/#writing-tests
-import org.hamcrest.Matchers;
+import io.restassured.http.ContentType;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import org.junit.jupiter.api.BeforeAll;
+import static io.restassured.RestAssured.*;
+import static org.hamcrest.Matchers.*;
 
 class GroupRestServiceIT {
     /* TODO: IT when they fail we have to kill manually processes ?

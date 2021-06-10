@@ -12,11 +12,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 // just a test for unit testing
 class UserTest {
-    private final User user = new User(1);
+    private final User user = new User("1");
 
     @Test
     void testGetId(){
-        assertEquals(1, user.getId() );
+        assertEquals("1", user.getId());
     }
 
     @Test
@@ -26,7 +26,7 @@ class UserTest {
 
     @Test
     void testSetGroups(){
-        User tmpuser = new User(1);
+        User tmpuser = new User("1");
         Group grp1 = new Group("hello");
         Group grp2 = new Group("world");
         Set<Group> groups = new HashSet<>();
@@ -40,7 +40,7 @@ class UserTest {
 
     @Test
     void testAddGroups(){
-        User tmpuser = new User(1);
+        User tmpuser = new User("1");
         Group grp1 = new Group("hello");
         Group grp2 = new Group("world");
         Set<Group> groups = new HashSet<>();
@@ -55,7 +55,7 @@ class UserTest {
 
     @Test
     void testRemoveGroups(){
-        User tmpuser = new User(1);
+        User tmpuser = new User("1");
         Group grp1 = new Group("hello");
         Group grp2 = new Group("world");
         Set<Group> groups = new HashSet<>();
@@ -75,7 +75,7 @@ class UserTest {
 
     @Test
     void testGetIdNoArgsConstructor(){
-        assertEquals(0, new User().getId() );
+        assertEquals(new User().getId(), "0");
     }
 
     @Test

@@ -8,8 +8,10 @@
         <p class="body-card-text">
             Waiting for all participants to be ready.
         </p>
-        <app-display-users-status [currentGroup]="currentGroup" (groupStatusEvent)="goToFindMatchIfVoting($event)"></app-display-users-status>
-        <div type="button" class="btn btn-primary btn-lg btn-block mt-5" id="start" (click)="skipPref()">Start
+        <app-display-users-status (groupStatusEvent)="goToFindMatchIfVoting($event)"
+                                  [currentGroup]="currentGroup"></app-display-users-status>
+        <div (click)="endChoosing()" *ngIf="isAdmin" class="btn btn-primary btn-lg btn-block mt-5" id="start"
+             type="button">Start
         </div>
     </div>
 </div>
