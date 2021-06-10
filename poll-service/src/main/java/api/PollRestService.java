@@ -3,8 +3,7 @@ package api;
 import domain.model.Count;
 import domain.model.RawSuggestion;
 import domain.model.Voting;
-import domain.service.MovieServiceRequesterInterface;
-import domain.service.MovietRequester;
+import domain.service.MovietRequesterComputer;
 import domain.service.SuggestionManager;
 import domain.service.VoteManager;
 import io.swagger.annotations.ApiOperation;
@@ -26,12 +25,12 @@ public class PollRestService {
 
     private final SuggestionManager suggestionManager;
     private final VoteManager voteManager;
-    private final MovietRequester moviet;
+    private final MovietRequesterComputer movietComputer;
 
     public PollRestService() {
         this.suggestionManager = new SuggestionManager();
         this.voteManager = new VoteManager();
-        this.moviet = new MovietRequester();
+        this.movietComputer = new MovietRequesterComputer();
     }
 
     @POST
@@ -51,28 +50,22 @@ public class PollRestService {
 
         List<Integer> ids;
 
-        MovieServiceRequesterInterface moviesService = moviet.movieRequester();
         try {
-            retrofit2.Response<List<Integer>> response = moviesService
-                    .discoverId(
-                            page,
-                            sortBy,
-                            release_year_gte,
-                            release_year_lte,
-                            genres,
-                            keywords,
-                            banned_genres,
-                            banned_keywords,
-                            genres_operator,
-                            keywords_operator)
-                    .execute();
-
-            if (response.isSuccessful()) {
-                ids = response.body();
-            } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
-                        "Request to TMDb failed:" + response.message()).build();
-            }
+            ids = movietComputer.discoverId(
+                    page,
+                    sortBy,
+                    release_year_gte,
+                    release_year_lte,
+                    genres,
+                    keywords,
+                    banned_genres,
+                    banned_keywords,
+                    genres_operator,
+                    keywords_operator
+            );
+        } catch (InternalServerErrorException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
+                    "Request to TMDb failed:" + e.getMessage()).build();
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Discover Request didn't succeed.", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
