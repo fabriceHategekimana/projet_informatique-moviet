@@ -1,5 +1,6 @@
 package domain.service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import domain.model.Group;
@@ -21,5 +22,6 @@ public interface GroupService{
     Status getGroupStatus(int group_id); // called by GET request
     boolean updateMoviePreferences(int group_id, String user_id, MoviePreferences movie_preferences); // called by PUT request
     MoviePreferences getMoviePreferences(int group_id, String user_id); // called by GET request
+    List<MoviePreferences> getAllMoviePreferences(int group_id); // called by GET request
     Group deleteGroup(int id); // called by DELETE request
 }

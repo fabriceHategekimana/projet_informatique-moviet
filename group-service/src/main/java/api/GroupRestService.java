@@ -20,6 +20,7 @@ import domain.service.GroupService;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 /*
@@ -171,12 +172,6 @@ public class GroupRestService {
          */
 
         try {
-            /*
-            MultivaluedMap<String, String> my_headers = headers.getRequestHeaders();
-            // X-User
-            String user_id = my_headers.getFirst("X-User");
-            String add_another_user = my_headers.getFirst("Add-Another-User");  // null if key not in the map
-            */
             // adding current user who called the method
             if ((user_id != null) && (!"true".equalsIgnoreCase(add_another_user))) {
                 User new_user = new User(user_id);
@@ -229,12 +224,6 @@ public class GroupRestService {
 
          */
         try {
-            /*
-            MultivaluedMap<String, String> my_headers = headers.getRequestHeaders();
-            // X-User
-            String user_id = my_headers.getFirst("X-User");
-            String remove_another_user = my_headers.getFirst("Remove-Another-User");  // null if key not in the map
-            */
             // adding current user who called the method
             if ((user_id != null) && (!"true".equalsIgnoreCase(remove_another_user))) {
                 str_user_id = user_id;
@@ -404,7 +393,7 @@ public class GroupRestService {
                     // group does not exist already or user did not exist
                     return Response.status(Response.Status.NOT_FOUND).build(); // 404
                 }
-                return Response.ok(returnedBoolean).build(); // 200
+                return Response.ok(true).build(); // 200
             }
             catch (IllegalArgumentException e){
                 return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Bad movie preferences requested: " + e).build();
@@ -440,6 +429,31 @@ public class GroupRestService {
         }
         catch(NumberFormatException e){ // invalid id
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id or user id, it should be numerical: group_id = " + str_group_id + ", user_id = " + str_user_id).build();
+        }
+    }
+
+    @GET
+    @Path("/{group_id}/movie_preferences")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "GET Movie Preferences of all users in the group (short term preferences composed of genres, keywords, year from, year to)")
+    public Response getAllMoviePreferences(@PathParam("group_id") String str_group_id) {
+        try {
+            log.info("Trying to get movie preferences of all users from a Group having group_id=" + str_group_id);
+            int group_id = Integer.parseInt(str_group_id);
+            try {
+                List<MoviePreferences> returned_all_movie_preferences = groupService.getAllMoviePreferences(group_id);
+                if (returned_all_movie_preferences == null){
+                    // group does not exist already or no users
+                    return Response.status(Response.Status.NOT_FOUND).build(); // 404
+                }
+                return Response.ok(returned_all_movie_preferences).build(); // 200
+            }
+            catch (IllegalArgumentException e){
+                return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Bad movie preferences requested: " + e).build();
+            }
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id, it should be numerical: group_id = " + str_group_id).build();
         }
     }
 
