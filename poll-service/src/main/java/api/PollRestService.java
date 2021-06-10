@@ -50,6 +50,7 @@ public class PollRestService {
                                 @QueryParam("keywords_operator") String keywords_operator) {
 
         List<Integer> ids;
+        LOGGER.log(Level.WARNING, "HELLO");
 
         MovieServiceRequesterInterface moviesService = moviet.movieRequester();
         try {
@@ -70,6 +71,7 @@ public class PollRestService {
             if (response.isSuccessful()) {
                 ids = response.body();
             } else {
+                LOGGER.log(Level.WARNING, "AAAAAAAAAAAAAA Not successful");
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
                         "Request to TMDb failed:" + response.message()).build();
             }
@@ -82,6 +84,7 @@ public class PollRestService {
         if (ids == null) {
             LOGGER.log(Level.INFO, "Discover request to TMDb has returned null");
         } else {
+            LOGGER.log(Level.INFO, "BBBBBBBBBBBBBBBBBBBB ids not null");
             for (Integer movie_id : ids) {
                 try {
                     suggestionManager.addRawSuggestion(new RawSuggestion(group_id, movie_id));
@@ -184,6 +187,7 @@ public class PollRestService {
     @ApiOperation(value = "Clear t_proposition of group_id so new propositions can be filled in")
     public Response newRound(@PathParam("group_id") int group_id) {
         try {
+            LOGGER.log(Level.WARNING, "HELLO I am in result");
             if (voteManager.deleteAllPolls(group_id) == 0) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }

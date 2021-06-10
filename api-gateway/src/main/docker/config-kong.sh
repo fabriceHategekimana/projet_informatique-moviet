@@ -7,6 +7,7 @@ curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=movie-
 curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=movie-service-search-mock" --data-urlencode "url=http://movie-service:8080/Mock_search"
 curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=movie-service-discover-mock" --data-urlencode "url=http://movie-service:8080/Mock_discover"
 curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=movie-service-discover" --data-urlencode "url=http://movie-service:8080/discover"
+curl -S -s -i -X POST --url http://api-gateway:8001/services --data "name=poll-service" --data-urlencode "url=http://poll-service:8080/poll"
 
 curl -S -s -i -X POST  --url http://api-gateway:8001/services/group-service/routes --data-urlencode "paths[]=/api/v1/groups"
 curl -S -s -i -X POST  --url http://api-gateway:8001/services/user-service/routes --data-urlencode "paths[]=/api/v1/users"
@@ -16,6 +17,7 @@ curl -S -s -i -X POST  --url http://api-gateway:8001/services/movie-service-sear
 curl -S -s -i -X POST  --url http://api-gateway:8001/services/movie-service-search-mock/routes --data-urlencode "paths[]=/api/v1/movie-service/Mock_search"
 curl -S -s -i -X POST  --url http://api-gateway:8001/services/movie-service-discover-mock/routes --data-urlencode "paths[]=/api/v1/movie-service/Mock_discover"
 curl -S -s -i -X POST  --url http://api-gateway:8001/services/movie-service-discover/routes --data-urlencode "paths[]=/api/v1/movie-service/discover"
+curl -S -s -i -X POST  --url http://api-gateway:8001/services/poll-service/routes --data-urlencode "paths[]=/api/v1/poll-service/poll"
 
 movie-service/
 #Enable the Open ID Plugin

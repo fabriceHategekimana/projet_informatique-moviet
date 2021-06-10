@@ -2,6 +2,7 @@ package api;
 
 // Injection
 import javax.inject.Inject; // dependency injection
+import javax.persistence.EntityExistsException;
 import javax.ws.rs.*;
 
 import javax.ws.rs.core.*;  // Multivalued map
@@ -19,9 +20,11 @@ import domain.model.User;
 import domain.service.GroupService;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 /*
 https://thorntail.io/posts/wildfly-swarm-s-got-swagger/
@@ -34,6 +37,8 @@ which allows both humans and computers to discover and understand the capabiliti
 source code, documentation, or through network traffic inspection".
 
  */
+import domain.service.MovietRequester;
+import domain.service.PollServiceRequesterInterface;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.java.Log;
@@ -50,6 +55,10 @@ public class GroupRestService {
     @Inject
     private GroupService groupService; // no more instantiation in the constructor
 
+    private final MovietRequester moviet;
+    public GroupRestService(){
+        this.moviet = new MovietRequester();
+    }
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "GET a list of all groups")
@@ -385,13 +394,20 @@ public class GroupRestService {
         try {
             log.info("Trying to update movie preferences of user with user_id=" + str_user_id + " from a Group having group_id=" + str_group_id);
             int group_id = Integer.parseInt(str_group_id);
-            // TODO: Encode user id if I send it
             // user id can be 0
             try {
                 boolean returnedBoolean = groupService.updateMoviePreferences(group_id, str_user_id, movie_preferences);
+
+                // Send to poll-service, we do not
+                Response sendResponse = sendMoviePreferences(group_id, movie_preferences);
+
                 if (!returnedBoolean){
                     // group does not exist already or user did not exist
                     return Response.status(Response.Status.NOT_FOUND).build(); // 404
+                }
+                if (!(sendResponse.getStatusInfo().getStatusCode() == Response.Status.OK.getStatusCode())){
+                    log.info("Response received from Poll-service: " + sendResponse.getStatusInfo().toString());
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build(); // 500
                 }
                 return Response.ok(true).build(); // 200
             }
@@ -401,6 +417,27 @@ public class GroupRestService {
         }
         catch(NumberFormatException e){ // invalid id
             return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id or user id, it should be numerical: group_id = " + str_group_id + ", user_id = " + str_user_id).build();
+        }
+    }
+
+    private Response sendMoviePreferences(int group_id, MoviePreferences movie_preferences){
+        PollServiceRequesterInterface pollService = moviet.pollRequester();
+        try {
+            Integer[] genres = movie_preferences.getGenres_id().toArray(new Integer[0]);
+            Integer[] keywords = movie_preferences.getKeywords_id().toArray(new Integer[0]);
+            retrofit2.Response<Response> response = pollService
+                    .sendMoviePreferences(
+                            group_id,
+                            String.valueOf(movie_preferences.getYear_from()),
+                            String.valueOf(movie_preferences.getYear_to()),
+                            genres,
+                            keywords)
+                    .execute();
+            return Response.status(response.code(), response.message()).build();
+        } catch (Exception e) {
+            log.warning("Poll Request didn't succeed: " + e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
+                    "An exception has occurred while requesting Poll-Service:" + e).build();
         }
     }
 
