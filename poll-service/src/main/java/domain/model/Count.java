@@ -48,7 +48,7 @@ public class Count {
         return (float) (nb_yes - nb_no + .5 * nb_maybe);
     }
 
-    public void checkValidity() {
+    public void checkValidity() throws IllegalArgumentException {
         if (group_id <= 0) {
             throw new IllegalArgumentException(String.format("group_id should be a strictly positive integer, given %d", group_id));
         }
