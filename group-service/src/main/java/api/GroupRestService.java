@@ -396,6 +396,9 @@ public class GroupRestService {
             int group_id = Integer.parseInt(str_group_id);
             // user id can be 0
             try {
+                if (movie_preferences == null){
+                    movie_preferences = new MoviePreferences(new HashSet<>(), new HashSet<>(), null, null);
+                }
                 boolean returnedBoolean = groupService.updateMoviePreferences(group_id, str_user_id, movie_preferences);
 
                 // Send to poll-service, we do not
