@@ -39,7 +39,7 @@ export class UserService {
     // return this.http.get<User>(this.usersUrl + "/whoAmI", this.httpOptionsGet)
     //               .pipe(catchError(this.handleError<User>('whoAmI', undefined)));
     //!MOCK
-    return of({name: "nom", id: "1"});
+    return of({username: "nom", id: "1"});
   }
 
   //** handle error function from https://angular.io/tutorial/toh-pt6
