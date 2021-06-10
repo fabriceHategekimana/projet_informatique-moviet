@@ -46,6 +46,9 @@ public class Group {
     @Setter @Enumerated(EnumType.STRING) @Type( type = "status_db_enum" )
     private Status group_status = Status.CHOOSING;
 
+    @Setter
+    private int movie_winner_id = -1; // by default 0 and assumes there's no movie with id 0..
+
     public Group(String name){
         this.name = name;
     }

@@ -12,7 +12,8 @@ CREATE TABLE T_groups (
     group_id serial primary key,
     name varchar(255) not null,
     admin_id varchar(255) not null,
-    group_status status_type DEFAULT 'CHOOSING'
+    group_status status_type DEFAULT 'CHOOSING',
+    movie_winner_id int default -1  -- assumes there's no movie with id -1 x)
 );
 -- Grant SQL commands: https://www.ibm.com/docs/en/qmf/11.2?topic=privileges-sql-grant-statement
 -- GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA public to group-service;

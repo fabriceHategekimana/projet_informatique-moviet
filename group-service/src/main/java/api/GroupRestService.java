@@ -497,7 +497,7 @@ public class GroupRestService {
     @PUT
     @Path("/{group_id}/users_status")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Changes all the status in the group to Voting")
+    @ApiOperation(value = "Changes all the status in the group to Voting or Done")
     public Response skipAllUserStatus(@PathParam("group_id") String str_id){
         /*
         Skip group status ! Changes all the status in the group to Voting or to Done
@@ -517,6 +517,7 @@ public class GroupRestService {
         }
     }
 
+    /*
     @GET
     @Path("/testing_header_parsing")
     @Produces(MediaType.APPLICATION_JSON)
@@ -528,6 +529,33 @@ public class GroupRestService {
         log.info("This is my X-User: " + user_id);
         return Response.ok(my_headers).build();    //building the server response
     }
+    */
+
+    @PUT
+    @Path("/{group_id}/movie_winner_id/")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Changes movie_winner_id of a group")
+    public Response updateMovieWinnerId(@PathParam("group_id") String str_id, String str_movie_winner_id){
+        /*
+        Skip group status ! Changes all the status in the group to Voting or to Done
+         */
+        try {
+            log.info("Trying to change movie winner id of group" + str_id + " with movie_winner_id=" + str_id);
+            int group_id = Integer.parseInt(str_id);
+            int movie_winner_id = Integer.parseInt(str_movie_winner_id);
+
+            Integer returned_movie_winner_id = groupService.updateMovieWinnerId(group_id, movie_winner_id);
+            if (returned_movie_winner_id == null){
+                // group not found
+                return Response.status(Response.Status.NOT_FOUND).build(); // 404
+            }
+            return Response.ok(returned_movie_winner_id).build(); // 200
+        }
+        catch(NumberFormatException e){ // invalid id
+            return Response.status(Response.Status.BAD_REQUEST).entity("BAD_REQUEST : Invalid group id or movie winner id, it should be numerical: group id = " + str_id + " movie winner id=" + str_movie_winner_id).build();
+        }
+    }
+
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)

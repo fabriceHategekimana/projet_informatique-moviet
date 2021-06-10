@@ -110,6 +110,13 @@ class GroupTest {
     }
 
     @Test
+    void testSetMovie_winner_id(){
+        Group grp = new Group();
+        grp.setMovie_winner_id(1);
+        assertEquals(1, grp.getMovie_winner_id());
+    }
+
+    @Test
     void testGetIdNoArgsConstructor(){
         assertEquals(0, new Group().getId() );
     }
@@ -131,6 +138,6 @@ class GroupTest {
 
     @Test
     void testToString(){
-        assertEquals("Group(id=0, name=hello world, admin_id=0, users=[], group_status=CHOOSING)", group.toString() );
+        assertEquals("Group(id=0, name=hello world, admin_id=0, users=[], group_status=CHOOSING, movie_winner_id=-1)", group.toString() );
     }
 }

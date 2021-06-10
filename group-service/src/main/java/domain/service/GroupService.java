@@ -23,5 +23,6 @@ public interface GroupService{
     boolean updateMoviePreferences(int group_id, String user_id, MoviePreferences movie_preferences); // called by PUT request
     MoviePreferences getMoviePreferences(int group_id, String user_id); // called by GET request
     List<MoviePreferences> getAllMoviePreferences(int group_id); // called by GET request
+    Integer updateMovieWinnerId(int group_id, int movie_winner_id); // called by PUT request
     Group deleteGroup(int id); // called by DELETE request
 }
