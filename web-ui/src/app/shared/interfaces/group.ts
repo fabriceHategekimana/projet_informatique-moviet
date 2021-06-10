@@ -4,11 +4,11 @@
  * */
 
 interface GroupUser { // only used inside a group object
-  id: number;
+  id: string;
 }
 export interface Group {
     id: number;
     name: string;
-    admin_id: number;
+    admin_id: string;
     users: GroupUser[];
   }

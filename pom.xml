@@ -20,8 +20,9 @@
     </modules>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <!--maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>-->
+        <maven.compiler.release>11</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -256,20 +257,27 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
-
+    
         <pluginManagement>
             <plugins>
+                <!-- <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.3.1</version>
+                </plugin> -->
                 <plugin>
                     <!-- Compile source files + test files, think about javac -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.1</version>
-
-                    <!-- -->
+                    <configuration>
+                        <release>${maven.compiler.release}</release>
+                    </configuration>
+                    <!--
                     <configuration>
                         <source>${maven.compiler.source}</source>
                         <target>${maven.compiler.target}</target>
-                    </configuration>
+                    </configuration>-->
                 </plugin>
 
                 <!-- Unit test -->
@@ -307,6 +315,25 @@
         </pluginManagement>
         <!-- -->
         <plugins>
+                <!-- <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                        <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                        <rules>
+                            <requireMavenVersion>
+                            <version>3.8</version>
+                            </requireMavenVersion>
+                        </rules>    
+                        </configuration>
+                    </execution>
+                    </executions>
+                </plugin> -->
             <!-- Compile source files + test files, think about javac -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -352,7 +379,7 @@
                 </executions>
             </plugin>
         </plugins>
-
+        <defaultGoal>install</defaultGoal>
     </build>
 
     <!-- profiles copied from https://github.com/PInfo-2020/Exercises/blob/master/maven/super-project/pom.xml-->
@@ -405,7 +432,7 @@
                                         </ports>
                                     </run>
                                     <build>
-                                        <from>java:openjdk-8-jdk</from>
+                                        <from>openjdk:11-jdk</from>
                                         <ports>
                                             <port>8080</port>
                                         </ports>

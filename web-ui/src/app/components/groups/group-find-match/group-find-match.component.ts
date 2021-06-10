@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, OnDestroy } from '@angular/core'
 import { GroupService } from '../../../services/group.service'
 import { GroupsComponent } from '../groups.component'
 import { UserStatusValue } from '../../../shared/interfaces/users-status'
@@ -11,7 +11,7 @@ const maxSec = 22; // max number of seconds for the timer
   styleUrls: ['./group-find-match.component.css']
 })
 
-export class GroupFindMatchComponent implements OnInit {
+export class GroupFindMatchComponent implements OnInit, OnDestroy {
 
   timer?: NodeJS.Timeout;
 
@@ -31,6 +31,12 @@ export class GroupFindMatchComponent implements OnInit {
       this.getMovieId(); // get the movie to watch
       this.startTimer(maxSec);
     });
+  }
+
+  ngOnDestroy() {
+    if (this.timer != undefined) {
+      clearInterval(this.timer); 
+    }
   }
 
   startTimer(maxSec: number = 20,  then: () => any = () => {this.onMaybe();}) { // if the timer ends, send "maybe" as an answer
@@ -144,8 +150,8 @@ export class GroupFindMatchComponent implements OnInit {
     this.startTimer(maxSec);
   }
 
-  getMyUserId(): number { //! Temporary
-    return 1;
+  getMyUserId(): string { //! Temporary
+    return '1';
   }
 
   setUserStatus(then: () => any = () => void 0, onError?: () => any) {

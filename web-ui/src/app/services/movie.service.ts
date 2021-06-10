@@ -8,6 +8,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http' // http requests
 import { catchError, map, tap } from 'rxjs/operators' // error handling
 import { environment } from '../../environments/environment';
 
+const movie_API_URL = environment.production ? 'movie-service/' : 'movie-service/Mock_';
 @Injectable({
   providedIn: 'root'
 })
@@ -19,10 +20,11 @@ export class MovieService {
 
     })};
 
+    
 
-  private movieUrl : string = environment.API_URL + "movie-service/Mock_movies"; //! MOCK
-  private genresUrl : string = environment.API_URL + "movie-service/Mock_movies/genres"; //! MOCK
-  private keywordUrl : string = environment.API_URL + "movie-service/Mock_search/keyword"; //! MOCK
+  private movieUrl : string = environment.API_URL + movie_API_URL + "movies"; //! MOCK
+  private genresUrl : string = environment.API_URL + movie_API_URL + "movies/genres"; //! MOCK
+  private keywordUrl : string = environment.API_URL + movie_API_URL + "search/keyword"; //! MOCK
 
   constructor(private http: HttpClient) { }
 

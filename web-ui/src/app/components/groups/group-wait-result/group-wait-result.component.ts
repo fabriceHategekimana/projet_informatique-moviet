@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { GroupsComponent } from '../groups.component'
 import { Group } from '../../../shared/interfaces/group';
 import { UserService } from '../../../services/user.service';
@@ -10,7 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   templateUrl: './group-wait-result.component.html',
   styleUrls: ['./group-wait-result.component.css']
 })
-export class GroupWaitResultComponent implements OnInit {
+export class GroupWaitResultComponent implements OnInit, OnDestroy {
 
   currentGroup?: Group;
 
@@ -33,6 +33,12 @@ export class GroupWaitResultComponent implements OnInit {
     this.timerRefreshResult = setInterval(() => {this.getMovieResult();}, 1000);
   }
 
+  ngOnDestroy() {
+    if (this.timerRefreshResult != undefined) {
+      clearInterval(this.timerRefreshResult); 
+    }
+  }
+  
   goToShowResult() { // go to the show-result page
     history.pushState({ winningMovie: this.matchMovieId}, '', undefined); // push data to history
     this.router.navigate(['show-result'], {relativeTo: this.route.parent, skipLocationChange: true}); // pass the movieId to show-result

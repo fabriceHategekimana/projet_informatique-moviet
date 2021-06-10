@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { GroupsComponent } from '../groups.component'
 import { Group } from '../../../shared/interfaces/group';
 import { UsersStatus } from '../../../shared/interfaces/users-status';
@@ -6,15 +6,20 @@ import { UserStatusValue } from '../../../shared/interfaces/users-status';
 import { UserService } from '../../../services/user.service';
 import { GroupService } from 'src/app/services/group.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { User } from 'src/app/shared/interfaces/user';
 
 @Component({
   selector: 'app-group-wait-voting',
   templateUrl: './group-wait-voting.component.html',
   styleUrls: ['./group-wait-voting.component.css']
 })
-export class GroupWaitVotingComponent implements OnInit {
+export class GroupWaitVotingComponent implements OnInit, OnDestroy {
 
   currentGroup?: Group;
+
+  myUser?: User;
+
+  isAdmin: boolean = false;
 
   private timerRefreshResult? :NodeJS.Timeout;
 
@@ -23,6 +28,9 @@ export class GroupWaitVotingComponent implements OnInit {
   ngOnInit(): void {
     let thenGroupimport = () => {
       this.currentGroup = this.groupsComponent.currentGroup; // save the current group
+      this.getMyUser(() => {
+        this.testIfAdmin();
+      });
     };
 
     this.groupsComponent.getGroup(undefined, () => {thenGroupimport(); this.setUserStatus();});
@@ -31,6 +39,12 @@ export class GroupWaitVotingComponent implements OnInit {
     this.timerRefreshResult = setInterval(() => {this.groupsComponent.getGroup(undefined, thenGroupimport);}, 1000);
   }
 
+  ngOnDestroy() {
+    if (this.timerRefreshResult != undefined) {
+      clearInterval(this.timerRefreshResult); 
+    }
+  }
+  
   goToWaitResult() { // go to the wait-result page
     if (this.timerRefreshResult != undefined) {
       this.clearTimer();
@@ -40,7 +54,9 @@ export class GroupWaitVotingComponent implements OnInit {
 
   endVoting() {
     //TODO: test if admin:
-    this.skipPref();
+    if (this.isAdmin) {
+      this.skipPref(); 
+    }
   }
 
   skipPref() {
@@ -54,8 +70,33 @@ export class GroupWaitVotingComponent implements OnInit {
     }
   }
 
-  getMyUserId(): number { //! Temporary
-    return 1;
+  getMyUserId(): string {
+    if (this.myUser != undefined) {
+      return this.myUser.id;
+    } else {
+      return '';
+    }
+  }
+
+  getMyUser(then: ()=>any = ()=>void 0) {
+    this.userService.whoAmI()
+      .subscribe((user) => {
+        this.myUser = user;
+        then();
+      });
+  }
+
+
+  testIfAdmin() { // test if the user is admin
+    if (this.currentGroup != undefined) {
+      if (this.myUser != undefined) {
+        if (this.myUser.id == this.currentGroup.admin_id) {
+          this.isAdmin = true;
+        } else {
+          this.isAdmin = false;
+        }
+      }
+    }
   }
 
   setUserStatus(then: () => any = () => void 0, onError?: () => any) {
