@@ -56,8 +56,27 @@ public class SuggestionWithCriteria {
         this.n_sat_date = n_sat_date;
     }
 
-    public void checkValidity() throws IllegalArgumentException{
-        if (group_id <= 0){
+    public static SuggestionWithCriteria fromRawSuggestion(RawSuggestion suggestion) {
+        int group_id = suggestion.getGroup_id();
+        int movie_id = suggestion.getMovie_id();
+        float popularity = 42;  // from Movie-Service
+        int n_sat_w_genre = 42;  // genres from Movie-Service w_genres from Group-Service
+        int n_sat_b_genre = 42;  // genres from Movie-Service b_genres from Group-Service
+        int n_match_w_keyword = 42;  // keyword from Movie-Service w_keywords from Group-Service
+        int n_match_b_keyword = 42;  // keyword from Movie-Service b_keywords from Group-Service
+        int n_sat_date = 42;  // dates from Movie-Service w_dates from Group-Service
+
+        // TODO use other services
+        return new SuggestionWithCriteria(
+                group_id, movie_id,
+                popularity,
+                n_sat_w_genre, n_sat_b_genre,
+                n_match_w_keyword, n_match_b_keyword,
+                n_sat_date);
+    }
+
+    public void checkValidity() throws IllegalArgumentException {
+        if (group_id <= 0) {
             throw new IllegalArgumentException(String.format("group_id should be a strictly positive integer, given '%d'", group_id));
         }
         if (movie_id <= 0) {

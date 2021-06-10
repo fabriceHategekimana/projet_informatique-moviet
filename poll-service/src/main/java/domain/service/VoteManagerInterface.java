@@ -1,11 +1,17 @@
 package domain.service;
 
 import domain.model.Count;
+import domain.model.Voting;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public interface VoteManagerInterface {
+
+    Voting beginVoting(@NotNull Voting voting);
+
+    Voting endVoting(@NotNull int group_id);
+
     Count createPoll(@NotNull Count count);
 
     Count incrementYes(@NotNull int group_id, @NotNull int movie_id);
@@ -20,5 +26,5 @@ public interface VoteManagerInterface {
 
     Count deletePoll(@NotNull int group_id, @NotNull int movie_id);
 
-    List<Count> deleteAllPolls(@NotNull int group_id);
+    int deleteAllPolls(@NotNull int group_id);
 }

@@ -4,15 +4,13 @@ import domain.model.KeyGroupMovie;
 import domain.model.Proposition;
 import domain.model.RawSuggestion;
 import domain.model.SuggestionWithCriteria;
-import lombok.Getter;
-import lombok.Setter;
 
 import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
-import javax.persistence.EntityExistsException;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.PersistenceContext;
+import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -23,10 +21,6 @@ public class SuggestionManager implements SuggestionManagerInterface {
     @SuppressWarnings("unused")
     @PersistenceContext(unitName = "PollPU")
     private EntityManager em;
-
-    @Setter
-    @Getter
-    private int defaultQuantity = 10;
 
     @Override
     @Transactional
@@ -45,20 +39,13 @@ public class SuggestionManager implements SuggestionManagerInterface {
 
     @Override
     public RawSuggestion fetchRawSuggestion(@Nullable Integer group_id) {
-        return null;
+        Query query = em.createQuery("SELECT * FROM RawSuggestion ORDER BY added_at"); // limit 1?
+        return (RawSuggestion) query.getSingleResult();
     }
 
-    @Override
-    public List<RawSuggestion> fetchRawSuggestions(@Nullable Integer group_id) {
-        return fetchRawSuggestions(group_id, defaultQuantity);
-    }
 
     @Override
-    public List<RawSuggestion> fetchRawSuggestions(@Nullable Integer group_id, int quantity) {
-        return null;
-    }
-
-    @Override
+    @Transactional
     public RawSuggestion removeRawSuggestion(@NotNull int group_id, @NotNull int movie_id) throws EntityNotFoundException {
         RawSuggestion rawSuggestion = em.find(RawSuggestion.class, new KeyGroupMovie(group_id, movie_id));
         if (rawSuggestion == null) {
@@ -69,18 +56,21 @@ public class SuggestionManager implements SuggestionManagerInterface {
     }
 
     @Override
-    public List<RawSuggestion> removeAllRawSuggestions(@NotNull int group_id) {
-        return null;
+    @Transactional
+    public int removeAllRawSuggestions(@NotNull int group_id) {
+        Query query = em.createQuery("DELETE FROM RawSuggestion s WHERE s.group_id = :group_id");
+        query.setParameter("group_id", group_id);
+
+        return query.executeUpdate();
     }
 
     @Override
     public SuggestionWithCriteria computeSuggestionWithCriteria(@NotNull RawSuggestion rawSuggestion) {
-        // Need Communication with Group-Service and Movie-Service via API
-        // Will be managed with GroupServiceRequester and MovieServiceRequester
-        return null;
+        return SuggestionWithCriteria.fromRawSuggestion(rawSuggestion);
     }
 
     @Override
+    @Transactional
     public SuggestionWithCriteria addSuggestionWithCriteria(@NotNull SuggestionWithCriteria suggestionWithCriteria) throws EntityExistsException, IllegalArgumentException {
         int group_id = suggestionWithCriteria.getGroup_id();
         int movie_id = suggestionWithCriteria.getMovie_id();
@@ -97,20 +87,13 @@ public class SuggestionManager implements SuggestionManagerInterface {
 
     @Override
     public SuggestionWithCriteria fetchSuggestionWithCriteria(@Nullable Integer group_id) {
-        return null;
+        Query query = em.createQuery("SELECT * FROM SuggestionWithCriteria ORDER BY added_at");  // limit 1?
+        return (SuggestionWithCriteria) query.getSingleResult();
     }
 
-    @Override
-    public List<SuggestionWithCriteria> fetchSuggestionsWithCriteria(@Nullable Integer group_id) {
-        return fetchSuggestionsWithCriteria(group_id, defaultQuantity);
-    }
 
     @Override
-    public List<SuggestionWithCriteria> fetchSuggestionsWithCriteria(@Nullable Integer group_id, int quantity) {
-        return null;
-    }
-
-    @Override
+    @Transactional
     public SuggestionWithCriteria removeSuggestionWithCriteria(@NotNull int group_id, @NotNull int movie_id) throws EntityNotFoundException {
         SuggestionWithCriteria suggestionWithCriteria = em.find(SuggestionWithCriteria.class, new KeyGroupMovie(group_id, movie_id));
         if (suggestionWithCriteria == null) {
@@ -121,8 +104,12 @@ public class SuggestionManager implements SuggestionManagerInterface {
     }
 
     @Override
-    public List<SuggestionWithCriteria> removeAllSuggestionsWithCriteria(@NotNull int group_id) {
-        return null;
+    @Transactional
+    public int removeAllSuggestionsWithCriteria(@NotNull int group_id) {
+        Query query = em.createQuery("DELETE FROM SuggestionWithCriteria s WHERE s.group_id = :group_id");
+        query.setParameter("group_id", group_id);
+
+        return query.executeUpdate();
     }
 
     @Override
@@ -131,6 +118,7 @@ public class SuggestionManager implements SuggestionManagerInterface {
     }
 
     @Override
+    @Transactional
     public Proposition addProposition(@NotNull Proposition proposition) throws EntityExistsException, IllegalArgumentException {
         int group_id = proposition.getGroup_id();
         int movie_id = proposition.getMovie_id();
@@ -146,10 +134,18 @@ public class SuggestionManager implements SuggestionManagerInterface {
 
     @Override
     public List<Proposition> getPropositions(@NotNull int group_id) {
-        return null;
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+
+        CriteriaQuery<Proposition> criteria = builder.createQuery(Proposition.class);
+        Root<Proposition> root = criteria.from(Proposition.class);
+        criteria.select(root);
+        criteria.where(builder.equal(root.get("group_id"), group_id));
+
+        return em.createQuery(criteria).getResultList();
     }
 
     @Override
+    @Transactional
     public Proposition removeProposition(@NotNull int group_id, @NotNull int movie_id) throws EntityNotFoundException {
         Proposition proposition = em.find(Proposition.class, new KeyGroupMovie(group_id, movie_id));
         if (proposition == null) {
@@ -160,8 +156,12 @@ public class SuggestionManager implements SuggestionManagerInterface {
     }
 
     @Override
-    public List<Proposition> removeAllPropositions(@NotNull int group_id) {
-        return null;
+    @Transactional
+    public int removeAllPropositions(@NotNull int group_id) {
+        Query query = em.createQuery("DELETE FROM Proposition p WHERE p.group_id = :group_id");
+        query.setParameter("group_id", group_id);
+
+        return query.executeUpdate();
     }
 
     private <T> Boolean checkIfExists(@NotNull Class<T> cls, @NotNull KeyGroupMovie key) {
