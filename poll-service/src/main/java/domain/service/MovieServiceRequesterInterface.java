@@ -1,7 +1,9 @@
 package domain.service;
 
+import domain.model.MovieSuggestionInfo;
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 import java.util.List;
@@ -25,4 +27,7 @@ public interface MovieServiceRequesterInterface {
             @Query("genres_operator") String genres_operator,
             @Query("keywords_operator") String keywords_operator
     );
+
+    @GET("movie-service/suggestion-info/{id}")
+    Call<MovieSuggestionInfo> getSuggestionInfo(@Path("id") int id);
 }
