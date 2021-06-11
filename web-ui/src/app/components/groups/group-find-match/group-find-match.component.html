@@ -1,0 +1,18 @@
+<div class="page-container">
+    <div class="background-box">
+        <div class="blur-box"></div>
+    </div>
+    <div id="match-container">
+        <div class="inline-container">
+            <ng-container *ngIf="movieId != undefined">
+                <app-display-movie [movieId]="movieId"></app-display-movie>
+            </ng-container>
+        </div>
+        <div class="inline-container button-container">
+            <img class="btn btn-lg btn-danger" id="btn-no" src="../../../../assets/buttons/1F922.svg" alt="" width="100" (click)="onNo()">
+            <img class="btn btn-lg btn-secondary" id="btn-maybe" src="../../../../assets/buttons/1F610.svg" alt="" width="100" (click)="onMaybe()">
+            <img class="btn btn-lg btn-success" id="btn-yes" src="../../../../assets/buttons/1F60D.svg" alt="" width="100" (click)="onYes()">
+        </div>
+        <div id="timer" class="mt-2"><h3><span id="timerValue">00:00</span></h3></div>
+    </div>
+</div>

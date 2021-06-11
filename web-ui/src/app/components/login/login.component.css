@@ -1,0 +1,24 @@
+.form-box {
+    position: relative;
+    /* left: 50%;
+    top: 50%; */
+    /* center the div */
+    /* -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%); */
+    padding: 2em;
+    margin: 0 auto;
+    -webkit-transform: translateY(20vh);
+    transform: translateY(20vh);
+    width: 25em;
+    /* border: 1px solid grey; */
+    border-radius: 2em;
+    background-color: whitesmoke;
+    vertical-align: middle;
+    /* shadow */
+    box-shadow: 1px 1px 40px 0px black;
+}
+
+/* background */
+.background-box {
+    background-image: url("../../../assets/background/background-login.jpg");
+}

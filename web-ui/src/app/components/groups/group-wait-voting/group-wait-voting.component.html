@@ -1,0 +1,15 @@
+<div id="page-container">
+    <div class="background-box">
+        <div class="blur-box"></div>
+    </div>
+    <div id="info-container" *ngIf="currentGroup">
+        <h2>Group ID: {{currentGroup.id}}</h2>
+        <h2>Group name: {{currentGroup.name}}</h2>
+        <p class="body-card-text">
+            Waiting for all participants to be ready.
+        </p>
+        <app-display-users-status [currentGroup]="currentGroup"></app-display-users-status>
+        <div *ngIf="isAdmin" type="button" class="btn btn-primary btn-lg btn-block mt-5" id="endVotes" (click)="endVoting()">End votes
+        </div>
+    </div>
+</div>

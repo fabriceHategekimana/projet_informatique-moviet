@@ -1,0 +1,24 @@
+<div id="user-list" class="card">
+    <div class="card-header">
+        <h4>Users</h4>
+    </div>
+    <ul class="list-group list-group-flush" *ngIf="currentGroup !== undefined">
+        <li class="list-group-item list-group-item" *ngFor="let user of users">
+            <!-- <span>
+                            {{user.id}}
+                        </span> -->
+            <div class="user-text-item">
+                <span class="text-username">
+                    {{user.username}}
+                </span>
+                <ng-container *ngIf="user.id == currentGroup.admin_id">
+                    <span class="text-admin">admin</span>
+                </ng-container>
+            </div>
+            <div class="user-status" [style.color]="getStatusTextColor(getUserStatus(user.id))">
+                <div class="user-status-text">{{getStatusText(getUserStatus(user.id))}}</div>
+                <img class="user-status-icon" width="18" [src]="getStatusIconPath(getUserStatus(user.id))" alt="">
+            </div>
+        </li>
+    </ul>
+</div>

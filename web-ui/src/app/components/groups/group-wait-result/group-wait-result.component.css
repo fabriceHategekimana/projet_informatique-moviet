@@ -1,0 +1,26 @@
+#waiting-img {
+    margin: auto;
+    width: 50%;
+    height: auto;
+    max-width: 25em;
+    max-width: 25em;
+    vertical-align: middle;
+    /* prevent selecting */
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+#img-container {
+    display: flex;
+    align-items: center;
+    height: 85vh;
+    text-align: center;
+    margin: auto;
+}
+
+.page-container {
+    overflow: hidden;
+}

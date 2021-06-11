@@ -1,0 +1,18 @@
+#group-choice {
+    position: relative;
+    width: 20em;
+    margin: 0 auto;
+    -webkit-transform: translateY(30vh);
+    transform: translateY(30vh);
+}
+
+/* background */
+.background-box {
+    background-image: url("../../../../assets/background/background-groups.jpg");
+}
+
+#join-container {
+    display: none;
+    /* display: flex; */
+    flex-direction: column;
+}

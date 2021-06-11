@@ -1,0 +1,17 @@
+/* background */
+.background-box {
+    background-image: url("../../../assets/background/background-home.jpg");
+}
+
+.page-container {
+    color: white;
+}
+
+#home-title-container {
+    position: relative;
+    /* margin-top: 18em; */
+    -webkit-transform: translateY(30vh);
+    transform: translateY(30vh);
+    /* -webkit-transform: translateY(-60%);
+    transform: translateY(-60%); */
+}
